@@ -91,4 +91,8 @@ docs/_build/
 # PyBuilder
 target/
 
+# Folder with keys
 fieldkeys/
+
+# Conf file for Django
+*.cnf
