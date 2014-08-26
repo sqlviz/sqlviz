@@ -1,0 +1,64 @@
+{% extends 'website/base.html' %}
+
+
+{% block title %} Chartly Homepage {% endblock %}
+{% load staticfiles %}
+
+{% block main %}
+{% if query_list %}
+    <table id='query_list_table' class="table table-striped dataTable">
+      <thead>
+        <tr>
+          <td> ID </td>
+          <td> Title </td>
+          <td> Type </td>
+          <td> Created </td>
+          <td> Description </td>
+          <td> Owner </td>
+          <td> Target DB </td>
+          <td> Chart </td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for query in query_list %}
+        <tr>
+          <td> {{query.id}} </td> <!-- TODO add url reverse resolver -->
+          <td> <a href="/query/{{query.id}}">{{query.title}} </a></td>
+          <td> Query </td>
+          <td> {{query.create_time}} </td>
+          <td> {{query.description}}  {{query.description_long}}</td>
+          <td> {{query.owner}} </td>
+          <td> {{query.database}} </td>
+          <td> {{query.chart_type}} </td>
+        </tr>        
+        {% endfor %}
+        {% for query in dashboard_list %}
+        <tr>
+          <td> {{query.id}} </td> 
+          <td> <a href="/dashboard/{{query.id}}">{{query.title}} </a></td>
+          <td> Dashboard </td>
+          <td> {{query.create_time}} </td>
+          <td> {{query.description}}  {{query.description_long}}</td>
+          <td> {{query.owner}} </td>
+          <td>  </td>
+          <td>  </td>
+        </tr>        
+        {% endfor %}        
+      </tbody>
+    </table>
+    <script>
+    $(document).ready(function() {
+      $('#query_list_table').dataTable({
+         "bAutoWidth": false,
+         "bScrollCollapse": true,
+          "tableTools": {
+            "sSwfPath": "{% static 'DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls_pdf.swf' %}"
+        }
+      });
+    } );
+    </script>
+{% else %}
+    <p>No Queries are available.</p>
+{% endif %}
+{% endblock %}
+

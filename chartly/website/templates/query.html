@@ -1,0 +1,59 @@
+{% extends 'website/base.html' %}
+{% load staticfiles %}
+
+
+{% block title %} 
+{% if query_list %}
+  {% for query in query_list %}  
+  {{query.title}}
+  {% endfor %}
+{% else %}
+    No Matched Query
+{% endif %}  
+  {% endblock %}
+
+          
+          {% block links %}
+            <li ><a href="/">Home</a></li>
+            <li><a href="">Query Live</a></li>
+            <li><a href="/admin/">Admin</a></li>
+            <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
+          </ul>
+          {% endblock %}
+
+{% block main %}
+<script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
+{% if query_list %}
+  {% for query in query_list %}  
+    <div class='jumbotron' id='div_{{query.id}}'>
+    <h2>{{query.title}}</h2>
+    <table class='table table-striped' id = 'table_{{query.id}}'></table>
+    <div id ='chart_{{query.id}}'></div>
+      <ul>
+        <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
+        <li>Description Short:{{query.description}}</li>
+        <li>Description Long: {{query.description_long}}</li>
+        <li>Query Text:{{query.query_text}}</li>
+        <li>Query Creation: {{query.create_time}}</li>
+        <li>Query Last Modified: {{query.modified_time}}</li>
+        <li>Database: {{query.database}}</li>
+      </ul>
+    </div>
+    <script>
+
+    $.getJSON('/query_api/{{query.id}}', function( json_data ) { //TODO add URL reverse here
+      if ('{{query.hide_table}}' ==  'False') {
+        make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
+      }
+      if ('{{query.chart_type}}' != 'None'){
+        make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title');
+        };      
+      });
+    </script>
+  {% endfor %}
+{% else %}
+    <h3 class='label-danger'>Nothing matches that descriptions.  Are you sure it is there?</h3>
+{% endif %}
+{% endblock %}
+

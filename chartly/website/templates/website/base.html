@@ -1,0 +1,84 @@
+{% load url from future %}
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- TODO <link rel="icon" href="{% templatetag openblock %} static 'img/favicon.ico' {% templatetag closeblock %} ">-->
+
+    <title>{% block title %}(no title){% endblock %}</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Bootstrap core CSS -->
+    <!-- Latest compiled and minified CSS -->
+  
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="{% static 'css/sticky-footer-navbar.css' %}">
+  <script type="text/javascript" src="{% static 'DataTables-1.10.2/media/js/jquery.DataTables.js' %}"></script>
+  <script type="text/javascript" src="{% static 'DataTables-1.10.2/extensions/Tabletools/js/dataTables.tableTools.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'DataTables-1.10.2/media/css/jquery.DataTables.css' %}"/>
+  <link rel="stylesheet" href="{% static 'DataTables-1.10.2/media/css/jquery.DataTables_themeroller.css' %}"/>
+
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Chartly</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+          {% block links %}
+            <li class="active"><a href="">Home</a></li>
+            <li><a href="">Query Live</a></li>
+            <li><a href="/admin/">Admin</a></li>
+            <li><a href="/admin/website/query">Edit</a></li>
+          </ul>
+          {% endblock links %}
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="../navbar/">More Stuff</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="">
+        {% block main %}(no content){% endblock main %}
+      </div>
+      
+    </div> <!-- /container -->
+    <div class="footer">
+        <div class="container">
+        <p class="text-muted">Copyright 2014 Matthew Feldman</p>
+        </div>
+      </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+  </body>
+</html>

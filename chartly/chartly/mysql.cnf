@@ -1,0 +1,8 @@
+# my.cnf
+[client]
+host = localhost
+port = 3306
+name = django
+user = django
+password = django
+default-character-set = utf8
