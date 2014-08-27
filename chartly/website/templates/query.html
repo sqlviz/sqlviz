@@ -24,6 +24,12 @@
 {% block main %}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'datepicker/js/bootstrap-datepicker.js' %}"></script>
+<link rel="stylesheet" href="{% static 'datepicker/css/datepicker.css' %}"/>
+<!--<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>-->
+
+
 {% if query_list %}
   {% for query in query_list %}  
     <div class='jumbotron' id='div_{{query.id}}'>
@@ -42,7 +48,7 @@
     </div>
     <script>
 
-    $.getJSON('/query_api/{{query.id}}', function( json_data ) { //TODO add URL reverse here
+    $.getJSON('/query_api/{{query.id}}', {json_get}, function( json_data ) { //TODO add URL reverse here
       if ('{{query.hide_table}}' ==  'False') {
         make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
       }
@@ -55,5 +61,40 @@
 {% else %}
     <h3 class='label-danger'>Nothing matches that descriptions.  Are you sure it is there?</h3>
 {% endif %}
+{% if replacement_dict %}
+<div class='jumbotron'>
+  <form action = '#'>
+  {% for key, default_dict in replacement_dict.items %}
+    {%if default_dict.data_type = 'Date' %}
+    <h3>Rerun with Parameters </h3>
+      {# DATEPICKER #}
+            <p> {{default_dict.search_for}} 
+            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}">
+            </p>
+      <script>
+        $(function(){
+          $('#selector_{{default_dict.search_for}}').datepicker({
+            format: 'yyyy-mm-dd'
+          });
+        });
+      </script>
+    {% elif default_dict.data_type == 'Numeric' %}
+      {# NUMERIC #}
+      <p> {{default_dict.search_for}}
+        <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"></p>
+    {% else %}
+      {# STRING #}
+        <p> {{default_dict.search_for}}
+          <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}">
+        </p>
+    {% endif %}
+
+  {% endfor %}
+  <button class='btn btn-primary'>Run with Parameters</button>
+    </form>
+  </div>
+{% else %}
+ No Defaults Found
+ {% endif %}
 {% endblock %}
 

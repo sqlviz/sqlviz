@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render, render_to_response
 from django.utils import timezone
 from django.views import generic
-from models import Query, DashboardQuery, Dashboard
+from models import Query, DashboardQuery, Dashboard, QueryDefault
 import json
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
@@ -22,7 +22,7 @@ def index(request):
 
 def query_api(request, query_id):
     startTime = time.time()
-    DM = DataManager(query_id)
+    DM = DataManager(query_id, request)
     DM.prepareQuery()
     response_data = DM.runQuery()
     time_elapsed = time.time()-startTime
@@ -33,20 +33,30 @@ def query_api(request, query_id):
                     "error" : False}
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
-
 def query(request, query_ids):
+    # TODO display in the order that they come in!!!
     query_id_array = query_ids.split(',')
     query_list = Query.objects.filter(id__in = query_id_array)
-    return render_to_response('query.html', {'query_list': query_list})
+    replacement_dict = {}
+    json_get = {}
+    for query in query_list:
+        DM = DataManager(query.id, request)
+        DM.prepareQuery()
+        query.query_text = DM.query_text
+        for k,v in DM.replacement_dict.iteritems():
+            replacement_dict[k] = v # This dict has target, replacement, and data_type
+            json_get[v.search_for] = v.replace_with
+    #logging.warning(request.get)
+    return render_to_response('query.html', {'query_list': query_list, 'replacement_dict' : replacement_dict, json_get = json.dumps(json_get)})
 
 def dashboard(request, dashboard_id):
+    # First find all the queries, then run it as a list of queries
     dashboard_query_list = DashboardQuery.objects.filter(dashboard_id = dashboard_id).order_by('order')
-    logging.warning(dashboard_query_list)
     query_id_array = []
     for q in dashboard_query_list:
-        query_id_array.append(q.query_id)
-    query_list = Query.objects.filter(id__in = query_id_array)
-    return render_to_response('query.html', {'query_list': query_list})
+        query_id_array.append(str(q.query_id))
+    query_list_string  = ','.join(query_id_array)
+    return query(request, query_list_string)
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
