@@ -5,9 +5,10 @@ import pandas
 logger = logging.getLogger(__name__)
 
 class DataManager:
-    def __init__(self, query_id = None):
+    def __init__(self, query_id = None, request = None):
         self.query_id = query_id
         self.query_text = None
+        self.request = request
     def setQuery(self, query_text):
         self.query_text = query_text
 
@@ -19,11 +20,17 @@ class DataManager:
         self.db = Db.objects.filter(id = q.database_id)[0]
         self.pivot_data = q.pivot_data
         # Replace with defaults
-        #self.defaultUpdate() TODO make this work
+
+        logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
+        self.defaultFind() 
+        logging.error('QUERY IS NOW AFTER DEFUALTS: %s' % (self.query_text))
+        # Set default Values
+        self.defaultSet()
+        logging.error('QUERY IS NOW AFTER UPDATES: %s' % (self.query_text))
         # Attach Limits
         if q.insert_limit == True:
             self.addLimits()
-        # Run safety/sanity check
+        # Run safety/sanity check for deletes/updates/...
         self.checkSafety()
         logging.info('QUERY IS NOW : %s' % (self.query_text))
 
@@ -58,6 +65,7 @@ class DataManager:
                     username = self.db.username, password =self.db.password_encrpyed)
         data = pandas.io.sql.read_sql(self.query_text,con)
         self.data = data
+
     def runHiveQuery(self):
         # TODO write this
         con = MySQLdb.connect(host = self.db.host, port = self.db.port, 
@@ -69,13 +77,20 @@ class DataManager:
         # Check for dangerous database things
         stop_words = ['insert','delete','drop','truncate','alter','grant']
         for word in stop_words:
-            logger.error("WAHOO; %s \n %s" % (word, self.query_text))
+            #logger.error("WAHOO; %s \n %s" % (word, self.query_text))
             if re.match(self.query_text, word) != None:
                 raise IllegalCondition
+        # TODO check for major ass subselects, dumbass joins and other dumb-ass shit like that!
 
     def addLimits(self):
+        # Adds limit 1000 to the end of the query
         # TODO check that limits are already not there
-        self.query_text += " limit 1000"
+        if len(re.findall('limit(\s)*(\d)*(\s)*(;)(\s)*?$', self.query_text)) == 0:
+            # check for semicolon
+            if len(re.findall('[;](\s)*$', self.query_text)) == 0: # No Semicolon
+                self.query_text += " limit 1000;"
+            else: #semicolon
+                self.query_text = re.sub('[;](\s)*$','', self.query_text) + 'limit 1000;'
 
     def pivot(self):
         # use pandas TODO to make the pivot
@@ -121,19 +136,29 @@ class DataManager:
             new_data.append(temp_row)
         self.data = new_data
 
-    def defaultUpdate(self):
-        #TODO MAKE THIS WORK
+    def defaultFind(self):
+        # Find default values, compare with those in request, and update those defaults
+        # that are over-riden by client values
         # Get values from DB
         value_objects = QueryDefault.objects.filter(query_id = self.query_id)
-        for key in value_objects:
-            target_value = self.request.get(i.search_for, i.replace_with)
-            if value_objects[key].type=="Numeric":
-                target_value = float(target_value)
-            elif value_objects[key].type == "String":
-                target_value = str(target_value) #Perhaps check for no SQL injections
-            elif value_objects[key].type == "Date":
-                # Regexes to YYYY-MM-DD
-                pass
+        self.replacement_dict = {}
+        for value_object in value_objects:
+            # Compare with those from client request
+            self.replacement_dict[value_object.search_for] = {'data_type' : value_object.data_type,
+                                                   'search_for' : value_object.search_for,
+                                                   'replace_with' : self.request.GET.get(value_object.search_for, value_object.replace_with_cleaned())}
+        return self.replacement_dict
+        """# Ensure Data Types are appropriate ?
+        if value_objects[key].type == "Numeric":
+            target_value = float(target_value)
+        elif value_objects[key].type == "String":
+            target_value = str(target_value) #TODO check that there are no SQL injections here!
+        elif value_objects[key].type == "Date":
+            target_value = target_value # Regexes to YYYY-MM-DD"""
 
-            # Replace key with target_value
-            self.query_text.replace(key, target_value)
+    def defaultSet(self):
+        # For values in the replacement dict, update the self.query_text
+        # Replace key with target_value
+        for key, replacement_dict in self.replacement_dict.iteritems():
+            self.query_text = self.query_text.replace(replacement_dict['search_for'], str(replacement_dict['replace_with']))
+        #raise ValueError('go fuck yourself')

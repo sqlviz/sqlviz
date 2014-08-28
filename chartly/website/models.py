@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from encrypted_fields import EncryptedCharField
 from django.core.exceptions import ValidationError
 import re
-
+import time
 #import MySQLdb
 
 class Db(models.Model):
@@ -22,6 +22,7 @@ class Db(models.Model):
     password_encrpyed = EncryptedCharField(max_length=1024)
     def __str__(self):
         return self.name_short
+
 class Query(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')
     description = models.TextField(max_length = 200)
@@ -59,12 +60,24 @@ class QueryChart(models.Model):
 class QueryDefault(models.Model):
     query = models.ForeignKey(Query)
     search_for = models.CharField(max_length=128)
-    replace_with = models.CharField(max_length=1024)
+    replace_with = models.CharField(max_length=1024, help_text ='For todays date set replace with = today and data_type = Date')
     data_type = models.CharField(max_length=10,
                                   choices=(('Numeric','Numeric'),('String','String'),('Date','Date')),
                                   default='String')
     def __str__(self):
         return "%s : %s " % (self.query, self.search_for[0:10])
+
+    def replace_with_cleaned(self):
+        if self.data_type == "Date" and self.replace_with.lower() == 'today':
+            return time.strftime("%Y-%m-%d") 
+        else:
+            return self.replace_with
+
+    def clean(self):
+        def valid_date(datestring):
+            pass
+            ## TODO CHECK
+        return True
 
 class Dashboard(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')
