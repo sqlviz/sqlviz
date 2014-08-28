@@ -20,9 +20,13 @@ class DataManager:
         self.db = Db.objects.filter(id = q.database_id)[0]
         self.pivot_data = q.pivot_data
         # Replace with defaults
+
+        logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
         self.defaultFind() 
+        logging.error('QUERY IS NOW AFTER DEFUALTS: %s' % (self.query_text))
         # Set default Values
         self.defaultSet()
+        logging.error('QUERY IS NOW AFTER UPDATES: %s' % (self.query_text))
         # Attach Limits
         if q.insert_limit == True:
             self.addLimits()
@@ -73,7 +77,7 @@ class DataManager:
         # Check for dangerous database things
         stop_words = ['insert','delete','drop','truncate','alter','grant']
         for word in stop_words:
-            logger.error("WAHOO; %s \n %s" % (word, self.query_text))
+            #logger.error("WAHOO; %s \n %s" % (word, self.query_text))
             if re.match(self.query_text, word) != None:
                 raise IllegalCondition
         # TODO check for major ass subselects, dumbass joins and other dumb-ass shit like that!
@@ -142,7 +146,7 @@ class DataManager:
             # Compare with those from client request
             self.replacement_dict[value_object.search_for] = {'data_type' : value_object.data_type,
                                                    'search_for' : value_object.search_for,
-                                                   'replace_with' : self.request.GET.get(value_object.search_for, value_object.replace_with_cleaned)}
+                                                   'replace_with' : self.request.GET.get(value_object.search_for, value_object.replace_with_cleaned())}
         return self.replacement_dict
         """# Ensure Data Types are appropriate ?
         if value_objects[key].type == "Numeric":
@@ -156,4 +160,5 @@ class DataManager:
         # For values in the replacement dict, update the self.query_text
         # Replace key with target_value
         for key, replacement_dict in self.replacement_dict.iteritems():
-            self.query_text.replace(key, str(replacement_dict['replace_with']))
+            self.query_text = self.query_text.replace(replacement_dict['search_for'], str(replacement_dict['replace_with']))
+        #raise ValueError('go fuck yourself')

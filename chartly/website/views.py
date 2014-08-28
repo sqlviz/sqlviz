@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render, render_to_response
 from django.utils import timezone
 from django.views import generic
+from django.template import RequestContext
 from models import Query, DashboardQuery, Dashboard, QueryDefault
 import json
 from django.utils.functional import Promise
@@ -45,9 +46,24 @@ def query(request, query_ids):
         query.query_text = DM.query_text
         for k,v in DM.replacement_dict.iteritems():
             replacement_dict[k] = v # This dict has target, replacement, and data_type
-            json_get[v.search_for] = v.replace_with
+            json_get[v['search_for']] = v['replace_with']
     #logging.warning(request.get)
-    return render_to_response('query.html', {'query_list': query_list, 'replacement_dict' : replacement_dict, json_get = json.dumps(json_get)})
+    return render_to_response('query.html', 
+                {
+                    'query_list': query_list,
+                    'replacement_dict' : replacement_dict,
+                    'json_get' : json.dumps(json_get)
+                },
+                context_instance=RequestContext(request))
+    
+def query_name(request, query_names):
+    query_name_array = query_names.split(',')
+    query_list = Query.objects.filter(title__in = query_name_array)
+    query_id_array = []
+    for q in query_list:
+        query_id_array.append(str(q.id))
+    query_list_string  = ','.join(query_id_array)
+    return query(request, query_list_string)
 
 def dashboard(request, dashboard_id):
     # First find all the queries, then run it as a list of queries

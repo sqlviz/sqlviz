@@ -48,7 +48,7 @@
     </div>
     <script>
 
-    $.getJSON('/query_api/{{query.id}}', {json_get}, function( json_data ) { //TODO add URL reverse here
+    $.getJSON('/query_api/{{query.id}}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
       if ('{{query.hide_table}}' ==  'False') {
         make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
       }
@@ -63,13 +63,15 @@
 {% endif %}
 {% if replacement_dict %}
 <div class='jumbotron'>
-  <form action = '#'>
+  <form action ='{{request.path}}' method='GET'>
   {% for key, default_dict in replacement_dict.items %}
     {%if default_dict.data_type = 'Date' %}
     <h3>Rerun with Parameters </h3>
       {# DATEPICKER #}
             <p> {{default_dict.search_for}} 
-            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}">
+            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
+            name = "{{default_dict.search_for}}"
+            >
             </p>
       <script>
         $(function(){
@@ -81,16 +83,16 @@
     {% elif default_dict.data_type == 'Numeric' %}
       {# NUMERIC #}
       <p> {{default_dict.search_for}}
-        <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"></p>
+        <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}"></p>
     {% else %}
       {# STRING #}
         <p> {{default_dict.search_for}}
-          <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}">
+          <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
         </p>
     {% endif %}
 
   {% endfor %}
-  <button class='btn btn-primary'>Run with Parameters</button>
+    <input type="submit" class='btn btn-primary' value="Submit"/>
     </form>
   </div>
 {% else %}
