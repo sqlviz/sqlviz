@@ -7,6 +7,11 @@ from models import *
 class QueryDefaultAdmin(admin.TabularInline):
     model = QueryDefault
 
+class QueryPrecedentAdmin(admin.TabularInline):
+    model = QueryPrecedent    
+    fk_name = "final_query"
+
+
 class QueryAdminForm(forms.ModelForm):
     class Meta:
         model = Query
@@ -15,7 +20,7 @@ class QueryAdminForm(forms.ModelForm):
 
 class QueryAdmin(admin.ModelAdmin):
     form = QueryAdminForm
-    inlines = [QueryDefaultAdmin]
+    inlines = [QueryDefaultAdmin, QueryPrecedentAdmin]
 
 class DbAdminForm(forms.ModelForm):
     class Meta:

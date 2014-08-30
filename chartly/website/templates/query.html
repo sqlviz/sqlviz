@@ -53,7 +53,7 @@
         make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
       }
       if ('{{query.chart_type}}' != 'None'){
-        make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title');
+        make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}');
         };      
       });
     </script>

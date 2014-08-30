@@ -34,6 +34,7 @@ class Query(models.Model):
     hide_index = models.BooleanField(default=False, help_text = 'Hide from Main Search')
     hide_table = models.BooleanField(default=False, help_text = 'Supress Data output in display')
     pivot_data = models.BooleanField(default=False,  help_text = 'Pivot data around first/second columns.  Nulls filled with 0')
+    log_scale_y = models.BooleanField(default=False,  help_text = 'Log scale Y axis')
     chart_type = models.CharField(max_length=10,
                                       choices=(('None','None'),('line','line'),('bar','bar'),('column','column'),('area','area')),
                                       default='None')
@@ -42,7 +43,7 @@ class Query(models.Model):
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
 
     def __str__(self):
-        return self.title
+        return "%s: %s" % (self.id, self.title)
     def clean(self):
         # dont allow queries to contain blacklist words
         blacklist = ['delete','insert','update','alter','drop']
@@ -78,6 +79,10 @@ class QueryDefault(models.Model):
             pass
             ## TODO CHECK
         return True
+
+class QueryPrecedent(models.Model):
+    final_query = models.ForeignKey(Query)
+    preceding_query = models.ForeignKey(Query, related_name = "+")
 
 class Dashboard(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')

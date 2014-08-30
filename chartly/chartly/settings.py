@@ -109,11 +109,15 @@ DATABASES = {
         'PASSWORD' : 'django',
         'HOST' : '127.0.0.1',
         'PORT' : 3306
-        #'OPTIONS': {
-
-            #'read_default_file': BASE_DIR + '/mysql.cnf',
-        #},
-    }
+    },
+    'write_to': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME' : 'test',
+        'USER' : 'django',
+        'PASSWORD' : 'django',
+        'HOST' : '127.0.0.1',
+        'PORT' : 3306
+    },
 }
 
 

@@ -1,32 +1,39 @@
 from models import *
 import logging
 import MySQLdb
-import pandas
+from pandas import *
+import uuid
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
+MAX_DEPTH_RECURSION = 10
 
 class DataManager:
-    def __init__(self, query_id = None, request = None):
+    def __init__(self, query_id = None, request = None, depth = 0):
         self.query_id = query_id
         self.query_text = None
         self.request = request
+        self.depth = depth
+        if depth > MAX_DEPTH_RECURSION:
+            raise IOError("Recursion Limit Reached")
     def setQuery(self, query_text):
         self.query_text = query_text
 
     def prepareQuery(self):
         # Get Query From Database
         q = Query.objects.filter(id = self.query_id)[0]
-        # SEt up query and DB
+        # Set up query and DB
         self.query_text = q.query_text
         self.db = Db.objects.filter(id = q.database_id)[0]
         self.pivot_data = q.pivot_data
         # Replace with defaults
 
-        logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
+        #logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
         self.defaultFind() 
-        logging.error('QUERY IS NOW AFTER DEFUALTS: %s' % (self.query_text))
+        #logging.error('QUERY IS NOW AFTER DEFUALTS: %s' % (self.query_text))
         # Set default Values
         self.defaultSet()
-        logging.error('QUERY IS NOW AFTER UPDATES: %s' % (self.query_text))
+        #logging.error('QUERY IS NOW AFTER UPDATES: %s' % (self.query_text))
         # Attach Limits
         if q.insert_limit == True:
             self.addLimits()
@@ -49,7 +56,16 @@ class DataManager:
         self.pandasToArray()
         self.numericalizeData()
 
-        return self.data
+        return self.data_array
+    def setPrecedents(self):
+        # Will find precents for the particular query ID and run them, saving output
+        # to the local DB
+        QP = QueryPrecents.objects.filter(final_query_id = self.query_id)
+        for i in QP: # TODO could be parralelized???
+            DM = DataManager(QP.preding_query_id, request, self.depth + 1)
+            DM.prepareQuery()
+            DM.runQuery()
+            DM.saveToSQLTable()
 
     def runMySQLQuery(self):
         #TODO optimize
@@ -58,13 +74,16 @@ class DataManager:
                 db = self.db.db)
         data = pandas.io.sql.read_sql(self.query_text,con)
         self.data = data
+        self.data_pandas = data
+        con.close()
 
     def runPostgresQuery(self):
         # TODO write this
-        con = MySQLdb.connect(host = self.db.host, port = self.db.port, 
+        con = psycopg2.connect(host = self.db.host, port = self.db.port, 
                     username = self.db.username, password =self.db.password_encrpyed)
         data = pandas.io.sql.read_sql(self.query_text,con)
         self.data = data
+        con.close()
 
     def runHiveQuery(self):
         # TODO write this
@@ -72,7 +91,8 @@ class DataManager:
                     username = self.db.username, password =self.db.password_encrpyed)
         data = pandas.io.sql.read_sql(self.query_text,con)
         self.data = data
-    
+        con.close()
+
     def checkSafety(self):
         # Check for dangerous database things
         stop_words = ['insert','delete','drop','truncate','alter','grant']
@@ -117,12 +137,25 @@ class DataManager:
             for v in row[1]:
                 temp_row.append(v)
             data_output.append(temp_row)
-        self.data = data_output
+        self.data_array = data_output
+
+    def saveToSQLTable(self, table_name = None):
+        if table_name == None:
+            table_name = 'table_%s' % self.query_id
+        db = settings.DATABASES['write_to']
+        logging.warning(db)
+        con = MySQLdb.connect(host = db['HOST'], port = db['PORT'], 
+                    user = db['USER'], passwd = db['PASSWORD'], db = db['NAME'])
+        #data_to_write = self.data_pandas
+        #data_type = type(data_to_write)
+        #
+        self.data_pandas.to_sql(table_name, con, flavor='mysql', if_exists='replace')
+        con.close() 
 
     def numericalizeData(self):
         # Checks for numbers encoded as strings due to bad database encoding
         new_data = []
-        for row in self.data:
+        for row in self.data_array:
             temp_row = []
             for value in row:
                 try:
@@ -134,7 +167,7 @@ class DataManager:
                         pass
                 temp_row.append(value)
             new_data.append(temp_row)
-        self.data = new_data
+        self.data_array = new_data
 
     def defaultFind(self):
         # Find default values, compare with those in request, and update those defaults

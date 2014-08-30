@@ -21,7 +21,7 @@ function make_table(columns, data, target){
     });      
 };
 
-function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis){
+function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis, yAxis_log){
   options = {
         chart: {
           type : graph_type,
@@ -84,6 +84,10 @@ function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yA
     }
     if (options.xAxis.categories.length > 14){
       options.xAxis.labels = {'step' :Math.max(Math.round(options.xAxis.categories.length / 7),1)}
+    }
+    if (yAxis_log == 'True'){
+      options.yAxis.type = 'logarithmic'
+
     }
     var chart = new Highcharts.Chart(options);
 }

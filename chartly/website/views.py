@@ -26,6 +26,7 @@ def query_api(request, query_id):
     DM = DataManager(query_id, request)
     DM.prepareQuery()
     response_data = DM.runQuery()
+    DM.saveToSQLTable()
     time_elapsed = time.time()-startTime
     return_data = {
                     "data":
