@@ -24,12 +24,12 @@
 {% block main %}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
-<script type="text/javascript" src="{% static 'datepicker/js/bootstrap-datepicker.js' %}"></script>
-<link rel="stylesheet" href="{% static 'datepicker/css/datepicker.css' %}"/>
-<!--<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
-<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>-->
-
-
+<!--<script type="text/javascript" src="{% static 'datepicker/js/bootstrap-datepicker.js' %}"></script>
+<link rel="stylesheet" href="{% static 'datepicker/css/datepicker.css' %}"/>-->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<div id='sortable'>
 {% if query_list %}
   {% for query in query_list %}  
     <div class='jumbotron' id='div_{{query.id}}'>
@@ -49,6 +49,8 @@
     <script>
 
     $.getJSON('/query_api/{{query.id}}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
+      console.log(json_data);
+      console.log('chart_{{query.id}}');
       if ('{{query.hide_table}}' ==  'False') {
         make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
       }
@@ -57,10 +59,29 @@
         };      
       });
     </script>
+      <!--<script>
+  $(function() {
+    $( "#div_{{query.id}}" ).draggable();
+  });
+  </script>-->
   {% endfor %}
 {% else %}
     <h3 class='label-danger'>Nothing matches that descriptions.  Are you sure it is there?</h3>
 {% endif %}
+</div>
+ <!--<script>
+  $(function() {
+    $( "#sortable" ).sortable();
+    $( "#sortable" ).disableSelection();
+  });
+  </script>-->
+ <!--<script>
+  $(function() {
+    $( "#accordion" ).accordion({
+      heightStyle: "content"
+    });
+  });
+  </script>-->
 {% if replacement_dict %}
 <div class='jumbotron'>
   <form action ='{{request.path}}' method='GET'>
@@ -75,9 +96,7 @@
             </p>
       <script>
         $(function(){
-          $('#selector_{{default_dict.search_for}}').datepicker({
-            format: 'yyyy-mm-dd'
-          });
+          $('#selector_{{default_dict.search_for}}').datepicker({ dateFormat: 'yy-mm-dd' });
         });
       </script>
     {% elif default_dict.data_type == 'Numeric' %}
@@ -95,6 +114,7 @@
     <input type="submit" class='btn btn-primary' value="Submit"/>
     </form>
   </div>
+
 {% else %}
  No Defaults Found
  {% endif %}
