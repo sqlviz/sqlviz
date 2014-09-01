@@ -1,5 +1,4 @@
 function make_table(columns, data, target){
-    console.log('target 1:' + target);
     html  ='<thead><tr>';
     $.each( columns, function( key, val ) {
       html += "<td>" + val  +"</td>";
@@ -14,11 +13,7 @@ function make_table(columns, data, target){
     });
     html += "</tbody>"
     $(target).html(html);
-    console.log('target 2:' + target);
-
     $(document).ready(function() {
-      console.log('target 3:' + target);
-
       $(target).dataTable({
         "bAutoWidth": false,
         "bScrollCollapse": true,
@@ -27,7 +22,6 @@ function make_table(columns, data, target){
 };
 
 function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis, yAxis_log){
-  console.log('target:' + target);
   options = {
         chart: {
           type : graph_type,

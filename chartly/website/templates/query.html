@@ -24,19 +24,18 @@
 {% block main %}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
-<!--<script type="text/javascript" src="{% static 'datepicker/js/bootstrap-datepicker.js' %}"></script>
-<link rel="stylesheet" href="{% static 'datepicker/css/datepicker.css' %}"/>-->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 <div id='sortable'>
 {% if query_list %}
   {% for query in query_list %}  
     <div class='jumbotron' id='div_{{query.id}}'>
     <h2>{{query.title}}</h2>
+    <div class='hide_{{query.id}}'>
     <table class='table table-striped' id = 'table_{{query.id}}'></table>
+    </div>
     <div id ='chart_{{query.id}}'></div>
-      <ul>
+      <ul class='hide_{{query.id}}'>
         <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
         <li>Description Short:{{query.description}}</li>
         <li>Description Long: {{query.description_long}}</li>
@@ -45,6 +44,20 @@
         <li>Query Last Modified: {{query.modified_time}}</li>
         <li>Database: {{query.database}}</li>
       </ul>
+      </br>
+      <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">Hide</button>
+      <script>
+      $(document).ready(function() {
+        $('#toggle_{{query.id}}').click(function() {
+        $(".hide_{{query.id}}").toggleClass("hide");
+        if ($.trim($(this).text()) === 'Hide') {
+          $(this).text('Show');
+        } else {
+          $(this).text('Hide');        
+        }
+    });
+});
+      </script>
     </div>
     <script>
 
@@ -69,12 +82,12 @@
     <h3 class='label-danger'>Nothing matches that descriptions.  Are you sure it is there?</h3>
 {% endif %}
 </div>
- <!--<script>
+ <script>
   $(function() {
     $( "#sortable" ).sortable();
     $( "#sortable" ).disableSelection();
   });
-  </script>-->
+  </script>
  <!--<script>
   $(function() {
     $( "#accordion" ).accordion({
