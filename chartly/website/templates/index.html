@@ -17,6 +17,7 @@
           <td> Owner </td>
           <td> Target DB </td>
           <td> Chart </td>
+          <td> Tags </td>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +31,9 @@
           <td> {{query.owner}} </td>
           <td> {{query.database}} </td>
           <td> {{query.chart_type}} </td>
+          <td>  {{ query.tags.names|join:", " }}
+
+          </td>
         </tr>        
         {% endfor %}
         {% for query in dashboard_list %}
@@ -42,6 +46,10 @@
           <td> {{query.owner}} </td>
           <td>  </td>
           <td>  </td>
+
+          <td>  {{ query.tags.names|join:", " |truncatechars_html:4 }}
+
+          </td>
         </tr>        
         {% endfor %}        
       </tbody>

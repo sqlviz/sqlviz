@@ -1,9 +1,8 @@
 Django==1.6.5
-bpython==0.13
-django-braces==1.4.0
-django-model-utils==2.0.3
 logutils==0.3.3
 South==0.8.4
 django-encrypted-fields==1.1.1
 MySQLdb==1.2.2
 django_ace==1.0.1
+pscopg2
+pandas

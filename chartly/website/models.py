@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from encrypted_fields import EncryptedCharField
 from django.core.exceptions import ValidationError
+from taggit.managers import TaggableManager
 import re
 import time
 #import MySQLdb
@@ -41,6 +42,7 @@ class Query(models.Model):
     stacked = models.BooleanField(default=False, help_text = 'Stack graph Type')
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
+    tags = TaggableManager(blank=True)
 
     def __str__(self):
         return "%s: %s" % (self.id, self.title)
@@ -90,8 +92,9 @@ class Dashboard(models.Model):
     description_long = models.TextField(max_length=  1024)
     owner = models.ForeignKey(User)
     hide_index = models.BooleanField(default=False, help_text = 'Hide from Main Search')
-    create_time = models.DateField(auto_now_add = True, editable = False)
-    modified_time = models.DateField(auto_now = True, editable =  False)
+    create_time = models.DateTimeField(auto_now_add = True, editable = False)
+    modified_time = models.DateTimeField(auto_now = True, editable =  False)
+    tags = TaggableManager(blank=True)
 
     def __str__(self):
         return self.title

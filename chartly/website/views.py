@@ -14,6 +14,7 @@ from query import DataManager
 import time
 import datetime
 import logging
+import sys
 logger = logging.getLogger(__name__)
 
 def index(request):
@@ -22,17 +23,24 @@ def index(request):
     return render_to_response('index.html', {'query_list': query_list, 'dashboard_list' : dashboard_list})
 
 def query_api(request, query_id):
-    startTime = time.time()
-    DM = DataManager(query_id, request)
-    DM.prepareQuery()
-    response_data = DM.runQuery()
-    DM.saveToSQLTable()
-    time_elapsed = time.time()-startTime
-    return_data = {
-                    "data":
-                        {"columns" : response_data.pop(0), "data" : response_data},
-                    "time_elapsed" : time_elapsed,
-                    "error" : False}
+    try:
+        startTime = time.time()
+        DM = DataManager(query_id, request)
+        DM.prepareQuery()
+        response_data = DM.runQuery()
+        DM.saveToSQLTable()
+        time_elapsed = time.time()-startTime
+        return_data = {
+                        "data":
+                            {"columns" : response_data.pop(0), "data" : response_data},
+                        "time_elapsed" : time_elapsed,
+                        "error" : False}
+    except:
+            return_data = {
+                            "data": str(sys.exc_info()),
+                            "time_elapsed" : 0,
+                            "error" : True,
+                        }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
 def query(request, query_ids):

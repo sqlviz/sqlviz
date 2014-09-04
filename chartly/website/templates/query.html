@@ -25,14 +25,47 @@
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<style>
+/*flash*/
+.alert-error {
+    background-color: #f2dede;
+    border-color: #eed3d7;
+    color: #b94a48;
+    text-align: left;
+ }
+
+.alert-alert {
+    background-color: #f2dede;
+    border-color: #eed3d7;
+    color: #b94a48;
+    text-align: left;
+ }
+
+.alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #468847;
+    text-align: left;
+ }
+
+.alert-notice {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #468847;
+    text-align: left;
+ }
+ </style>
 <div id='sortable'>
 {% if query_list %}
-  {% for query in query_list %}  
+  {% for query in query_list %}    
+
     <div class='jumbotron' id='div_{{query.id}}'>
     <h2>{{query.title}}</h2>
     <div class='hide_{{query.id}}'>
     <table class='table table-striped' id = 'table_{{query.id}}'></table>
+    <div id="waiting_{{query.id}}">Waiting for Query to Load</div>
+    <div id="error_{{query.id}}" class = "alert alert-error alert-block"></div>
     </div>
     <div id ='chart_{{query.id}}'></div>
       <ul class='hide_{{query.id}}'>
@@ -64,13 +97,19 @@
     $.getJSON('/query_api/{{query.id}}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
       console.log(json_data);
       console.log('chart_{{query.id}}');
-      if ('{{query.hide_table}}' ==  'False') {
-        make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
+      $( "#waiting_{{query.id}}" ).empty();
+      if (json_data.error == false){
+        if ('{{query.hide_table}}' ==  'False') {
+          make_table(json_data.data.columns, json_data.data.data, '#table_{{query.id}}');  
+        }
+        if ('{{query.chart_type}}' != 'None'){
+          make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}');
+          };          
+      } else {
+        $( "#error_{{query.id}}" ).text(json_data.data)
       }
-      if ('{{query.chart_type}}' != 'None'){
-        make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}');
-        };      
-      });
+
+    });
     </script>
       <!--<script>
   $(function() {
