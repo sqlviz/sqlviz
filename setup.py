@@ -27,5 +27,5 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Scientific/Engineering :: Information Analysis'
     ],
-    install_requires=["Django==1.7","logutils","South","django-encrypted-fields","MySQL-python","django_ace","psycopg2","pandas "]
+    install_requires=["Django==1.7","logutils","South","django-encrypted-fields","MySQL-python","django_ace","psycopg2","pandas","uWSGI"]
 )
