@@ -12,28 +12,27 @@
     <!-- TODO <link rel="icon" href="{% templatetag openblock %} static 'img/favicon.ico' {% templatetag closeblock %} ">-->
 
     <title>{% block title %}(no title){% endblock %}</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Bootstrap core CSS -->
     <!-- Latest compiled and minified CSS -->
-  
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
-  <link rel="stylesheet" href="{% static 'css/sticky-footer-navbar.css' %}">
-  <script type="text/javascript" src="{% static 'DataTables-1.10.2/media/js/jquery.DataTables.js' %}"></script>
-  <script type="text/javascript" src="{% static 'DataTables-1.10.2/extensions/Tabletools/js/dataTables.tableTools.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'DataTables-1.10.2/media/css/jquery.DataTables.css' %}"/>
-  <link rel="stylesheet" href="{% static 'DataTables-1.10.2/media/css/jquery.DataTables_themeroller.css' %}"/>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="{% static 'css/sticky-footer-navbar.css' %}">
+    <script type="text/javascript" src="{% static 'DataTables-1.10.2/media/js/jquery.DataTables.js' %}"></script>
+    <script type="text/javascript" src="{% static 'DataTables-1.10.2/extensions/Tabletools/js/dataTables.tableTools.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'DataTables-1.10.2/media/css/jquery.DataTables.css' %}"/>
+    <link rel="stylesheet" href="{% static 'DataTables-1.10.2/media/css/jquery.DataTables_themeroller.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/warning_box.css' %}">
 
   </head>
-
   <body>
-
     <!-- Static navbar -->
     <div class="navbar navbar-default navbar-static-top" role="navigation">
       <div class="container">
@@ -53,6 +52,7 @@
             <li><a href="">Query Live</a></li>
             <li><a href="/admin/">Admin</a></li>
             <li><a href="/admin/website/query">Edit</a></li>
+            <li><a href="/website/query_interactive/">Interactive Mode</a></li>
           </ul>
           {% endblock links %}
           <ul class="nav navbar-nav navbar-right">

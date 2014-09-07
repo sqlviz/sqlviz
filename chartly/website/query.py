@@ -1,7 +1,7 @@
-from models import *
+import models
 import logging
 import MySQLdb
-from pandas import *
+import pandas as pd
 import uuid
 from django.conf import settings
 
@@ -18,15 +18,21 @@ class DataManager:
             raise IOError("Recursion Limit Reached")
     def setQuery(self, query_text):
         self.query_text = query_text
+        self.checkSafety()
+
+    def setDB(self, db):
+        self.db = models.Db.objects.filter(id = db)[0]
+
+    def setPivot(self, pivot):
+        self.pivot_data = pivot
 
     def prepareQuery(self):
         # Get Query From Database
-        q = Query.objects.filter(id = self.query_id)[0]
-        # Set up query and DB
-        self.query_text = q.query_text
-        self.db = Db.objects.filter(id = q.database_id)[0]
-        self.pivot_data = q.pivot_data
-        # Replace with defaults
+        q = models.Query.objects.filter(id = self.query_id)[0]
+        # Set up query and DB and pivot
+        self.setQuery(q.query_text)
+        self.setDB(q.database_id)
+        self.setPivot(q.pivot_data)
 
         #logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
         self.defaultFind() 
@@ -72,7 +78,7 @@ class DataManager:
         con = MySQLdb.connect(host = self.db.host, port = self.db.port, 
                 user = self.db.username, passwd =self.db.password_encrpyed,
                 db = self.db.db)
-        data = pandas.io.sql.read_sql(self.query_text,con)
+        data = pd.io.sql.read_sql(self.query_text,con)
         self.data = data
         self.data_pandas = data
         con.close()
@@ -81,7 +87,7 @@ class DataManager:
         # TODO write this
         con = psycopg2.connect(host = self.db.host, port = self.db.port, 
                     username = self.db.username, password =self.db.password_encrpyed)
-        data = pandas.io.sql.read_sql(self.query_text,con)
+        data = pd.io.sql.read_sql(self.query_text,con)
         self.data = data
         con.close()
 
@@ -89,7 +95,7 @@ class DataManager:
         # TODO write this
         con = MySQLdb.connect(host = self.db.host, port = self.db.port, 
                     username = self.db.username, password =self.db.password_encrpyed)
-        data = pandas.io.sql.read_sql(self.query_text,con)
+        data = pd.io.sql.read_sql(self.query_text,con)
         self.data = data
         con.close()
 
@@ -115,7 +121,7 @@ class DataManager:
     def pivot(self):
         # use pandas TODO to make the pivot
         logging.warning(self.data)
-        df2 = pandas.pivot_table(self.data, values=self.data.columns[2],
+        df2 = pd.pivot_table(self.data, values=self.data.columns[2],
                 index = self.data.columns[0],
                 columns = self.data.columns[1]).fillna(0)
         df2.reset_index(level=0, inplace=True)
@@ -124,23 +130,14 @@ class DataManager:
         logging.warning(self.data)
         
     def pandasToArray(self):
-        # Convert from panadas format to array of arrays
-        #data_dict = self.data.to_dict(outtype='records')
-        #logging.warning(data_dict[0])
-        data_output = []
-        temp_row = []
-        for k in self.data.columns:
-            temp_row.append(k)
-        data_output.append(temp_row)            
-        for row in self.data.iterrows():
-            temp_row = []
-            for v in row[1]:
-                temp_row.append(v)
-            data_output.append(temp_row)
+        """ Convert from panadas format to array of arrays
+        """
+        data_output = [self.data.columns]
+        data_output += [v for v in row[1] for row in self.data.iterrows()]
         self.data_array = data_output
 
     def saveToSQLTable(self, table_name = None):
-        if table_name == None:
+        if table_name is None:
             table_name = 'table_%s' % self.query_id
         db = settings.DATABASES['write_to']
         logging.warning(db)
@@ -160,10 +157,10 @@ class DataManager:
             for value in row:
                 try:
                     value = int(value)
-                except:
+                except Exception:
                     try:
                         value = float(value)
-                    except:
+                    except Exception:
                         pass
                 temp_row.append(value)
             new_data.append(temp_row)

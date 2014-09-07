@@ -21,6 +21,7 @@ class QueryAdminForm(forms.ModelForm):
 class QueryAdmin(admin.ModelAdmin):
     form = QueryAdminForm
     inlines = [QueryDefaultAdmin, QueryPrecedentAdmin]
+    list_display = ('id', 'title', 'database','owner','chart_type','modified_time')
 
 class DbAdminForm(forms.ModelForm):
     class Meta:
@@ -30,6 +31,7 @@ class DbAdminForm(forms.ModelForm):
 
 class DbAdmin(admin.ModelAdmin):
     form = DbAdminForm
+    list_display = ('id', 'name_short', 'type','port','username')
 
 class DashboardQueryAdmin(admin.TabularInline):
     model = DashboardQuery
@@ -37,6 +39,7 @@ class DashboardQueryAdmin(admin.TabularInline):
 class DashboardAdmin(admin.ModelAdmin):
     model = Dashboard
     inlines = [DashboardQueryAdmin]
+    list_display = ('id', 'title', 'owner','modified_time')
 
 
 admin.site.register(Query, QueryAdmin)

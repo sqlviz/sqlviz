@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from taggit.managers import TaggableManager
 import re
 import time
+#from query import DataManager
 #import MySQLdb
 
 class Db(models.Model):
@@ -20,9 +21,15 @@ class Db(models.Model):
     db = models.CharField(max_length=1024)
     port = models.IntegerField()
     username = models.CharField(max_length=128)
-    password_encrpyed = EncryptedCharField(max_length=1024)
+    password_encrpyed = EncryptedCharField(max_length=1024,)
+    create_time = models.DateTimeField(auto_now_add = True, editable = False)
+    modified_time = models.DateTimeField(auto_now = True, editable =  False)
+    tags = TaggableManager(blank=True)
     def __str__(self):
         return self.name_short
+
+    def clean(self):
+        return True # TODO Validate database connection
 
 class Query(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')
@@ -56,6 +63,9 @@ class Query(models.Model):
                 raise ValidationError('Queries can not contain %s' % word)
         if self.chart_type == 'None' and self.stacked == 1:
             raise ValidationError("Can't stack an invisible chart")
+
+        # Validate that query runs!
+        # TODO
 
 class QueryChart(models.Model):
     query = models.ForeignKey(Query)

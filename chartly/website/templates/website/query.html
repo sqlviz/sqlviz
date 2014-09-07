@@ -18,6 +18,7 @@
             <li><a href="">Query Live</a></li>
             <li><a href="/admin/">Admin</a></li>
             <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
+            <li><a href="/website/query_interactive/">Interactive Mode</a></li>
           </ul>
           {% endblock %}
 
@@ -26,36 +27,6 @@
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
-<style>
-/*flash*/
-.alert-error {
-    background-color: #f2dede;
-    border-color: #eed3d7;
-    color: #b94a48;
-    text-align: left;
- }
-
-.alert-alert {
-    background-color: #f2dede;
-    border-color: #eed3d7;
-    color: #b94a48;
-    text-align: left;
- }
-
-.alert-success {
-    background-color: #dff0d8;
-    border-color: #d6e9c6;
-    color: #468847;
-    text-align: left;
- }
-
-.alert-notice {
-    background-color: #dff0d8;
-    border-color: #d6e9c6;
-    color: #468847;
-    text-align: left;
- }
- </style>
 <div id='sortable'>
 {% if query_list %}
   {% for query in query_list %}    
@@ -79,8 +50,9 @@
       </ul>
       </br>
       <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">Hide</button>
-      <script>
-      $(document).ready(function() {
+    </div>
+    <script>
+        $(document).ready(function() {
         $('#toggle_{{query.id}}').click(function() {
         $(".hide_{{query.id}}").toggleClass("hide");
         if ($.trim($(this).text()) === 'Hide') {
@@ -88,12 +60,10 @@
         } else {
           $(this).text('Hide');        
         }
+      });
     });
-});
-      </script>
-    </div>
+    </script>
     <script>
-
     $.getJSON('/query_api/{{query.id}}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
       console.log(json_data);
       console.log('chart_{{query.id}}');
@@ -111,62 +81,49 @@
 
     });
     </script>
-      <!--<script>
-  $(function() {
-    $( "#div_{{query.id}}" ).draggable();
-  });
-  </script>-->
   {% endfor %}
 {% else %}
     <h3 class='label-danger'>Nothing matches that descriptions.  Are you sure it is there?</h3>
 {% endif %}
 </div>
- <script>
-  $(function() {
-    $( "#sortable" ).sortable();
-    $( "#sortable" ).disableSelection();
-  });
-  </script>
- <!--<script>
-  $(function() {
-    $( "#accordion" ).accordion({
-      heightStyle: "content"
-    });
-  });
-  </script>-->
+<script>
+$(function() {
+  $( "#sortable" ).sortable();
+  $( "#sortable" ).disableSelection();
+});
+</script>
 {% if replacement_dict %}
-<div class='jumbotron'>
-  <form action ='{{request.path}}' method='GET'>
-  {% for key, default_dict in replacement_dict.items %}
-    {%if default_dict.data_type = 'Date' %}
-    <h3>Rerun with Parameters </h3>
-      {# DATEPICKER #}
-            <p> {{default_dict.search_for}} 
-            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
-            name = "{{default_dict.search_for}}"
-            >
-            </p>
-      <script>
-        $(function(){
-          $('#selector_{{default_dict.search_for}}').datepicker({ dateFormat: 'yy-mm-dd' });
-        });
-      </script>
-    {% elif default_dict.data_type == 'Numeric' %}
-      {# NUMERIC #}
-      <p> {{default_dict.search_for}}
-        <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}"></p>
-    {% else %}
-      {# STRING #}
+  <div class='jumbotron'>
+    <form action ='{{request.path}}' method='GET'>
+    {% for key, default_dict in replacement_dict.items %}
+      {%if default_dict.data_type = 'Date' %}
+      <h3>Rerun with Parameters </h3>
+        {# DATEPICKER #}
+          <p> {{default_dict.search_for}} 
+          <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
+          name = "{{default_dict.search_for}}"
+          >
+          </p>
+        <script>
+          $(function(){
+            $('#selector_{{default_dict.search_for}}').datepicker({ dateFormat: 'yy-mm-dd' });
+          });
+        </script>
+      {% elif default_dict.data_type == 'Numeric' %}
+        {# NUMERIC #}
+        <p> {{default_dict.search_for}}
+          <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
+        </p>
+      {% else %}
+        {# STRING #}
         <p> {{default_dict.search_for}}
           <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
         </p>
-    {% endif %}
-
-  {% endfor %}
+      {% endif %}
+    {% endfor %}
     <input type="submit" class='btn btn-primary' value="Submit"/>
-    </form>
-  </div>
-
+  </form>
+</div>
 {% else %}
  No Defaults Found
  {% endif %}

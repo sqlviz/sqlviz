@@ -17,9 +17,13 @@ import logging
 import sys
 logger = logging.getLogger(__name__)
 
-def index(request):
-    query_list = Query.objects.filter(hide_index = 0)
-    dashboard_list = Dashboard.objects.filter(hide_index = 0)
+def index(request, filter= None):
+    if filter == None:
+        query_list = Query.objects.filter(hide_index = 0)
+        dashboard_list = Dashboard.objects.filter(hide_index = 0)
+    else:
+        query_list = Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
+        dashboard_list = Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
     return render_to_response('index.html', {'query_list': query_list, 'dashboard_list' : dashboard_list})
 
 def query_api(request, query_id):
@@ -82,6 +86,36 @@ def dashboard(request, dashboard_id):
         query_id_array.append(str(q.query_id))
     query_list_string  = ','.join(query_id_array)
     return query(request, query_list_string)
+
+def query_interactive(request):
+    # Render empty page for users to add data to
+    return render_to_response('query_interactive.html',{})
+
+def query_interactive_api(request):
+    # Take Query, Database, and Pivot
+    # Create DataManager, run and return as JSON schema
+    try:
+        query_text  = request.POST['query_text']
+        db  = request.POST['db']
+        pivot  = request.POST['pivot']
+        startTime = time.time()
+        DM = DataManager()
+        DM.setQuery(query_text)
+        DM.setDB(db)
+        DM.setPivot(pivot)
+        response_data = DM.runQuery()
+        time_elapsed = time.time() - startTime # TODO get rid of this copy-pasta
+        return_data = {
+                        "data":
+                            {"columns" : response_data.pop(0), "data" : response_data},
+                        "time_elapsed" : time_elapsed,
+                        "error" : False}
+    except:
+            return_data = {
+                            "data": str(sys.exc_info()),
+                            "time_elapsed" : 0,
+                            "error" : True,
+                        }
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
