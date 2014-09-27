@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 # 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import logging
+
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -74,33 +76,46 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 )
 
 # logging
-import logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+            },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR + '/debug.log',
+            'formatter': 'simple'
+            },
         },
-       'console':{
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-        },
-    },
     'loggers': {
-        'django.request': {
+        'django': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True,
-        },
-    },
-}
+            },
+        }
+    }
+
+if DEBUG:
+    # make all loggers use the console.
+    for logger in LOGGING['loggers']:
+        LOGGING['loggers'][logger]['handlers'] = ['console']
 
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
-logging.debug(BASE_DIR + '/mysql.cnf')
 
 DATABASES = {
     'default': {

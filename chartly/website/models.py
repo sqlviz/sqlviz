@@ -34,7 +34,7 @@ class Db(models.Model):
 class Query(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')
     description = models.TextField(max_length = 200)
-    description_long = models.TextField(max_length=  1024)
+    description_long = models.TextField(max_length=  1024, blank = True)
     query_text = models.TextField(max_length = 2048, help_text = 'Query to Run')
     insert_limit = models.BooleanField(default = True, help_text = 'Insert limit 1000 to end of query')
     database = models.ForeignKey(Db)
@@ -49,6 +49,7 @@ class Query(models.Model):
     stacked = models.BooleanField(default=False, help_text = 'Stack graph Type')
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
+    graph_extra = models.TextField(blank = True, help_text = 'JSON form of highcharts formatting')
     tags = TaggableManager(blank=True)
 
     def __str__(self):

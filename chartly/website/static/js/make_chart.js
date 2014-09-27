@@ -21,7 +21,7 @@ function make_table(columns, data, target){
     });      
 };
 
-function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis, yAxis_log){
+function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis, yAxis_log, defaults){
   options = {
         chart: {
           type : graph_type,
@@ -87,7 +87,7 @@ function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yA
     }
     if (yAxis_log == 'True'){
       options.yAxis.type = 'logarithmic'
-
     }
+    $.extend(options, defaults); // MUNGE GRAPH SETTINGS
     var chart = new Highcharts.Chart(options);
 }

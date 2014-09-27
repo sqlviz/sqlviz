@@ -4,6 +4,7 @@ import MySQLdb
 import pandas as pd
 import uuid
 from django.conf import settings
+import re
 
 logger = logging.getLogger(__name__)
 MAX_DEPTH_RECURSION = 10
@@ -56,10 +57,11 @@ class DataManager:
             self.runPostgresQuery()
         elif self.db.type == 'Hive':
             self.runHiveQuery()
-        logger.warning("PIVOT STATE %s " % self.pivot_data)
+        #logger.warning("PIVOT STATE %s " % self.pivot_data)
         if self.pivot_data == True:
             self.pivot()
         self.pandasToArray()
+        logging.warning("TO NUMERICALZE NOW")
         self.numericalizeData()
 
         return self.data_array
@@ -120,27 +122,26 @@ class DataManager:
 
     def pivot(self):
         # use pandas TODO to make the pivot
-        logging.warning(self.data)
+        #logging.warning(self.data)
         df2 = pd.pivot_table(self.data, values=self.data.columns[2],
                 index = self.data.columns[0],
                 columns = self.data.columns[1]).fillna(0)
         df2.reset_index(level=0, inplace=True)
 
         self.data = df2
-        logging.warning(self.data)
+        #logging.warning(self.data)
         
     def pandasToArray(self):
         """ Convert from panadas format to array of arrays
         """
         data_output = [self.data.columns]
-        data_output += [v for v in row[1] for row in self.data.iterrows()]
+        data_output += [[v for v in row[1]] for row in self.data.iterrows()]
         self.data_array = data_output
 
     def saveToSQLTable(self, table_name = None):
         if table_name is None:
             table_name = 'table_%s' % self.query_id
         db = settings.DATABASES['write_to']
-        logging.warning(db)
         con = MySQLdb.connect(host = db['HOST'], port = db['PORT'], 
                     user = db['USER'], passwd = db['PASSWORD'], db = db['NAME'])
         #data_to_write = self.data_pandas
@@ -151,26 +152,22 @@ class DataManager:
 
     def numericalizeData(self):
         # Checks for numbers encoded as strings due to bad database encoding
-        new_data = []
-        for row in self.data_array:
-            temp_row = []
-            for value in row:
-                try:
-                    value = int(value)
-                except Exception:
-                    try:
-                        value = float(value)
-                    except Exception:
-                        pass
-                temp_row.append(value)
-            new_data.append(temp_row)
+        def num(foo):
+            #try:
+            #    return float(foo)
+            #except (ValueError, TypeError) as e:
+            try:
+                return float(foo)
+            except (ValueError, TypeError) as e:
+                return foo
+        new_data = [[num(foo) for foo in row] for row in self.data_array]                
         self.data_array = new_data
 
     def defaultFind(self):
         # Find default values, compare with those in request, and update those defaults
         # that are over-riden by client values
         # Get values from DB
-        value_objects = QueryDefault.objects.filter(query_id = self.query_id)
+        value_objects = models.QueryDefault.objects.filter(query_id = self.query_id)
         self.replacement_dict = {}
         for value_object in value_objects:
             # Compare with those from client request
