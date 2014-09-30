@@ -10,5 +10,6 @@ urlpatterns = patterns('',
    	url(r'^query/(?P<query_names>[\w\ ]+)$', query_name, name='query_name'),
    	url(r'^dashboard/(?P<dashboard_id>\d+)$', dashboard, name='dashboard'),
    	url(r'^main/(?P<filter>[\w\ ]+)$', index, name='filter'),
-   	url(r'^query_interactive/', query_interactive, name='query_interactive')
+   	url(r'^query_interactive/', query_interactive, name='query_interactive'),
+   	url(r'^query_interactive_api/', query_interactive_api, name='query_interactive_api')
 )

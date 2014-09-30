@@ -54,6 +54,7 @@ class Query(models.Model):
 
     def __str__(self):
         return "%s: %s" % (self.id, self.title)
+        
     def clean(self):
         # dont allow queries to contain blacklist words
         blacklist = ['delete','insert','update','alter','drop']

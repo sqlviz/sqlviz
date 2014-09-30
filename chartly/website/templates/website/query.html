@@ -15,7 +15,6 @@
           
           {% block links %}
             <li ><a href="/">Home</a></li>
-            <li><a href="">Query Live</a></li>
             <li><a href="/admin/">Admin</a></li>
             <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
             <li><a href="/website/query_interactive/">Interactive Mode</a></li>

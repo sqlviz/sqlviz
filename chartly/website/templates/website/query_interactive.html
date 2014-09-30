@@ -5,71 +5,121 @@
   Interactive Mode
 {% endblock %}
 
+{% block style %}
+<style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+{% endblock %}
 {% block links %}
-<ul>
   <li><a href="/">Home</a></li>
-  <li><a href="">Query Live</a></li>
   <li><a href="/admin/">Admin</a></li>
-  <li><a href="/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
+  <li><a href="">Edit</a></li>
   <li class="active"><a href="/website/query_interactive/">Interactive Mode</a></li>
 </ul>
 {% endblock %}
 
 {% block main %}
+
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
+<script type="text/javascript" src="{% static 'ace-builds/src/ace.js' %}"  type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<style>
+.editor{height: 150px; width: 400px;}; 
+</style> <!-- TODO FIX CSS BUG HERE -->
 
-<div id='sortable'>
+<div id='whatever'>
     <div class='jumbotron'>
     <h2>Interactive Query Mode</h2>
     <table class='table table-striped' id = 'table'></table>
-    <div id="error_{{query.id}}" class = "alert alert-error alert-block"></div>
     </div>
-    <div id ='chart_{{query.id}}'></div>
-    <form action='TODO'>
-      <p>
-        <select id="db">
-          <h4>DB</h4>
-          {% for db in db_list%}
-            <option value="{{db.id}}">{{db.title}}</option>
-
-        {% endfor %}
-        </select>
-      </p>
-      <p><h4>Pivot </h4>
-        <input type='radio' name='pivot' id='pivot' value='True' label='True'>True
-        <input type='radio' name='pivot'  id='pivot' value='False' label='False'>False
-      </p>
-
-      <p><h4>Graph</h4>
-        <input type='radio' name='graph' id='graph' value='None' label='None'>None
-        <input type='radio' name='graph' id='graph' value='Line' label='Line'>Line
-        <input type='radio' name='graph' id='graph' value='Bar' label='Bar'>Bar
-        <input type='radio' name='graph' id='graph' value='Column' label='Column'>Column
-        <input type='radio' name='graph' id='graph' value='Scatter' label='Scatter'>Scatter
-      </p>
-        <textarea></textarea>
-        <div id='sql_area'></div> <!-- TODO get ACE working here -->               
-
-      <button type="submit" class="btn btn-primary">Run</button>
-    </form>
-    <script>
-    // TODO function which grabs parts of form submission
-     data = {'pivot': pivot, 'db' : db, 'query_text': query_text}
-     $.postJSON('/query_interactive_api',data, function( json_data ) {
+    <div id ='chart'></div>
+    <form id='chart_data'>
+      {% csrf_token %}
+      <div class='row'>
+        <div class='col-md-6'>
+          <div id='editor' class='editor'>select
+  *
+from
+  table
+limit
+  100</div>
+        </div>
+        <div class='col-md-6'>
+        <p>
+            <h4>DB</h4>
+            <select id="db">              
+            {% for db in db_list%}
+              <option value="{{db.id}}">{{db.name_long}}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <h4>Pivot </h4>
+          <input type='radio' name='pivot' id='pivot' value='false' label='False' checked>False
+          <input type='radio' name='pivot' id='pivot' value='true' label='True'>True
+          
+        </p>
+        <p>
+          <h4>Graph</h4>
+          <input type='radio' name='graph' id='graph' value='none' label='None' checked>None
+          <input type='radio' name='graph' id='graph' value='line' label='Line'>Line
+          <input type='radio' name='graph' id='graph' value='bar' label='Bar'>Bar
+          <input type='radio' name='graph' id='graph' value='column' label='Column'>Column
+          <input type='radio' name='graph' id='graph' value='scatter' label='Scatter'>Scatter
+        </p>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-12'>
+        <button type="submit" class="btn btn-primary">Run</button>
+      </div>
+    </div>
+  </form>
+</div>
+<script>
+  // TODO function which grabs parts of form submission
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/clouds");
+  editor.getSession().setMode("ace/mode/sql");
+  
+  // Run once every time the submit button is pressed
+  function send_data(foo){
+    var graph =  $('input[id=graph]:checked', '#chart_data').val();
+    var db = $("#db option:selected").val();
+    var pivot = $('input[id=pivot]:checked', '#chart_data').val();
+    data = {'pivot': pivot,
+      'db' : db,
+      'graph' : graph,
+      'query_text': editor.getValue(),
+      'csrfmiddlewaretoken' : '{{ csrf_token }}'
+    };
+    console.log(data);
+    $.post('/query_interactive_api/',data, function( json_data ) {
       //TODO add URL reverse here
       console.log(json_data);
       console.log('chart_{{query.id}}');
-      $( "#waiting_{{query.id}}" ).empty();
-      if (json_data.error == false){
+      //$( "#waiting_{{query.id}}" ).empty());
+      if (json_data.error == false) {
         make_table(json_data.data.columns, json_data.data.data, '#table');  
         make_chart(json_data.data.columns, json_data.data.data, 'chart', 'False', graph, 'Interactive Query Mode', 'Xaxis Title', 'yAxis Title' ,'False');
-          };          
       } else {
         $( "#error" ).text(json_data.data)
       }
     });
-    </script>
+  };
+
+  $( "#chart_data" ).submit(function( event ) {
+  send_data();
+  event.preventDefault();
+  });
+</script>
+    
 {% endblock %}
