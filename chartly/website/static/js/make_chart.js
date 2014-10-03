@@ -1,5 +1,8 @@
 function make_table(columns, data, target){
-    html  ='<thead><tr>';
+    var table_name = 'table_' +  target; 
+    var div_name  = '#div_table_' + target;
+    html = "<table class='table table-striped' id='" + table_name + "'>\n";
+    html  +='<thead><tr>';
     $.each( columns, function( key, val ) {
       html += "<td>" + val  +"</td>";
     });
@@ -11,12 +14,20 @@ function make_table(columns, data, target){
       });
       html += "</tr>\n";
     });
-    html += "</tbody>"
-    $(target).html(html);
+    html += "</tbody></table>\n"
+    console.log(html);
+    $(div_name).html(html);
+    console.log('#' + table_name);
+    console.log(div_name);
     $(document).ready(function() {
-      $(target).dataTable({
+      $('#' + table_name).dataTable({
         "bAutoWidth": false,
         "bScrollCollapse": true,
+        "dom": 'T<"clear">lfrtip',
+        "tableTools": {
+          "aButtons": [ "copy", "csv" ],
+          "sSwfPath": "/static/DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls.swf"
+        }
       });
     });      
 };
@@ -77,7 +88,7 @@ function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yA
       });
     });
     options.series = series;
-    console.log(options)
+    //console.log(options)
     if (stacked == 'True'){
       options.plotOptions = {};
       options.plotOptions [graph_type] = {'stacking' :'normal'};

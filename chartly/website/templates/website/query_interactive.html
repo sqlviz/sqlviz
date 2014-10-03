@@ -13,6 +13,8 @@
         right: 0;
         bottom: 0;
         left: 0;
+        height: 150px;
+        width: 400px;
     }
 </style>
 {% endblock %}
@@ -28,31 +30,28 @@
 
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
-<script type="text/javascript" src="{% static 'ace-builds/src/ace.js' %}"  type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
-<style>
-.editor{height: 150px; width: 400px;}; 
-</style> <!-- TODO FIX CSS BUG HERE -->
+<!-- TODO FIX CSS BUG HERE -->
 
-<div id='whatever'>
-    <div class='jumbotron'>
+<div id='run_block'>
+  <div class='jumbotron'>
     <h2>Interactive Query Mode</h2>
-    <table class='table table-striped' id = 'table'></table>
+  </div>
+    <div id='append_list'>
     </div>
-    <div id ='chart'></div>
-    <form id='chart_data'>
-      {% csrf_token %}
-      <div class='row'>
-        <div class='col-md-6'>
-          <div id='editor' class='editor'>select
-  *
+  <form id='chart_data'>
+    {% csrf_token %}
+    <div class='row'>
+      <div class='col-md-6'>
+        <div id='editor'>select
+  Pclass, sex, avg(survived) survival_rate
 from
-  table
-limit
-  100</div>
+  test.titanic
+group by
+  Pclass, sex</div>
         </div>
-        <div class='col-md-6'>
+      <div class='col-md-6'>
         <p>
             <h4>DB</h4>
             <select id="db">              
@@ -90,8 +89,13 @@ limit
   editor.setTheme("ace/theme/clouds");
   editor.getSession().setMode("ace/mode/sql");
   
+  // Start with error hidden
+  $( "#error" ).hide();
+
   // Run once every time the submit button is pressed
   function send_data(foo){
+    run_count = run_count + 1;
+    console.log("Run count : " + run_count);
     var graph =  $('input[id=graph]:checked', '#chart_data').val();
     var db = $("#db option:selected").val();
     var pivot = $('input[id=pivot]:checked', '#chart_data').val();
@@ -101,25 +105,33 @@ limit
       'query_text': editor.getValue(),
       'csrfmiddlewaretoken' : '{{ csrf_token }}'
     };
-    console.log(data);
+    //console.log(data);
+    var append_block = "<h3>Run " + run_count + "</h3><div class='col-md-12 jumbotron'  id ='block_" + run_count + "'><div id ='div_table_table_" + run_count + "'></div><div id ='chart_" + run_count + "'></div><div id ='error_" + run_count + "' class = 'alert alert-error alert-block'><pre></pre></div></div>";
     $.post('/query_interactive_api/',data, function( json_data ) {
+      $("#append_list").append(append_block);
       //TODO add URL reverse here
       console.log(json_data);
       console.log('chart_{{query.id}}');
-      //$( "#waiting_{{query.id}}" ).empty());
       if (json_data.error == false) {
-        make_table(json_data.data.columns, json_data.data.data, '#table');  
-        make_chart(json_data.data.columns, json_data.data.data, 'chart', 'False', graph, 'Interactive Query Mode', 'Xaxis Title', 'yAxis Title' ,'False');
+        $("#error_" + run_count ).hide();
+        make_table(json_data.data.columns, json_data.data.data, 'table_' + run_count);
+        if (graph != 'none'){
+          make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', 'yAxis Title' ,'False');  
+        } else {
+          $('#chart_' + run_count).empty();
+        }
+        
       } else {
-        $( "#error" ).text(json_data.data)
+        $("#error_" + run_count).show();
+        $("#error_" + run_count + " pre").text(json_data.data);
       }
     });
   };
-
+  var run_count = 0;
   $( "#chart_data" ).submit(function( event ) {
-  send_data();
-  event.preventDefault();
+    send_data();
+    event.preventDefault();
   });
-</script>
-    
+
+</script>    
 {% endblock %}

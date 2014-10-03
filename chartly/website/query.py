@@ -57,6 +57,8 @@ class DataManager:
             self.runPostgresQuery()
         elif self.db.type == 'Hive':
             self.runHiveQuery()
+        if len(self.data) == 0:
+            raise Exception("No Data Returned")
         #logger.warning("PIVOT STATE %s " % self.pivot_data)
         if self.pivot_data == True:
             self.pivot()
