@@ -121,9 +121,11 @@ def query_interactive_api(request):
                             {"columns" : response_data.pop(0), "data" : response_data},
                         "time_elapsed" : time_elapsed,
                         "error" : False}
-    except Exception as e:
+    except Exception, e:
+            logging.warning(traceback.format_exc())
             return_data = {
-                            "data": str(sys.exc_info()) + str(e),
+                            "data": #'\n'.join(map
+                                str(traceback.format_exc()),
                             "time_elapsed" : 0,
                             "error" : True,
                         }

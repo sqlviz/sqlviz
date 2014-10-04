@@ -99,14 +99,15 @@ group by
     var graph =  $('input[id=graph]:checked', '#chart_data').val();
     var db = $("#db option:selected").val();
     var pivot = $('input[id=pivot]:checked', '#chart_data').val();
+    var query_text = editor.getValue();
     data = {'pivot': pivot,
       'db' : db,
       'graph' : graph,
-      'query_text': editor.getValue(),
+      'query_text': query_text,
       'csrfmiddlewaretoken' : '{{ csrf_token }}'
     };
     //console.log(data);
-    var append_block = "<h3>Run " + run_count + "</h3><div class='col-md-12 jumbotron'  id ='block_" + run_count + "'><div id ='div_table_table_" + run_count + "'></div><div id ='chart_" + run_count + "'></div><div id ='error_" + run_count + "' class = 'alert alert-error alert-block'><pre></pre></div></div>";
+    var append_block = "<h3>Run " + run_count + "</h3><div class='col-md-12 jumbotron'  id ='block_" + run_count + "'><div id ='div_table_table_" + run_count + "'></div><div id ='chart_" + run_count + "'></div><div id ='error_" + run_count + "' class = 'alert alert-error alert-block'><pre></pre></div><pre>" + query_text + "</pre></div>";
     $.post('/query_interactive_api/',data, function( json_data ) {
       $("#append_list").append(append_block);
       //TODO add URL reverse here
