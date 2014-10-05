@@ -56,9 +56,11 @@ def query_api(request, query_id):
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
 def query(request, query_ids):
-    # TODO display in the order that they come in!!!
     query_id_array = query_ids.split(',')
-    query_list = Query.objects.filter(id__in = query_id_array)
+    #TODO filter to make sure only this applies to queries which exist
+    query_list = [Query.objects.filter(id = i)[0] for i in query_id_array]
+    logging.warning(query_id_array)
+    logging.warning(query_list)
     replacement_dict = {}
     json_get = {}
     for query in query_list:
