@@ -47,7 +47,7 @@
         <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
         <li>Description Short:{{query.description}}</li>
         <li>Description Long: {{query.description_long}}</li>
-        <li>Query Text: <div id='sql_{{query.id}}'><pre>{{query.query_text}}</pre></div></li>
+        <li>Query Text: <div id='sql_{{query.id}}'><pre>{{query.query_text}}</pre>  </div></li>
         <li>Query Creation: {{query.create_time}}</li>
         <li>Query Last Modified: {{query.modified_time}}</li>
         <li>Database: {{query.database}}</li>
@@ -62,17 +62,11 @@
         if ($.trim($(this).text()) === 'Hide') {
           $(this).text('Show');
         } else {
-          $(this).text('Hide');        
+          $(this).text('Hide');
         }
       });
     });
-
     </script>
-    <!--<script>
-      var editor = ace.edit("sql_{{query.id}}");
-      editor.setTheme("ace/theme/clouds");
-      editor.getSession().setMode("ace/mode/sql");
-    </script>-->
     <script>
     $( "#error_{{query.id}}" ).hide();
     $.getJSON('/query_api/{{query.id}}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
@@ -84,7 +78,7 @@
           make_table(json_data.data.columns, json_data.data.data, '{{query.id}}');  
         }
         if ('{{query.chart_type}}' != 'None'){
-          make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe}});
+          make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
           };          
       } else {
         $( "#error_{{query.id}}" ).show();

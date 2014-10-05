@@ -22,6 +22,7 @@ class QueryAdmin(admin.ModelAdmin):
     form = QueryAdminForm
     inlines = [QueryDefaultAdmin, QueryPrecedentAdmin]
     list_display = ('id', 'title', 'database','owner','chart_type','modified_time')
+    save_as = True
 
 class DbAdminForm(forms.ModelForm):
     class Meta:

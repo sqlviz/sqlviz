@@ -109,11 +109,13 @@ def query_interactive_api(request):
         query_text  = request.POST['query_text']
         db  = request.POST['db']
         pivot  =  True if request.POST['pivot'].lower() == 'true' else False
+        cumulative  =  True if request.POST['cumulative'].lower() == 'true' else False
         startTime = time.time()
         DM = DataManager()
         DM.setQuery(query_text)
         DM.setDB(db)
         DM.setPivot(pivot)
+        DM.setCumulative(cumulative)
         response_data = DM.runQuery()
         time_elapsed = time.time() - startTime # TODO get rid of this copy-pasta
         return_data = {

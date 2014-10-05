@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from taggit.managers import TaggableManager
 import re
 import time
+import json
 #from query import DataManager
 #import MySQLdb
 
@@ -42,6 +43,7 @@ class Query(models.Model):
     hide_index = models.BooleanField(default=False, help_text = 'Hide from Main Search')
     hide_table = models.BooleanField(default=False, help_text = 'Supress Data output in display')
     pivot_data = models.BooleanField(default=False,  help_text = 'Pivot data around first/second columns.  Nulls filled with 0')
+    cumulative = models.BooleanField(default=False,  help_text = 'Run cumulatie sum')
     log_scale_y = models.BooleanField(default=False,  help_text = 'Log scale Y axis')
     chart_type = models.CharField(max_length=10,
                                       choices=(('None','None'),('line','line'),('bar','bar'),('column','column'),('area','area')),
@@ -49,7 +51,7 @@ class Query(models.Model):
     stacked = models.BooleanField(default=False, help_text = 'Stack graph Type')
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
-    graph_extra = models.TextField(blank = True, help_text = 'JSON form of highcharts formatting')
+    graph_extra = models.TextField(default = '{}', blank = True, help_text = 'JSON form of highcharts formatting')
     tags = TaggableManager(blank=True)
 
     def __str__(self):
@@ -66,6 +68,10 @@ class Query(models.Model):
         if self.chart_type == 'None' and self.stacked == 1:
             raise ValidationError("Can't stack an invisible chart")
 
+        try:
+            json.loads(self.graph_extra)
+        except:
+            raise ValidationError("Graph Extra must be JSON!")
         # Validate that query runs!
         # TODO
 

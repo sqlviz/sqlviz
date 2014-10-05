@@ -15,10 +15,10 @@ function make_table(columns, data, target){
       html += "</tr>\n";
     });
     html += "</tbody></table>\n"
-    console.log(html);
+    //console.log(html);
     $(div_name).html(html);
-    console.log('#' + table_name);
-    console.log(div_name);
+    //console.log('#' + table_name);
+    //console.log(div_name);
     $(document).ready(function() {
       $('#' + table_name).dataTable({
         "bAutoWidth": false,

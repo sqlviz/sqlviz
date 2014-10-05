@@ -16,6 +16,14 @@
         height: 150px;
         width: 400px;
     }
+    #close{
+      display:block;
+      float:right;
+      right: -10px;
+      top: -10px;
+      width:10px;
+      height:10px;
+    }
 </style>
 {% endblock %}
 {% block links %}
@@ -64,7 +72,11 @@ group by
           <h4>Pivot </h4>
           <input type='radio' name='pivot' id='pivot' value='false' label='False' checked>False
           <input type='radio' name='pivot' id='pivot' value='true' label='True'>True
-          
+        </p>
+        <p>
+          <h4>Cumulative </h4>
+          <input type='radio' name='cumulative' id='cumulative' value='false' label='False' checked>False
+          <input type='radio' name='cumulative' id='cumulative' value='true' label='True'>True
         </p>
         <p>
           <h4>Graph</h4>
@@ -99,15 +111,28 @@ group by
     var graph =  $('input[id=graph]:checked', '#chart_data').val();
     var db = $("#db option:selected").val();
     var pivot = $('input[id=pivot]:checked', '#chart_data').val();
+    var cumulative = $('input[id=cumulative]:checked', '#chart_data').val();
     var query_text = editor.getValue();
     data = {'pivot': pivot,
       'db' : db,
       'graph' : graph,
       'query_text': query_text,
+      'cumulative': cumulative,
       'csrfmiddlewaretoken' : '{{ csrf_token }}'
     };
-    //console.log(data);
-    var append_block = "<h3>Run " + run_count + "</h3><div class='col-md-12 jumbotron'  id ='block_" + run_count + "'><div id ='div_table_table_" + run_count + "'></div><div id ='chart_" + run_count + "'></div><div id ='error_" + run_count + "' class = 'alert alert-error alert-block'><pre></pre></div><pre>" + query_text + "</pre></div>";
+    var append_block = "<h3>Run " + run_count + "</h3>\
+    <div class='col-md-12 jumbotron'  id ='block_" + run_count + "'>\
+    <button  type='submit' class='glyphicon glyphicon-remove-circle close' id ='close_" + run_count + "'></button>\
+    <div id ='div_table_table_" + run_count + "'></div>\
+    <div id ='chart_" + run_count + "'></div>\
+    <div id ='error_" + run_count + "' class = 'alert alert-error alert-block'><pre></pre>\
+    </div><pre>" + query_text + "</pre></div>";
+
+    $(document).ready(function(){
+      $('#close').click(function(){
+          $('#block_').toggleClass('hide');
+      });
+    });
     $.post('/query_interactive_api/',data, function( json_data ) {
       $("#append_list").append(append_block);
       //TODO add URL reverse here
@@ -117,7 +142,7 @@ group by
         $("#error_" + run_count ).hide();
         make_table(json_data.data.columns, json_data.data.data, 'table_' + run_count);
         if (graph != 'none'){
-          make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', 'yAxis Title' ,'False');  
+          make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', '' ,'False');  
         } else {
           $('#chart_' + run_count).empty();
         }

@@ -27,6 +27,9 @@ class DataManager:
     def setPivot(self, pivot):
         self.pivot_data = pivot
 
+    def setCumulative(self, cumulative):
+        self.cumulative = cumulative
+
     def prepareQuery(self):
         # Get Query From Database
         q = models.Query.objects.filter(id = self.query_id)[0]
@@ -34,6 +37,7 @@ class DataManager:
         self.setQuery(q.query_text)
         self.setDB(q.database_id)
         self.setPivot(q.pivot_data)
+        self.setCumulative(q.cumulative)
 
         #logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
         self.defaultFind() 
@@ -62,8 +66,10 @@ class DataManager:
         #logger.warning("PIVOT STATE %s " % self.pivot_data)
         if self.pivot_data == True:
             self.pivot()
+        if self.cumulative == True:
+            self.data = self.data.cumsum()
         self.pandasToArray()
-        logging.warning("TO NUMERICALZE NOW")
+        #logging.warning("TO NUMERICALZE NOW")
         self.numericalizeData()
 
         return self.data_array
@@ -108,7 +114,7 @@ class DataManager:
         stop_words = ['insert','delete','drop','truncate','alter','grant']
         for word in stop_words:
             #logger.error("WAHOO; %s \n %s" % (word, self.query_text))
-            if re.match(self.query_text, word) != None:
+            if word in self.query_text.lower():
                 raise IllegalCondition
         # TODO check for major ass subselects, dumbass joins and other dumb-ass shit like that!
 
