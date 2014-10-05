@@ -5,7 +5,7 @@
 {% load staticfiles %}
 
 {% block main %}
-{% if query_list %}
+{% if query_list or dashboard_list %}
     <table id='query_list_table' class="table table-striped dataTable">
       <thead>
         <tr>
@@ -66,7 +66,7 @@
     } );
     </script>
 {% else %}
-    <p>No Queries are available.</p>
+    <p>No Queries or Dashboards are available.</p>
 {% endif %}
 {% endblock %}
 
