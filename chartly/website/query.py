@@ -10,13 +10,15 @@ logger = logging.getLogger(__name__)
 MAX_DEPTH_RECURSION = 10
 
 class DataManager:
-    def __init__(self, query_id = None, request = None, depth = 0):
+    def __init__(self, query_id = None, request = None, depth = 0, pivot_data = None, cumulative = None):
         self.query_id = query_id
         self.query_text = None
         self.request = request
         self.depth = depth
         if depth > MAX_DEPTH_RECURSION:
             raise IOError("Recursion Limit Reached")
+        self.pivot_data = pivot_data
+        self.cumulative = cumulative
     def setQuery(self, query_text):
         self.query_text = query_text
         self.checkSafety()
@@ -197,3 +199,23 @@ class DataManager:
         for key, replacement_dict in self.replacement_dict.iteritems():
             self.query_text = self.query_text.replace(replacement_dict['search_for'], str(replacement_dict['replace_with']))
         #raise ValueError('go fuck yourself')
+
+class MySQLManager:
+    def __init__(self, db):
+        self.DM = DataManager()
+        self.DM.db = db # TODO make this use setDb
+
+    def runQuery(self):
+        return self.DM.runQuery()
+
+    def findDatabase(self):
+        self.DM.query_text = "show databases"
+
+    def showTables(self, db):
+        self.DM.query_text = "show tables in %s" % (db)
+
+    def describeTable(self, db, table):
+        self.DM.query_text = "describe %s.%s" % (db, table)
+
+    def describeIndexTable(self, db, table):
+        self.DM.query_text =  "show index from %s in %s" % (table, db)

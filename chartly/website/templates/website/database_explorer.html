@@ -1,0 +1,105 @@
+{% extends 'website/base.html' %}
+{% load staticfiles %}
+
+{% block title %} 
+  Interactive Mode
+{% endblock %}
+
+{% block style %}
+<style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 150px;
+        width: 400px;
+    }
+    #close{
+      display:block;
+      float:right;
+      right: -10px;
+      top: -10px;
+      width:10px;
+      height:10px;
+    }
+</style>
+{% endblock %}
+{% block links %}
+  <li><a href="/">Home</a></li>
+  <li><a href="/admin/">Admin</a></li>
+  <li><a href="">Edit</a></li>
+  <li class="active"><a href="/website/query_interactive/">Database Explorer</a></li>
+</ul>
+{% endblock %}
+
+{% block main %}
+
+<script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<!-- TODO FIX CSS BUG HERE -->
+
+<div id='run_block'>
+  <div class='jumbotron'>
+    <h2>Database Explorer</h2>
+  </div>
+
+  <form id='chart_data'>
+    {% csrf_token %}
+    <div class='row'>
+        <div class="col-md-2" id="host_selector">
+          <h3>Connections</h3>
+          {% for db in db_list%}
+            <ul class="db list-group-item" db_id="{{db.id}}"><a href='#' onClick='return false;'>{{db.name_long}}</a></ul>
+          {% endfor %}
+        </div>
+        <div class="col-md-3"><h3>DB Selector</h3><div id="db_selector"></div></div>
+        <div class="col-md-3"><h3>Table Selector</h3><div id="table_selector"></div></div>
+        <div class="col-md-4"><h3>Table Info<h3><div id="table_info"></div></div>
+    </div>
+
+  </form>
+</div>    
+<script>
+$( ".db" ).click(function() {
+  //alert($( this ).attr('db_id'));
+  event.preventDefault(); // prevents scrolling up
+  var db_id = $( this ).attr('db_id')
+  var data = {'db_id': db_id}
+  //console.log(data);
+  $.get('/database_explorer_api/',data, function( json_data ) {
+    html = '';
+    //console.log(json_data.data.data);
+    $.each(json_data.data.data, function(key, val) {
+      html += "<ul id ='db_db' class='list-group-item' db_db='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+    });
+    $('#db_selector').html(html);
+    
+    // run if the db is hit
+    $( "ul" ).click(function() {
+      //alert($( this ).attr('db_db'));
+      event.preventDefault(); // prevents scrolling up
+      var db_db = $( this ).attr('db_db')
+      var data = {'db_id': db_id, 'db_db' : db_db}
+      //console.log(data);
+      $.get('/database_explorer_api/',data, function( json_data ) {
+        html = '';
+        console.log(json_data.data.data);
+        $.each(json_data.data.data, function(key, val) {
+          html += "<ul class='table list-group-item' table='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+        });
+        $('#table_selector').html(html);
+        // Run if the table is hit
+      });
+    });
+  });
+});
+</script>
+<script>
+
+
+</script>
+{% endblock %}

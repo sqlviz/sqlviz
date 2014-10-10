@@ -5,12 +5,14 @@ from django.shortcuts import get_object_or_404, render, render_to_response
 from django.utils import timezone
 from django.views import generic
 from django.template import RequestContext
-from models import Query, DashboardQuery, Dashboard, QueryDefault, Db
+#from models import Query, DashboardQuery, Dashboard, QueryDefault, Db
+import models
 import json
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
 from django.core.serializers.json import DjangoJSONEncoder
-from query import DataManager
+#from query import DataManager, 
+import query
 import time
 import datetime
 import logging
@@ -21,17 +23,17 @@ logger = logging.getLogger(__name__)
 
 def index(request, filter= None):
     if filter == None:
-        query_list = Query.objects.filter(hide_index = 0)
+        query_list = models.Query.objects.filter(hide_index = 0)
         dashboard_list = Dashboard.objects.filter(hide_index = 0)
     else:
-        query_list = Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
-        dashboard_list = Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
+        query_list = models.Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
+        dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
     return render_to_response('website/index.html', {'query_list': query_list, 'dashboard_list' : dashboard_list})
 
 def query_api(request, query_id):
     try:
         startTime = time.time()
-        DM = DataManager(query_id, request)
+        DM = query.DataManager(query_id, request)
         DM.prepareQuery()
         response_data = DM.runQuery()
         try:
@@ -55,18 +57,18 @@ def query_api(request, query_id):
                         }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
-def query(request, query_ids):
+def query_view(request, query_ids):
     query_id_array = query_ids.split(',')
     #TODO filter to make sure only this applies to queries which exist
-    query_list = [Query.objects.filter(id = i)[0] for i in query_id_array]
+    query_list = [models.Query.objects.filter(id = i)[0] for i in query_id_array]
     logging.warning(query_id_array)
     logging.warning(query_list)
     replacement_dict = {}
     json_get = {}
-    for query in query_list:
-        DM = DataManager(query.id, request)
+    for q in query_list:
+        DM = query.DataManager(q.id, request)
         DM.prepareQuery()
-        query.query_text = DM.query_text
+        q.query_text = DM.query_text
         for k,v in DM.replacement_dict.iteritems():
             replacement_dict[k] = v # This dict has target, replacement, and data_type
             json_get[v['search_for']] = v['replace_with']
@@ -81,25 +83,25 @@ def query(request, query_ids):
     
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
-    query_list = Query.objects.filter(title__in = query_name_array)
+    c
     query_id_array = []
     for q in query_list:
         query_id_array.append(str(q.id))
     query_list_string  = ','.join(query_id_array)
-    return query(request, query_list_string)
+    return query_view(request, query_list_string)
 
 def dashboard(request, dashboard_id):
     # First find all the queries, then run it as a list of queries
-    dashboard_query_list = DashboardQuery.objects.filter(dashboard_id = dashboard_id).order_by('order')
+    dashboard_query_list = models.DashboardQuery.objects.filter(dashboard_id = dashboard_id).order_by('order')
     query_id_array = []
     for q in dashboard_query_list:
         query_id_array.append(str(q.query_id))
     query_list_string  = ','.join(query_id_array)
-    return query(request, query_list_string)
+    return query_view(request, query_list_string)
 
 def query_interactive(request):
     # Render empty page for users to add data to
-    db_list = Db.objects.all()
+    db_list = models.Db.objects.all()
     return render_to_response('website/query_interactive.html',{
             'db_list': db_list},
             RequestContext(request))
@@ -113,7 +115,7 @@ def query_interactive_api(request):
         pivot  =  True if request.POST['pivot'].lower() == 'true' else False
         cumulative  =  True if request.POST['cumulative'].lower() == 'true' else False
         startTime = time.time()
-        DM = DataManager()
+        DM = query.DataManager()
         DM.setQuery(query_text)
         DM.setDB(db)
         DM.setPivot(pivot)
@@ -134,7 +136,53 @@ def query_interactive_api(request):
                             "error" : True,
                         }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
-            content_type="application/json")                        
+            content_type="application/json")
+
+def database_explorer(request):
+    # Render empty page for users to add data to
+    db_list = models.Db.objects.all()
+    return render_to_response('website/database_explorer.html',{
+            'db_list': db_list},
+            RequestContext(request))
+
+def database_explorer_api(request):
+    # Get DB
+    try:
+        db_str = request.GET.get('db_id',None) # db_id
+        db_db = request.GET.get('db_db',None) # Database's database or none
+        db_table = request.GET.get('table',None) # table name , or none
+        # Get DB Type
+        db = models.Db.objects.filter(id = db_str).first()
+        if db.type == 'MySQL':
+            DMM = query.MySQLManager(db)
+            # Show database is db_db is none
+            if db_db is None:
+                DMM.findDatabase()
+            elif db_table is None: # Show tables if table is none
+                DMM.showTables(db_db)
+            elif db_table is not None:
+                DMM.describeTable(db_db, db_table)
+            else:
+                raise ValueError("Expected respone is not correct to database_explorer")
+            response_data = DMM.runQuery()
+            return_data = {
+                    "data":
+                        {"columns" : response_data.pop(0), "data" : response_data},
+                    "error" : False}
+            return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
+                    content_type="application/json")
+            # describe table if table is not none
+    except Exception, e:
+            logging.warning(traceback.format_exc())
+            return_data = {
+                            "data": #'\n'.join(map
+                                str(traceback.format_exc()),
+                            "time_elapsed" : 0,
+                            "error" : True,
+                        }
+    return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
+            content_type="application/json")
+
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
