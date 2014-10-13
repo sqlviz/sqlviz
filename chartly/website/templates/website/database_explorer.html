@@ -78,7 +78,7 @@ $( ".con" ).click(function() {
     });
     $('#db_selector').html(html);
     $('#table_selector').empty();
-    $('#column_selector').empty();
+    $('#div_table_columns').empty();
     
   });
 });
@@ -97,7 +97,7 @@ $( "#chart_data" ).on("click",'.db',function() {
       html += "<ul class='table list-group-item' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
     });
     $('#table_selector').html(html);
-    $('#column_selector').empty();
+    $('#div_table_columns').empty();
     // Run if the table is hit
   });
 });
