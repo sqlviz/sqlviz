@@ -52,54 +52,76 @@
     <div class='row'>
         <div class="col-md-2" id="host_selector">
           <h3>Connections</h3>
-          {% for db in db_list%}
-            <ul class="db list-group-item" db_id="{{db.id}}"><a href='#' onClick='return false;'>{{db.name_long}}</a></ul>
+          {% for con in db_list%}
+            <ul class="con list-group-item" con_id="{{con.id}}"><a href='#' onClick='return false;'>{{con.name_long}}</a></ul>
           {% endfor %}
         </div>
         <div class="col-md-3"><h3>DB Selector</h3><div id="db_selector"></div></div>
         <div class="col-md-3"><h3>Table Selector</h3><div id="table_selector"></div></div>
-        <div class="col-md-4"><h3>Table Info<h3><div id="table_info"></div></div>
+        <div class="col-md-4"><h3>Table Info</h3><div id="div_table_columns"></div></div>
     </div>
 
   </form>
 </div>    
 <script>
-$( ".db" ).click(function() {
+$( ".con" ).click(function() {
   //alert($( this ).attr('db_id'));
   event.preventDefault(); // prevents scrolling up
-  var db_id = $( this ).attr('db_id')
-  var data = {'db_id': db_id}
+  var con_id = $( this ).attr('con_id')
+  var data = {'con_id': con_id}
   //console.log(data);
   $.get('/database_explorer_api/',data, function( json_data ) {
     html = '';
     //console.log(json_data.data.data);
     $.each(json_data.data.data, function(key, val) {
-      html += "<ul id ='db_db' class='list-group-item' db_db='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+      html += "<ul class='db list-group-item' con_id='"+con_id +"' db_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
     });
     $('#db_selector').html(html);
+    $('#table_selector').empty();
+    $('#column_selector').empty();
     
-    // run if the db is hit
-    $( "ul" ).click(function() {
-      //alert($( this ).attr('db_db'));
-      event.preventDefault(); // prevents scrolling up
-      var db_db = $( this ).attr('db_db')
-      var data = {'db_id': db_id, 'db_db' : db_db}
-      //console.log(data);
-      $.get('/database_explorer_api/',data, function( json_data ) {
-        html = '';
-        console.log(json_data.data.data);
-        $.each(json_data.data.data, function(key, val) {
-          html += "<ul class='table list-group-item' table='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
-        });
-        $('#table_selector').html(html);
-        // Run if the table is hit
-      });
+  });
+});
+// run if the db is hit
+$( "#chart_data" ).on("click",'.db',function() {
+  //alert($( this ).attr('db_id'));
+  event.preventDefault(); // prevents scrolling up
+  var db_id = $( this ).attr('db_id')
+  var con_id = $( this ).attr('con_id')
+  var data = {'db_id': db_id, 'con_id' : con_id}
+  //console.log(data);
+  $.get('/database_explorer_api/',data, function( json_data ) {
+    html = '';
+    //console.log(json_data.data.data);
+    $.each(json_data.data.data, function(key, val) {
+      html += "<ul class='table list-group-item' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
     });
+    $('#table_selector').html(html);
+    $('#column_selector').empty();
+    // Run if the table is hit
+  });
+});
+
+// Run if the table is hit
+$( "#chart_data" ).on("click",'.table',function() {
+  //alert($( this ).attr('db_id'));
+  event.preventDefault(); // prevents scrolling up
+  var db_id = $( this ).attr('db_id')
+  var con_id = $( this ).attr('con_id')
+  var table_id = $( this ).attr('table_id')
+  var data = {'db_id': db_id, 'con_id' : con_id,'table_id': table_id}
+  console.log(data);
+  $.get('/database_explorer_api/',data, function( json_data ) {
+    make_table(json_data.data.columns,json_data.data.data, 'columns')
+    /*html = '';
+    console.log(json_data.data.data);
+
+    $.each(json_data.data.data, function(key, val) {
+      html += "<ul class='list-group-item' table_id='" + table_id + "' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+    });
+    $('#column_selector').html(html);*/
   });
 });
 </script>
-<script>
 
-
-</script>
 {% endblock %}

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def index(request, filter= None):
     if filter == None:
         query_list = models.Query.objects.filter(hide_index = 0)
-        dashboard_list = Dashboard.objects.filter(hide_index = 0)
+        dashboard_list = models.Dashboard.objects.filter(hide_index = 0)
     else:
         query_list = models.Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
         dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
@@ -148,20 +148,20 @@ def database_explorer(request):
 def database_explorer_api(request):
     # Get DB
     try:
-        db_str = request.GET.get('db_id',None) # db_id
-        db_db = request.GET.get('db_db',None) # Database's database or none
-        db_table = request.GET.get('table',None) # table name , or none
+        con_id = request.GET.get('con_id',None) # db_id
+        db_id = request.GET.get('db_id',None) # Database's database or none
+        table_id = request.GET.get('table_id',None) # table name , or none
         # Get DB Type
-        db = models.Db.objects.filter(id = db_str).first()
-        if db.type == 'MySQL':
-            DMM = query.MySQLManager(db)
+        con = models.Db.objects.filter(id = con_id).first()
+        if con.type == 'MySQL':
+            DMM = query.MySQLManager(con)
             # Show database is db_db is none
-            if db_db is None:
+            if db_id is None:
                 DMM.findDatabase()
-            elif db_table is None: # Show tables if table is none
-                DMM.showTables(db_db)
-            elif db_table is not None:
-                DMM.describeTable(db_db, db_table)
+            elif table_id is None: # Show tables if table is none
+                DMM.showTables(db_id)
+            elif table_id is not None:
+                DMM.describeTable(db_id, table_id)
             else:
                 raise ValueError("Expected respone is not correct to database_explorer")
             response_data = DMM.runQuery()
