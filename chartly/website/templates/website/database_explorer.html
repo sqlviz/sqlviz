@@ -98,7 +98,6 @@ $( "#chart_data" ).on("click",'.db',function() {
     });
     $('#table_selector').html(html);
     $('#div_table_columns').empty();
-    // Run if the table is hit
   });
 });
 
@@ -113,13 +112,6 @@ $( "#chart_data" ).on("click",'.table',function() {
   console.log(data);
   $.get('/database_explorer_api/',data, function( json_data ) {
     make_table(json_data.data.columns,json_data.data.data, 'columns')
-    /*html = '';
-    console.log(json_data.data.data);
-
-    $.each(json_data.data.data, function(key, val) {
-      html += "<ul class='list-group-item' table_id='" + table_id + "' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
-    });
-    $('#column_selector').html(html);*/
   });
 });
 </script>

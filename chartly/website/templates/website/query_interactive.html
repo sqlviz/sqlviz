@@ -8,13 +8,18 @@
 {% block style %}
 <style type="text/css" media="screen">
     #editor { 
-        position: absolute;
+        position: relative;
         top: 0;
         right: 0;
         bottom: 0;
         left: 0;
-        height: 150px;
-        width: 400px;
+        height: 480px;
+        width: 480px;
+        padding: 30px;
+        clear:both;
+        border-radius: 10px;
+
+
     }
     #close{
       display:block;
@@ -159,5 +164,70 @@ group by
     event.preventDefault();
   });
 
-</script>    
+</script>
+
+<div id='db_explorer'>
+  <form id='chart_data'>
+    {% csrf_token %}
+    <div class='row'>
+      <div class="col-md-3"><h3>DB Selector</h3><div id="db_selector"></div></div>
+      <div class="col-md-3"><h3>Table Selector</h3><div id="table_selector"></div></div>
+      <div class="col-md-6"><h3>Table Info</h3><div id="div_table_columns"></div></div>
+    </div>
+  </form>
+</div>
+<script>
+$( "select" ).change(function () {  
+  //alert($( this ).attr('db_id'));
+  event.preventDefault(); // prevents scrolling up
+  var con_id = $("#db option:selected").val();
+  //var con_id = $( this ).attr('con_id')
+  var data = {'con_id': con_id}
+  //console.log(data);
+  $.get('/database_explorer_api/',data, function( json_data ) {
+    html = '';
+    //console.log(json_data.data.data);
+    $.each(json_data.data.data, function(key, val) {
+      html += "<ul class='db list-group-item' con_id='"+con_id +"' db_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+    });
+    $('#db_selector').html(html);
+    $('#table_selector').empty();
+    $('#div_table_columns').empty();
+    
+  });
+});
+// run if the db is hit
+$( "#db_explorer" ).on("click",'.db',function() {
+  //alert($( this ).attr('db_id'));
+  event.preventDefault(); // prevents scrolling up
+  var db_id = $( this ).attr('db_id')
+  var con_id = $( this ).attr('con_id')
+  var data = {'db_id': db_id, 'con_id' : con_id}
+  //console.log(data);
+  $.get('/database_explorer_api/',data, function( json_data ) {
+    html = '';
+    //console.log(json_data.data.data);
+    $.each(json_data.data.data, function(key, val) {
+      html += "<ul class='table list-group-item' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+    });
+    $('#table_selector').html(html);
+    $('#div_table_columns').empty();
+  });
+});
+
+// Run if the table is hit
+$( "#db_explorer" ).on("click",'.table',function() {
+  //alert($( this ).attr('db_id'));
+  event.preventDefault(); // prevents scrolling up
+  var db_id = $( this ).attr('db_id')
+  var con_id = $( this ).attr('con_id')
+  var table_id = $( this ).attr('table_id')
+  var data = {'db_id': db_id, 'con_id' : con_id,'table_id': table_id}
+  console.log(data);
+  $.get('/database_explorer_api/',data, function( json_data ) {
+    make_table(json_data.data.columns,json_data.data.data, 'columns')
+  });
+});
+</script>
+
 {% endblock %}
