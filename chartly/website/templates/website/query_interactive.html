@@ -22,12 +22,12 @@
 
     }
     #close{
-      display:block;
       float:right;
-      right: -10px;
-      top: -10px;
-      width:10px;
-      height:10px;
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      width:30px;
+      height:30px;
     }
 </style>
 {% endblock %}
@@ -112,7 +112,7 @@ group by
   // Run once every time the submit button is pressed
   function send_data(foo){
     run_count = run_count + 1;
-    console.log("Run count : " + run_count);
+    //console.log("Run count : " + run_count);
     var graph =  $('input[id=graph]:checked', '#chart_data').val();
     var db = $("#db option:selected").val();
     var pivot = $('input[id=pivot]:checked', '#chart_data').val();
@@ -125,9 +125,9 @@ group by
       'cumulative': cumulative,
       'csrfmiddlewaretoken' : '{{ csrf_token }}'
     };
-    var append_block = "<h3>Run " + run_count + "</h3>\
-    <div class='col-md-12 jumbotron'  id ='block_" + run_count + "'>\
-    <button  type='submit' class='glyphicon glyphicon-remove-circle close' id ='close_" + run_count + "'></button>\
+    var append_block = "<div class='col-md-12 jumbotron'  id ='block_" + run_count + "'>\
+    <h3>Run " + run_count + "</h3>\
+    <button  type='submit' class='glyphicon glyphicon-remove-circle close' id='close' run_count ='" + run_count + "'></button>\
     <div id ='div_table_table_" + run_count + "'></div>\
     <div id ='chart_" + run_count + "'></div>\
     <div id ='error_" + run_count + "' class = 'alert alert-error alert-block'><pre></pre>\
@@ -141,8 +141,8 @@ group by
     $.post('/query_interactive_api/',data, function( json_data ) {
       $("#append_list").append(append_block);
       //TODO add URL reverse here
-      console.log(json_data);
-      console.log('chart_{{query.id}}');
+      //console.log(json_data);
+      //console.log('chart_{{query.id}}');
       if (json_data.error == false) {
         $("#error_" + run_count ).hide();
         make_table(json_data.data.columns, json_data.data.data, 'table_' + run_count);
@@ -163,7 +163,11 @@ group by
     send_data();
     event.preventDefault();
   });
-
+// Hide group if the x button is clicked
+$( "#append_list" ).on("click",'#close',function() {
+  var close_block = '#block_' + $( this ).attr('run_count') ;
+  $(close_block).hide(); 
+});
 </script>
 
 <div id='db_explorer'>
