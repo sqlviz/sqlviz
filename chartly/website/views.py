@@ -5,13 +5,11 @@ from django.shortcuts import get_object_or_404, render, render_to_response
 from django.utils import timezone
 from django.views import generic
 from django.template import RequestContext
-#from models import Query, DashboardQuery, Dashboard, QueryDefault, Db
 import models
 import json
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
 from django.core.serializers.json import DjangoJSONEncoder
-#from query import DataManager, 
 import query
 import time
 import datetime
@@ -148,30 +146,38 @@ def database_explorer(request):
 def database_explorer_api(request):
     # Get DB
     try:
-        con_id = request.GET.get('con_id',None) # db_id
+        con_id = request.GET.get('con_id') # connection id is needed
         db_id = request.GET.get('db_id',None) # Database's database or none
         table_id = request.GET.get('table_id',None) # table name , or none
         # Get DB Type
         con = models.Db.objects.filter(id = con_id).first()
+        
+        # Switch in database Type
         if con.type == 'MySQL':
             DMM = query.MySQLManager(con)
-            # Show database is db_db is none
-            if db_id is None:
-                DMM.findDatabase()
-            elif table_id is None: # Show tables if table is none
-                DMM.showTables(db_id)
-            elif table_id is not None:
-                DMM.describeTable(db_id, table_id)
-            else:
-                raise ValueError("Expected respone is not correct to database_explorer")
-            response_data = DMM.runQuery()
-            return_data = {
-                    "data":
-                        {"columns" : response_data.pop(0), "data" : response_data},
-                    "error" : False}
-            return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
-                    content_type="application/json")
-            # describe table if table is not none
+        elif con.type == 'Postgres':
+            DMM = query.PSQLManager(con)
+        else:
+            raise ValueError("Database cannot be explorered yet only supported types are 'MySQL','Postgres'")
+
+        # Get proper response data
+        if db_id is None:
+            DMM.findDatabase()
+        elif table_id is None: # Show tables if table is none
+            DMM.showTables(db_id)
+        elif table_id is not None:
+            DMM.describeTable(db_id, table_id)
+        else:
+            raise ValueError("""ERROR: con_id is needed,
+                    db_id needed for to produce table list,
+                    table_id needed to procude column list""")
+        response_data = DMM.runQuery()
+        return_data = {
+                "data":
+                    {"columns" : response_data.pop(0), "data" : response_data},
+                "error" : False}    
+        return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
+                content_type="application/json")
     except Exception, e:
             logging.warning(traceback.format_exc())
             return_data = {

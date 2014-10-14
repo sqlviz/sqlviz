@@ -5,6 +5,7 @@ import pandas as pd
 import uuid
 from django.conf import settings
 import re
+import psycopg2
 
 logger = logging.getLogger(__name__)
 MAX_DEPTH_RECURSION = 10
@@ -96,9 +97,9 @@ class DataManager:
         con.close()
 
     def runPostgresQuery(self):
-        # TODO write this
         con = psycopg2.connect(host = self.db.host, port = self.db.port, 
-                    username = self.db.username, password =self.db.password_encrpyed)
+                user = self.db.username, password =self.db.password_encrpyed,
+                database = self.db.db)
         data = pd.io.sql.read_sql(self.query_text,con)
         self.data = data
         con.close()
@@ -128,7 +129,7 @@ class DataManager:
             if len(re.findall('[;](\s)*$', self.query_text)) == 0: # No Semicolon
                 self.query_text += " limit 1000;"
             else: #semicolon
-                self.query_text = re.sub('[;](\s)*$','', self.query_text) + 'limit 1000;'
+                self.query_text = re.sub('[;](\s)*$','', self.query_text) + ' limit 1000;'
 
     def pivot(self):
         # use pandas TODO to make the pivot
@@ -219,3 +220,29 @@ class MySQLManager:
 
     def describeIndexTable(self, db, table):
         self.DM.query_text =  "show index from %s in %s" % (table, db)
+
+class PSQLManager:
+    def __init__(self, db):
+        self.DM = DataManager()
+        self.DM.db = db # TODO make this use setDb
+
+    def runQuery(self):
+        return self.DM.runQuery()
+
+    def findDatabase(self):
+        self.DM.query_text = """SELECT datname FROM pg_database
+            WHERE datistemplate = false;"""
+
+    def showTables(self, db):
+        self.DM.query_text = """SELECT table_name
+            FROM information_schema.tables
+            where table_catalog = '%s' and table_schema = 'public'
+            ORDER BY table_schema,table_name;""" % (db)
+
+    def describeTable(self, db, table):
+        self.DM.query_text = """SELECT column_name, data_type, character_maximum_length
+            FROM INFORMATION_SCHEMA.COLUMNS
+            where table_catalog = '%s' and table_name = '%s'""" % (db, table)
+
+    def describeIndexTable(self, db, table):
+        self.DM.query_text =  "show index from %s in %s" % (table, db)        
