@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render, render_to_response
 from django.utils import timezone
 from django.views import generic
+from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 import models
 import json
@@ -19,6 +20,7 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
+@login_required
 def index(request, filter= None):
     if filter == None:
         query_list = models.Query.objects.filter(hide_index = 0)

@@ -7,5 +7,5 @@ urlpatterns = patterns('',
    	url(r'^', include('website.urls', namespace="website")),
 	url(r'^website/', include('website.urls', namespace="website")),
     url(r'^admin/', include(admin.site.urls), name='admin'),
-    #url(r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    url(r'^accounts/', include('accounts.urls'), name='accounts')
 )

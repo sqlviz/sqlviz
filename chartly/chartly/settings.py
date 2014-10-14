@@ -42,7 +42,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_ace',
     'website',
-    'taggit'
+    'taggit',
+    'accounts'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -158,3 +159,6 @@ STATIC_URL = '/static/'
 
 #Encryption
 ENCRYPTED_FIELDS_KEYDIR = BASE_DIR + '/fieldkeys'
+
+# Login URL for @log_in decorator
+LOGIN_URL = '/accounts/login'

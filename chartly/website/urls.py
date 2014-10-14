@@ -13,5 +13,5 @@ urlpatterns = patterns('',
    	url(r'^query_interactive/', query_interactive, name='query_interactive'),
    	url(r'^query_interactive_api/', query_interactive_api, name='query_interactive_api'),
    	url(r'^database_explorer/', database_explorer, name='database_explorer'),
-   	url(r'^database_explorer_api/', database_explorer_api, name='database_explorer_api')
+   	url(r'^database_explorer_api/', database_explorer_api, name='database_explorer_api'),
 )
