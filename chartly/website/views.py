@@ -20,7 +20,7 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
-@login_required
+#@login_required
 def index(request, filter= None):
     if filter == None:
         query_list = models.Query.objects.filter(hide_index = 0)
@@ -28,7 +28,9 @@ def index(request, filter= None):
     else:
         query_list = models.Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
         dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
-    return render_to_response('website/index.html', {'query_list': query_list, 'dashboard_list' : dashboard_list})
+    return render_to_response('website/index.html',
+            {'query_list': query_list, 'dashboard_list' : dashboard_list},
+            context_instance = RequestContext(request))
 
 def query_api(request, query_id):
     try:

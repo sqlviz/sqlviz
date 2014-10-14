@@ -30,10 +30,10 @@
 </style>
 {% endblock %}
 {% block links %}
-  <li><a href="/">Home</a></li>
-  <li><a href="/admin/">Admin</a></li>
-  <li><a href="">Edit</a></li>
-  <li class="active"><a href="/website/query_interactive/">Interactive Mode</a></li>
+  <li><a href="{% url 'website:home' %}">Home</a></li>
+  <li><a href="/admin">Admin</a></li>
+  <li><a>Edit</a></li>
+  <li class="active"><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
 </ul>
 {% endblock %}
 
@@ -136,11 +136,8 @@ group by
           $('#block_').toggleClass('hide');
       });
     });
-    $.post('/query_interactive_api/',data, function( json_data ) {
+    $.post('{% url "website:query_interactive_api" %}',data, function( json_data ) {
       $("#append_list").append(append_block);
-      //TODO add URL reverse here
-      //console.log(json_data);
-      //console.log('chart_{{query.id}}');
       if (json_data.error == false) {
         $("#error_" + run_count ).hide();
         make_table(json_data.data.columns, json_data.data.data, 'table_' + run_count);
@@ -186,9 +183,9 @@ $( "select" ).change(function () {
   //var con_id = $( this ).attr('con_id')
   var data = {'con_id': con_id}
   //console.log(data);
-  $.get('/database_explorer_api/',data, function( json_data ) {
+  $.get('{% url "website:database_explorer_api" %}',data, function( json_data ) {
     html = '';
-    //console.log(json_data.data.data);
+    //console.log(json_data);
     $.each(json_data.data.data, function(key, val) {
       html += "<ul class='db list-group-item' con_id='"+con_id +"' db_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
     });
@@ -205,7 +202,7 @@ $( "#db_explorer" ).on("click",'.db',function() {
   var con_id = $( this ).attr('con_id')
   var data = {'db_id': db_id, 'con_id' : con_id}
   //console.log(data);
-  $.get('/database_explorer_api/',data, function( json_data ) {
+  $.get('{% url "website:database_explorer_api" %}',data, function( json_data ) {
     html = '';
     //console.log(json_data.data.data);
     $.each(json_data.data.data, function(key, val) {
@@ -224,8 +221,8 @@ $( "#db_explorer" ).on("click",'.table',function() {
   var con_id = $( this ).attr('con_id')
   var table_id = $( this ).attr('table_id')
   var data = {'db_id': db_id, 'con_id' : con_id,'table_id': table_id}
-  console.log(data);
-  $.get('/database_explorer_api/',data, function( json_data ) {
+  //console.log(data);
+  $.get('{% url "website:database_explorer_api" %}',data, function( json_data ) {
     make_table(json_data.data.columns,json_data.data.data, 'columns')
   });
 });

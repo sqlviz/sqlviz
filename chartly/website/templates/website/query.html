@@ -22,10 +22,10 @@
 
           
           {% block links %}
-            <li ><a href="/">Home</a></li>
+            <li><a href="{% url 'website:home' %}">Home</a></li>
             <li><a href="/admin/">Admin</a></li>
             <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
-            <li><a href="/website/query_interactive/">Interactive Mode</a></li>
+            <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
           </ul>
           {% endblock %}
 
@@ -69,7 +69,7 @@
     </script>
     <script>
     $( "#error_{{query.id}}" ).hide();
-    $.getJSON('/query_api/{{query.id}}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
+    $.getJSON('{% url "website:query_api" query.id %}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
       //console.log(json_data);
       //console.log('chart_{{query.id}}');
       $( "#waiting_{{query.id}}" ).empty();
@@ -92,12 +92,7 @@
     <h3 class='label-danger'>Nothing matches that descriptions.  Are you sure it is there?</h3>
 {% endif %}
 </div>
-<!--<script>
-$(function() {
-  $( "#sortable" ).sortable();
-  $("div, p, pre, table").disableSelection();
-});
-</script>-->
+
 {% if replacement_dict %}
   <div class='jumbotron'>
     <form action ='{{request.path}}' method='GET'>
