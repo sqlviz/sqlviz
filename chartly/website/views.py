@@ -20,7 +20,7 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
-#@login_required
+@login_required
 def index(request, filter= None):
     if filter == None:
         query_list = models.Query.objects.filter(hide_index = 0)
