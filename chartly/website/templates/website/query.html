@@ -19,21 +19,19 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 {% endblock %}
-
           
-          {% block links %}
-            <li><a href="{% url 'website:home' %}">Home</a></li>
-            <li><a href="/admin/">Admin</a></li>
-            <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
-            <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
-          </ul>
-          {% endblock %}
+{% block links %}
+  <li><a href="{% url 'website:home' %}">Home</a></li>
+  <li><a href="/admin/">Admin</a></li>
+  <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
+  <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
+</ul>
+{% endblock %}
 
 {% block main %}
 <div id='sortable'>
 {% if query_list %}
   {% for query in query_list %}    
-
     <div class='jumbotron' id='div_{{query.id}}'>
     <h2>{{query.title}}</h2>
     <div class='hide_{{query.id}}'>
@@ -44,9 +42,12 @@
     </div>
     <div id ='chart_{{query.id}}'></div>
       <ul class='hide_{{query.id}}'>
+        <li><a href="/admin/website/query/{{ query.id }}">Edit</a></li>
         <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
-        <li>Description Short:{{query.description}}</li>
+        <li>Description Short: {{query.description}}</li>
+        {% if query.description_long %}
         <li>Description Long: {{query.description_long}}</li>
+        {% endif %}
         <li>Query Text: <div id='sql_{{query.id}}'><pre>{{query.query_text}}</pre>  </div></li>
         <li>Query Creation: {{query.create_time}}</li>
         <li>Query Last Modified: {{query.modified_time}}</li>
