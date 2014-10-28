@@ -60,7 +60,7 @@
           </ul>
           {% endblock links %}
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="../navbar/">Username: {{ user.username }}</a></li>
+            <li><a href="{% url 'accounts:logout' %}">Username: {{ user.username }}</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
