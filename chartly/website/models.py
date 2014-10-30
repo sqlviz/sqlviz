@@ -22,7 +22,7 @@ class Db(models.Model):
     db = models.CharField(max_length=1024)
     port = models.IntegerField()
     username = models.CharField(max_length=128)
-    password_encrpyed = EncryptedCharField(max_length=1024,)
+    password_encrypted = EncryptedCharField(max_length=1024,) # TODO FIX SPELLING MISTAKE
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
     tags = TaggableManager(blank=True)
@@ -51,7 +51,7 @@ class Query(models.Model):
     stacked = models.BooleanField(default=False, help_text = 'Stack graph Type')
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
-    graph_extra = models.TextField(default = '{}', blank = True, help_text = 'JSON form of highcharts formatting')
+    graph_extra = models.TextField(default = '{}', help_text = 'JSON form of highcharts formatting')
     tags = TaggableManager(blank=True)
 
     def __str__(self):

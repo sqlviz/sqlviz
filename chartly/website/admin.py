@@ -15,7 +15,7 @@ class QueryPrecedentAdmin(admin.TabularInline):
 class QueryAdminForm(forms.ModelForm):
     class Meta:
         model = Query
-        #widgets = {'query_text' : AceWidget(mode='sql')}
+        widgets = {'query_text' : AceWidget(mode='sql')}
         exclude = ()
 
 class QueryAdmin(admin.ModelAdmin):

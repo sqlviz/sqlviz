@@ -32,6 +32,7 @@ def index(request, filter= None):
             {'query_list': query_list, 'dashboard_list' : dashboard_list},
             context_instance = RequestContext(request))
 
+@login_required
 def query_api(request, query_id):
     try:
         startTime = time.time()
@@ -59,6 +60,7 @@ def query_api(request, query_id):
                         }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
+@login_required
 def query_view(request, query_ids):
     query_id_array = query_ids.split(',')
     #TODO filter to make sure only this applies to queries which exist
@@ -82,7 +84,8 @@ def query_view(request, query_ids):
                     'json_get' : json.dumps(json_get)
                 },
                 context_instance=RequestContext(request))
-    
+
+@login_required    
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
     c
@@ -92,6 +95,7 @@ def query_name(request, query_names):
     query_list_string  = ','.join(query_id_array)
     return query_view(request, query_list_string)
 
+@login_required
 def dashboard(request, dashboard_id):
     # First find all the queries, then run it as a list of queries
     dashboard_query_list = models.DashboardQuery.objects.filter(dashboard_id = dashboard_id).order_by('order')
@@ -101,13 +105,14 @@ def dashboard(request, dashboard_id):
     query_list_string  = ','.join(query_id_array)
     return query_view(request, query_list_string)
 
+@login_required
 def query_interactive(request):
     # Render empty page for users to add data to
     db_list = models.Db.objects.all()
     return render_to_response('website/query_interactive.html',{
             'db_list': db_list},
             RequestContext(request))
-
+@login_required
 def query_interactive_api(request):
     # Take Query, Database, and Pivot
     # Create DataManager, run and return as JSON schema
@@ -140,6 +145,7 @@ def query_interactive_api(request):
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
             content_type="application/json")
 
+@login_required
 def database_explorer(request):
     # Render empty page for users to add data to
     db_list = models.Db.objects.all()
@@ -147,6 +153,7 @@ def database_explorer(request):
             'db_list': db_list},
             RequestContext(request))
 
+@login_required
 def database_explorer_api(request):
     # Get DB
     try:
