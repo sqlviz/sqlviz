@@ -1,0 +1,9 @@
+{% extends "accounts/base.html" %}
+
+{% block content %}
+	{% if user.is_authenticated %}
+		You are still logged in.  <a href='{% url 'accounts:logout' %}'>LOG OUT</a>
+	{% else %}
+		You have logged out.  <a href='{% url 'accounts:login' %}'>Log back in</a> 
+	{% endif %}
+{% endblock %}

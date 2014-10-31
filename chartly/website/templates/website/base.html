@@ -57,10 +57,14 @@
             <li><a href="/admin/">Admin</a></li>
             <li><a href="/admin/website/query">Edit</a></li>
             <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
+            {% endblock links %}
           </ul>
-          {% endblock links %}
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'accounts:logout' %}">Username: {{ user.username }}</a></li>
+            {% if user.username %}
+              <li><a href="{% url 'accounts:logout_confirm' %}">
+                  Username: {{ user.username }}</a></li>
+            {% endif %}
+
           </ul>
         </div><!--/.nav-collapse -->
       </div>
