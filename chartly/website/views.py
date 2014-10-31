@@ -53,8 +53,8 @@ def query_api(request, query_id):
             #logging.warning(str(sys.exc_info()) + str(e))
             logging.warning(traceback.format_exc())
             return_data = {
-                            "data": #'\n'.join(map
-                                str(traceback.format_exc()),
+                            "data": #str(traceback.format_exc()),
+                                    str(e),
                             "time_elapsed" : 0,
                             "error" : True,
                         }
@@ -88,7 +88,6 @@ def query_view(request, query_ids):
 @login_required    
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
-    c
     query_id_array = []
     for q in query_list:
         query_id_array.append(str(q.id))
@@ -112,6 +111,7 @@ def query_interactive(request):
     return render_to_response('website/query_interactive.html',{
             'db_list': db_list},
             RequestContext(request))
+
 @login_required
 def query_interactive_api(request):
     # Take Query, Database, and Pivot
@@ -137,8 +137,8 @@ def query_interactive_api(request):
     except Exception, e:
             logging.warning(traceback.format_exc())
             return_data = {
-                            "data": #'\n'.join(map
-                                str(traceback.format_exc()),
+                            "data":#str(traceback.format_exc()),
+                                str(e),
                             "time_elapsed" : 0,
                             "error" : True,
                         }

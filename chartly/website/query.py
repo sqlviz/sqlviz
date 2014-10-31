@@ -118,7 +118,7 @@ class DataManager:
         engine_string = '%s://%s:%s@%s:%s/%s' % (
                 self.db.type.lower(), 
                 self.db.username,
-                urlquote(self.db.password_encrpyed),
+                urlquote(self.db.password_encrypted),
                 self.db.host, 
                 self.db.port, 
                 self.db.db)
