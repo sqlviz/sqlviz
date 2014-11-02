@@ -27,7 +27,7 @@ class QueryAdmin(admin.ModelAdmin):
 class DbAdminForm(forms.ModelForm):
     class Meta:
         model = Db
-        widgets = {'password_encrpyed' : PasswordInput()}
+        widgets = {'password_encrptyed' : PasswordInput()}
         exclude = ()
 
 class DbAdmin(admin.ModelAdmin):
