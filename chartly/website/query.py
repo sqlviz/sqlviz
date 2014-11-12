@@ -30,7 +30,6 @@ class DataManager:
         Takes a query_text and sets it to the self.query_text
         """
         self.query_text = query_text
-        self.checkSafety()
 
     def setDB(self, db):
         """
@@ -68,9 +67,6 @@ class DataManager:
         # Attach Limits
         if q.insert_limit == True:
             self.addLimits()
-        # Run safety/sanity check for deletes/updates/...
-        self.checkSafety() # TODO this is run twice
-        self.addQueryComments()
         logging.info('QUERY IS NOW : %s' % (self.query_text))
 
     def addQueryComments(self):
@@ -87,6 +83,10 @@ class DataManager:
         Runs self's query against DB and then does post-processing
         like pivots, cumulative, etc
         """
+        # Run safety/sanity check for deletes/updates/...
+        self.checkSafety() # TODO this is run twice
+        self.addQueryComments()
+
         # Get DB creds
         if self.db.type  in  ['MySQL','Postgres']:
             self.runSQLQuery()

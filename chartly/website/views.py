@@ -43,7 +43,7 @@ def query_api(request, query_id):
             DM.saveToSQLTable()
         except Exception:
             logging.warning(sys.exc_info())
-        time_elapsed = time.time()-startTime
+        time_elapsed = time.time() - startTime
         return_data = {
                         "data":
                             {"columns" : response_data.pop(0), "data" : response_data},
@@ -76,7 +76,6 @@ def query_view(request, query_ids):
         for k,v in DM.replacement_dict.iteritems():
             replacement_dict[k] = v # This dict has target, replacement, and data_type
             json_get[v['search_for']] = v['replace_with']
-    #logging.warning(request.get)
     return render_to_response('website/query.html', 
                 {
                     'query_list': query_list,
@@ -123,11 +122,10 @@ def query_interactive_api(request):
         cumulative  =  True if request.POST['cumulative'].lower() == 'true' else False
         startTime = time.time()
         DM = query.DataManager()
-        DM.setQuery(query_text) # TODO clean this cruft up
+        DM.setQuery(query_text) # TODO clean this cruft up and consolidate
         DM.setDB(db)
         DM.setPivot(pivot)
         DM.setCumulative(cumulative)
-        DM.addQueryComments() 
         response_data = DM.runQuery()
         time_elapsed = time.time() - startTime # TODO get rid of this copy-pasta
         return_data = {
