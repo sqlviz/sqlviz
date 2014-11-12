@@ -123,10 +123,11 @@ def query_interactive_api(request):
         cumulative  =  True if request.POST['cumulative'].lower() == 'true' else False
         startTime = time.time()
         DM = query.DataManager()
-        DM.setQuery(query_text)
+        DM.setQuery(query_text) # TODO clean this cruft up
         DM.setDB(db)
         DM.setPivot(pivot)
         DM.setCumulative(cumulative)
+        DM.addQueryComments() 
         response_data = DM.runQuery()
         time_elapsed = time.time() - startTime # TODO get rid of this copy-pasta
         return_data = {

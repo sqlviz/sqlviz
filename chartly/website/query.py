@@ -24,6 +24,7 @@ class DataManager:
             raise IOError("Recursion Limit Reached")
         self.pivot_data = pivot_data
         self.cumulative = cumulative
+
     def setQuery(self, query_text):
         """
         Takes a query_text and sets it to the self.query_text
@@ -61,20 +62,26 @@ class DataManager:
         self.setDB(q.database_id)
         self.setPivot(q.pivot_data)
         self.setCumulative(q.cumulative)
-
-        #logging.error('QUERY IS NOW BEFORE DEFUALTS: %s' % (self.query_text))
         self.defaultFind() 
-        #logging.error('QUERY IS NOW AFTER DEFUALTS: %s' % (self.query_text))
         # Set default Values
         self.defaultSet()
-        #logging.error('QUERY IS NOW AFTER UPDATES: %s' % (self.query_text))
         # Attach Limits
         if q.insert_limit == True:
             self.addLimits()
         # Run safety/sanity check for deletes/updates/...
-        self.checkSafety()
+        self.checkSafety() # TODO this is run twice
+        self.addQueryComments()
         logging.info('QUERY IS NOW : %s' % (self.query_text))
 
+    def addQueryComments(self):
+        """
+        Adds comments before query for the DBAs to blame
+        """
+        if self.db == 'MySQL':
+            comment = "#"
+        else:
+            comment = "--"
+        self.query_text = "%s Chartly Running Query Id: %s \n %s" % (comment, self.query_id, self.query_text)
     def runQuery(self):
         """
         Runs self's query against DB and then does post-processing
@@ -111,7 +118,7 @@ class DataManager:
             DM = DataManager(QP.preding_query_id, request, self.depth + 1)
             DM.prepareQuery()
             DM.runQuery()
-            DM.saveToSQLTable()
+            DM.saveToSQLTable() # TODO run this after pivot?
 
     def runSQLQuery(self):
         #TODO optimize
@@ -122,10 +129,14 @@ class DataManager:
                 self.db.host, 
                 self.db.port, 
                 self.db.db)
-        engine = sqlalchemy.create_engine(engine_string)
+        engine = sqlalchemy.create_engine(engine_string,)
         c = engine.connect()
-        result = c.execute(self.query_text)
+        query_text = self.query_text.replace('%','%%') # SQLAlchemy Escaping
+        result = c.execute(query_text)
         df = pd.DataFrame(result.fetchall())
+
+        if df.shape == (0,0):
+            raise Exception("No Data Returned by Query!")
         df.columns = result.keys()
         c.close()
 
