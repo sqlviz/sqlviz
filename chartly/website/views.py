@@ -64,9 +64,9 @@ def query_api(request, query_id):
 def query_view(request, query_ids):
     query_id_array = query_ids.split(',')
     #TODO filter to make sure only this applies to queries which exist
-    query_list = [models.Query.objects.filter(id = i)[0] for i in query_id_array]
-    logging.warning(query_id_array)
-    logging.warning(query_list)
+    query_list = [m for m in models.Query.objects.filter(id__in =query_id_array)] #[0] for i in query_id_array]]
+    #logging.warning(query_id_array)
+    #logging.warning(query_list)
     replacement_dict = {}
     json_get = {}
     for q in query_list:
@@ -87,10 +87,11 @@ def query_view(request, query_ids):
 @login_required    
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
-    query_id_array = []
-    for q in query_list:
-        query_id_array.append(str(q.id))
-    query_list_string  = ','.join(query_id_array)
+    query_list_string = ','.join([str(m.id) for m in models.Query.objects.filter(title__in = query_name_array)])
+    #query_id_array = []
+    #for q in query_list:
+    #    query_id_array.append(str(q.id))
+    #query_list_string  = ','.join(query_id_array)
     return query_view(request, query_list_string)
 
 @login_required

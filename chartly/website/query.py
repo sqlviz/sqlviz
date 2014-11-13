@@ -24,6 +24,17 @@ class DataManager:
             raise IOError("Recursion Limit Reached")
         self.pivot_data = pivot_data
         self.cumulative = cumulative
+        if self.request is not None:
+            self.user = self.request.user
+
+    def logQueryUsage(self):
+        """
+        Saves query browsing for ACL purposes
+        """
+
+        QV = models.QueryView(user = self.user,
+            query = self.query)
+        QV.save()
 
     def setQuery(self, query_text):
         """
@@ -55,19 +66,19 @@ class DataManager:
         setting DB, Pivot and cumulative.
         Then sets defaults, limits, and checks safety
         """
-        q = models.Query.objects.filter(id = self.query_id)[0]
+        self.query = models.Query.objects.filter(id = self.query_id)[0]
         # Set up query and DB and pivot
-        self.setQuery(q.query_text)
-        self.setDB(q.database_id)
-        self.setPivot(q.pivot_data)
-        self.setCumulative(q.cumulative)
+        self.setQuery(self.query.query_text)
+        self.setDB(self.query.database_id)
+        self.setPivot(self.query.pivot_data)
+        self.setCumulative(self.query.cumulative)
         self.defaultFind() 
         # Set default Values
         self.defaultSet()
         # Attach Limits
-        if q.insert_limit == True:
+        if self.query.insert_limit == True:
             self.addLimits()
-        logging.info('QUERY IS NOW : %s' % (self.query_text))
+        #logging.info('QUERY IS NOW : %s' % (self.query_text))
 
     def addQueryComments(self):
         """
@@ -84,8 +95,12 @@ class DataManager:
         like pivots, cumulative, etc
         """
         # Run safety/sanity check for deletes/updates/...
+        PermissionToView(self.user, self.query).check_permission()
+
         self.checkSafety() # TODO this is run twice
         self.addQueryComments()
+        self.logQueryUsage()
+        
 
         # Get DB creds
         if self.db.type  in  ['MySQL','Postgres']:
@@ -259,7 +274,40 @@ class DataManager:
         # Replace key with target_value
         for key, replacement_dict in self.replacement_dict.iteritems():
             self.query_text = self.query_text.replace(replacement_dict['search_for'], str(replacement_dict['replace_with']))
-        #raise ValueError('go fuck yourself')
+
+class PermissionToView():
+    def __init__(self, user, query):
+        self.user = user
+        self.query = query
+
+    def check_permission(self):
+        """
+        return true is user has permission on query, false otherwise
+        """
+        if self.user.is_active == False:
+            logging.warning("NOT ACTIVE")
+            raise Exception("User is not Active!")
+            return False
+        if self.user.is_superuser == True:
+            logging.warning("SUPER USER")
+            return True
+        user_groups = self.user.groups.values_list('name',flat=True)
+        db_tags = [str(i) for i in self.query.database.tags.all()]
+        query_tags = [str(i) for i in self.query.tags.all()]
+        logging.warning("USER %s DB %s Query %s Required %s" % 
+            (
+                user_groups, db_tags, query_tags,
+                list(set(db_tags) | set(user_groups))
+            ))
+        if len(list(set(db_tags) & set(user_groups))) > 0 \
+                or len(list(set(query_tags) & set(user_groups))) > 0:
+            return True
+        elif len(db_tags) == 0 or len(query_tags) == 0: # No Permissions set
+            return True
+        else:
+            raise Exception("User does not have permission to view.  Requires membership in at least one of these groups:  %s " %  list(set(db_tags) | set(query_tags)))
+            return False
+
 
 class MySQLManager:
     def __init__(self, db):
