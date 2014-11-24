@@ -43,7 +43,9 @@ INSTALLED_APPS = (
     'django_ace',
     'website',
     'taggit',
-    'accounts'
+    'accounts',
+    'django_crontab',
+    'cron'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -107,8 +109,12 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
             },
+        'django_crontab': {
+            'handlers': ['console'],
+            'level': 'INFO',
         }
     }
+}
 
 if DEBUG:
     # make all loggers use the console.
@@ -162,3 +168,19 @@ ENCRYPTED_FIELDS_KEYDIR = BASE_DIR + '/fieldkeys'
 
 # Login URL for @log_in decorator
 LOGIN_URL = '/accounts/login'
+
+# Cronjobs
+CRONJOBS = [
+    ('0 * * * *', 'cron.cron.scheduled_job', ['hourly']),
+    ('0 0 * * *', 'cron.cron.scheduled_job', ['daily']),
+    ('0 0 * * 0', 'cron.cron.scheduled_job', ['weekly']),
+    ('0 0 1 * *', 'cron.cron.scheduled_job', ['monthly'])
+]
+
+# EMAIL MODE FOR TEST
+if DEBUG == True:
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_HOST_USER = 'matthew.feldman@gmail.com'
+    EMAIL_HOST_PASSWORD = 'uydzgtfqwxcghzxl'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True

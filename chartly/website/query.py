@@ -26,15 +26,19 @@ class DataManager:
         self.cumulative = cumulative
         if self.request is not None:
             self.user = self.request.user
+        else:
+            self.user = None
 
     def logQueryUsage(self):
         """
         Saves query browsing for ACL purposes
         """
-
-        QV = models.QueryView(user = self.user,
-            query = self.query)
-        QV.save()
+        if self.user is None:
+            logging.info("Runnig query without a user %s" % self.query)
+        else:
+            QV = models.QueryView(user = self.user,
+                query = self.query)
+            QV.save()
 
     def setQuery(self, query_text):
         """
@@ -103,7 +107,7 @@ class DataManager:
         
 
         # Get DB creds
-        if self.db.type  in  ['MySQL','Postgres']:
+        if self.db.type in ['MySQL','Postgres']:
             self.runSQLQuery()
         elif self.db.type == 'Hive':
             self.runHiveQuery()
@@ -213,6 +217,12 @@ class DataManager:
         data_output += [[v for v in row[1]] for row in self.data.iterrows()]
         self.data_array = data_output
 
+    def returnHTMLTable(self):
+        """
+        Returns a Pandas HTML Array from the data DataFrame
+        """
+        return(self.data.to_html(index= False))
+
     def saveToSQLTable(self, table_name = None):
         """
         Writes output to SQL table
@@ -276,7 +286,7 @@ class DataManager:
             self.query_text = self.query_text.replace(replacement_dict['search_for'], str(replacement_dict['replace_with']))
 
 class PermissionToView():
-    def __init__(self, user, query):
+    def __init__(self, user = None, query = None):
         self.user = user
         self.query = query
 
@@ -284,6 +294,8 @@ class PermissionToView():
         """
         return true is user has permission on query, false otherwise
         """
+        if self.user is None:
+            return True # TODO THIS BYPASSES UNAUTHENTICATED USERS AND MAY BE BAD?
         if self.user.is_active == False:
             logging.warning("NOT ACTIVE")
             raise Exception("User is not Active!")

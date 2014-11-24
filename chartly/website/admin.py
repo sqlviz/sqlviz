@@ -36,6 +36,11 @@ class DbAdmin(admin.ModelAdmin):
 
 class DashboardQueryAdmin(admin.TabularInline):
     model = DashboardQuery
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(DashboardQueryAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['order'].initial = 1
+        return form
+
 
 class DashboardAdmin(admin.ModelAdmin):
     model = Dashboard

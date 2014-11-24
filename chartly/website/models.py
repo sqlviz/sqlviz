@@ -51,7 +51,7 @@ class Query(models.Model):
     stacked = models.BooleanField(default=False, help_text = 'Stack graph Type')
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
-    graph_extra = models.TextField(default = '{}', help_text = 'JSON form of highcharts formatting')
+    graph_extra = models.TextField(help_text = 'JSON form of highcharts formatting') # SHOULD INCLUDE default={} in ADMIN!
     tags = TaggableManager(blank=True)
 
     def __str__(self):
@@ -79,6 +79,8 @@ class QueryChart(models.Model):
     query = models.ForeignKey(Query)
 
 class QueryDefault(models.Model):
+    class Meta:
+        unique_together = ['query', 'search_for']
     query = models.ForeignKey(Query)
     search_for = models.CharField(max_length=128)
     replace_with = models.CharField(max_length=1024, help_text ='For todays date set replace with = today and data_type = Date')
@@ -118,14 +120,16 @@ class Dashboard(models.Model):
         return self.title
 
 class DashboardQuery(models.Model):
+    class Meta:
+        unique_together = ['query', 'dashboard']
     query = models.ForeignKey(Query)
     dashboard = models.ForeignKey(Dashboard)
-    order = models.IntegerField()
+    order = models.IntegerField(default = 1)
 
     def __str__(self):
         return "%s : %s" % (self.query, self.dashboard)
 
-class QueryFavorite(models.Model):
+"""class QueryFavorite(models.Model):
     user = models.ForeignKey(User)
     query = models.ForeignKey(Query)
 
@@ -136,7 +140,8 @@ class DashboardFavorite(models.Model):
     user = models.ForeignKey(User)
     dashboard = models.ForeignKey(Dashboard)    
     def __str__(self):
-        return "%s : %s" % (self.user, self.dashboard)
+        return "%s : %s" % (self.user, self.dashboard)"""
+
 class QueryView(models.Model):
     user = models.ForeignKey(User)
     query = models.ForeignKey(Query)
