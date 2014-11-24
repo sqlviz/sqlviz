@@ -106,6 +106,12 @@ class QueryPrecedent(models.Model):
     final_query = models.ForeignKey(Query)
     preceding_query = models.ForeignKey(Query, related_name = "+")
 
+    def clean(self):
+        def cycle_check(self):
+            # Check to ensure no cycles
+            pass
+        return True
+
 class Dashboard(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')
     description = models.TextField(max_length=  200)

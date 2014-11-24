@@ -36,7 +36,8 @@
     <div class='hide_{{query.id}}'>
     <div id='div_table_{{query.id}}'></div>
     
-    <div id="waiting_{{query.id}}">Waiting for Query to Load</div>
+    <div id="waiting_{{query.id}}"><img src='{% static 'ajax-loader.gif' %}'>
+    </div>
     <div id="error_{{query.id}}" class = "alert alert-error alert-block"><pre></pre></div>
     </div>
     <div id ='chart_{{query.id}}'></div>

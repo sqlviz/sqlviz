@@ -28,13 +28,14 @@ class DataManager:
             self.user = self.request.user
         else:
             self.user = None
+        self.query = None # TODO find a better way around this
 
     def logQueryUsage(self):
         """
         Saves query browsing for ACL purposes
         """
-        if self.user is None:
-            logging.info("Runnig query without a user %s" % self.query)
+        if self.user is None or self.query is None:
+            logging.info("Runnig query without a user or query")
         else:
             QV = models.QueryView(user = self.user,
                 query = self.query)
@@ -192,7 +193,7 @@ class DataManager:
                 self.query_text = re.sub('[;](\s)*$','', self.query_text) + \
                         ' limit 1000;'
 
-    def pivot(self, null_fill = 0):
+    def pivot(self, null_fill = None):
         """
         Pivots data along first and second columns
         Fills nulls as null_fill (defaults to 0)
