@@ -1,0 +1,11 @@
+{% for query in query_list %}  
+	<h2>{{query.title}}</h2></br>
+	<p>{{query.description}}</p>
+	{% if query.table %}
+		{{query.table}} </br>
+	{% endif %}
+	{% if query.img %}
+		<img src='cid:{{query.img}}'>
+	{% endif %}
+		</br></br>
+{% endfor %}
