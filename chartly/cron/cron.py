@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from email.MIMEImage import MIMEImage
 import subprocess
+import sys
 
 class Job:
     def __init__(self, id, dashboard_id, owner):
@@ -47,7 +48,17 @@ class Job:
             table = DM.returnHTMLTable()
             #TODO fix this it is ugly!
             self.return_dict[query.id] = {'id' : dq.query_id,
-                    'data': {'columns' : data.pop(0), 'data' : data},
+                    'data': 
+                        {'columns' : data.pop(0),
+                        'data' : data,
+                        'chart_type':query.chart_type,
+                        'graph_extra': query.graph_extra,
+                        'yAxis_log' : query.log_scale_y,
+                        'stacked' : query.stacked,
+                        'xAxis' : '', 'yAxis' : '',
+                        'graph_extra' : query.graph_extra,
+                        'title' : query.title
+                    },
                     'table' : table, 'title': query.title,
                     'description': query.description}
 
@@ -115,10 +126,10 @@ class Job:
         """
         send a stack trace to the owner of the mailing list
         """
-        subject = 
+        subject = 'Email Failure Chartly!'
         sender = self.owner.email
         to_mail = self.owner.email
-        send_mail('JOB FAILURE', trace_string,self.owner.email,
+        send_mail('JOB FAILURE : %s' % (self.id), trace_string,self.owner.email,
             [self.owner.email], fail_silently=False)
 
 def scheduled_job(frequency):
@@ -131,7 +142,7 @@ def scheduled_job(frequency):
         j = Job(job.id, job.dashboard_id, job.owner)
         try:
             j.run()
-            j.save()
+            job.save()
         except Exception, e:
-            print str(sys.exc_info()) + str(e))
-            j.failure(str(sys.exc_info()) + str(e)))
+            print str(sys.exc_info()) + str(e)
+            j.failure(str(sys.exc_info()) + str(e))

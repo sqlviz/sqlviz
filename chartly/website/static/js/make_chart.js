@@ -33,10 +33,10 @@ function make_table(columns, data, target){
     return html; 
 };
 
-function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis, yAxis_log, defaults){
+function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yAxis, yAxis_log, graph_extra){
   options = {
         chart: {
-          type : graph_type,
+          type : chart_type,
           renderTo: target,
           zoomType: 'xy'
         },
@@ -92,7 +92,7 @@ function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yA
     //console.log(options)
     if (stacked == 'True'){
       options.plotOptions = {};
-      options.plotOptions [graph_type] = {'stacking' :'normal'};
+      options.plotOptions[chart_type] = {'stacking' :'normal'};
     }
     if (options.xAxis.categories.length > 14){
       options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)}
@@ -100,7 +100,7 @@ function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yA
     if (yAxis_log == 'True'){
       options.yAxis.type = 'logarithmic'
     }
-    $.extend(options, defaults); // MUNGE GRAPH SETTINGS
+    $.extend(options, graph_extra); // MUNGE GRAPH SETTINGS
     //var chart = new Highcharts.Chart(options);
     return options;
 }
