@@ -29,7 +29,8 @@ function make_table(columns, data, target){
           "sSwfPath": "/static/DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls.swf"
         }
       });
-    });      
+    });    
+    return html; 
 };
 
 function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yAxis, yAxis_log, defaults){
@@ -100,5 +101,6 @@ function make_chart(columns, data, target, stacked, graph_type, title, xAxis, yA
       options.yAxis.type = 'logarithmic'
     }
     $.extend(options, defaults); // MUNGE GRAPH SETTINGS
-    var chart = new Highcharts.Chart(options);
+    //var chart = new Highcharts.Chart(options);
+    return options;
 }

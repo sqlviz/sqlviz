@@ -1,0 +1,7 @@
+{% for query in query_list %}  
+	{{query.title}}
+	{{query.description}}
+	{% if query.table %}
+		{{query.table}}
+	{% endif %}
+{% endfor %}
