@@ -100,3 +100,6 @@ fieldkeys/
 
 # Do not migrate migrations
 *migrations/
+
+# SFTP File
+sftp-config.json

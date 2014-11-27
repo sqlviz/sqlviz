@@ -9,9 +9,9 @@ class EmailUserAdmin(admin.TabularInline):
     model = EmailUser    
     extra = 3
 
-class SchedueleAdmin(admin.ModelAdmin):
-    model = Scheduele
+class JobAdmin(admin.ModelAdmin):
+    model = Job
     inlines = [EmailUserAdmin]
 
-admin.site.register(Scheduele, SchedueleAdmin)
+admin.site.register(Job, JobAdmin)
 #admin.site.register(EmailUser, EmailUserAdmin)

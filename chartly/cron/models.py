@@ -6,8 +6,7 @@ from django.contrib.auth.models import User
 
 
 
-
-class Scheduele(models.Model):
+class Job(models.Model):
     name = models.CharField(unique=True,max_length=128)
     type = models.CharField(max_length=10,
                                   choices=(('hourly','hourly'),
@@ -16,6 +15,7 @@ class Scheduele(models.Model):
                                     ('monthly','monthly')),
                                   default='hourly')
     dashboard =  models.ForeignKey('website.Dashboard')
+    owner = models.ForeignKey(User)
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     last_run_time = models.DateTimeField(auto_now = True, editable =  False)
 
@@ -27,6 +27,6 @@ class Scheduele(models.Model):
 
 class EmailUser(models.Model):
     class Meta:
-        unique_together = ['user', 'scheduele']
-    scheduele = models.ForeignKey(Scheduele)
+        unique_together = ['user', 'job']
+    job = models.ForeignKey(Job)
     user = models.ForeignKey(User)
