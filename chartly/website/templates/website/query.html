@@ -78,7 +78,8 @@
           make_table(json_data.data.columns, json_data.data.data, '{{query.id}}');  
         }
         if ('{{query.chart_type}}' != 'None'){
-          make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
+          options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
+            var chart = new Highcharts.Chart(options);
           };          
       } else {
         $( "#error_{{query.id}}" ).show();
