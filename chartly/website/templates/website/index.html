@@ -10,6 +10,7 @@
       <thead>
         <tr>
           <td> ID </td>
+          <td> Fav </td>
           <td> Title </td>
           <td> Type </td>
           <td> Created </td>
@@ -23,7 +24,8 @@
       <tbody>
         {% for query in query_list %}
         <tr>
-          <td> Q{{query.id}} </td> <!-- TODO add url reverse resolver -->
+          <td> Q{{query.id}} </td>
+          <td> {{query.fav}} </td>
           <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
           <td> Query </td>
           <td> {{query.create_time}} </td>
@@ -31,7 +33,7 @@
           <td> {{query.owner}} </td>
           <td> {{query.database}} </td>
           <td> {{query.chart_type}} </td>
-          <td>  {{ query.tags.names|join:", " }}
+          <td> {{query.tags.names|join:", " }}
 
           </td>
         </tr>        
@@ -39,6 +41,7 @@
         {% for dash in dashboard_list %}
         <tr>
           <td> D{{dash.id}} </td> 
+          <td> {{dash.fav}} </td>
           <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
           <td> Dashboard </td>
           <td> {{dash.create_time}} </td>

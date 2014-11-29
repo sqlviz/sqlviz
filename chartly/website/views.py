@@ -17,6 +17,9 @@ import datetime
 import logging
 import sys
 import traceback
+import favit.models
+from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +31,31 @@ def index(request, filter= None):
     else:
         query_list = models.Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
         dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
+
+    # Get Favorites
+    user = User.objects.get(username = request.user)
+    query_favorites = favit.models.Favorite.objects.for_user(user, model = models.Query)
+    query_fav_dict = {}
+    query_fav_dict = dict([(i.id, i) for i in query_favorites])
+    
+    for q in query_list:
+        if q.id in query_fav_dict:
+            setattr(q,'fav',True)
+        else:
+            setattr(q,'fav',False)
+    dash_favorites = favit.models.Favorite.objects.for_user(user, model = models.Dashboard)
+    dash_fav_dict = {}
+    dash_fav_dict = dict([(i.id, i) for i in dash_favorites])
+    
+    for d in dashboard_list:
+        if d.id in dash_fav_dict:
+            setattr(d,'fav',True)
+        else:
+            setattr(d,'fav',False)
+
     return render_to_response('website/index.html',
-            {'query_list': query_list, 'dashboard_list' : dashboard_list},
+            {'query_list': query_list, 'dashboard_list' : dashboard_list,
+                    'query_favorites' : query_fav_dict},
             context_instance = RequestContext(request))
 
 @login_required
