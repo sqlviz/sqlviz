@@ -4,5 +4,5 @@ from django.conf.urls import patterns, url
 from views import *
 
 urlpatterns = patterns('',
-   	url(r'^api/fav/(?P<id>\d+)/(?P<type>\d+)/(?P<state>\d+)$', favorite_set_api, name='favorite_set_api')
+   	url(r'^api/fav/$', favorite_set_api, name='favorite_set_api')
 )

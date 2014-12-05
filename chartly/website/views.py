@@ -36,8 +36,8 @@ def index(request, filter= None):
     user = User.objects.get(username = request.user)
     query_favorites = favit.models.Favorite.objects.for_user(user, model = models.Query)
     query_fav_dict = {}
-    query_fav_dict = dict([(i.id, i) for i in query_favorites])
-    
+    query_fav_dict = dict([(i.target_object_id, i) for i in query_favorites])
+    #logging.warning('%s waldo' % (query_fav_dict))
     for q in query_list:
         if q.id in query_fav_dict:
             setattr(q,'fav',True)
@@ -45,8 +45,8 @@ def index(request, filter= None):
             setattr(q,'fav',False)
     dash_favorites = favit.models.Favorite.objects.for_user(user, model = models.Dashboard)
     dash_fav_dict = {}
-    dash_fav_dict = dict([(i.id, i) for i in dash_favorites])
-    
+    dash_fav_dict = dict([(i.target_object_id, i) for i in dash_favorites])
+    #logging.warning('%s coco puffs' % (dash_fav_dict))
     for d in dashboard_list:
         if d.id in dash_fav_dict:
             setattr(d,'fav',True)

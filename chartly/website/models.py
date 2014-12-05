@@ -54,8 +54,11 @@ class Query(models.Model):
     graph_extra = models.TextField(help_text = 'JSON form of highcharts formatting') # SHOULD INCLUDE default={} in ADMIN!
     tags = TaggableManager(blank=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return "%s: %s" % (self.id, self.title)
+
+    def __str__(self):
+        return self.__unicode__
         
     def clean(self):
         # dont allow queries to contain blacklist words
@@ -122,8 +125,11 @@ class Dashboard(models.Model):
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
     tags = TaggableManager(blank=True)
 
+    def __unicode__(self):
+        return "%s: %s" % (self.id, self.title)
+
     def __str__(self):
-        return self.title
+        return self.__unicode__
 
 class DashboardQuery(models.Model):
     class Meta:

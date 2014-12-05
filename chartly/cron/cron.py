@@ -67,14 +67,17 @@ class Job:
         does some subprocess magic on the js files to create images in the tmp folder
         """
         # Transform data into json file using Phantom JS
-        current_path = os.getcwd()
+
+
+        static_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'website/static'))
+        print static_path
         file_output = uuid.uuid1()
-        cli = """phantomjs %s/website/static/js/phantom_make_chart.js '%s' //tmp/%s.json""" % (current_path, json.dumps(data), file_output)
+        cli = """phantomjs %s/js/phantom_make_chart.js '%s' //tmp/%s.json""" % (static_path, json.dumps(data), file_output)
         print cli
         subprocess.call([cli], shell = True)
         # Transform JSON file into image using CLI and Phantom JS
         output_image = '//tmp/%s.png' % (file_output)
-        cli = """phantomjs %s/website/static/Highcharts-4.0.3/exporting-server/phantomjs/highcharts-convert.js -infile //tmp/%s.json -outfile %s -scale 2.5 -width 400""" % (current_path, file_output, output_image)
+        cli = """phantomjs %s/Highcharts-4.0.3/exporting-server/phantomjs/highcharts-convert.js -infile //tmp/%s.json -outfile %s -scale 2.5 -width 400""" % (static_path, file_output, output_image)
         print cli
         subprocess.call([cli], shell = True)
         return output_image
@@ -111,7 +114,7 @@ class Job:
         msg.attach_alternative(html_content, "text/html")
 
         msg.mixed_subtype = 'related'
-        print subject, text_content, sender, to_mail
+        #print subject, text_content, sender, to_mail
         for k,f in self.return_dict.iteritems():
             f = f['img']
             fp = open(os.path.join(os.path.dirname(__file__), f), 'rb')

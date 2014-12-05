@@ -3,7 +3,24 @@
 
 {% block title %} Chartly Homepage {% endblock %}
 {% load staticfiles %}
+{% block style %}
+  <style>
+    .star {
+         text-indent: -5000px;
+         display: block;
+         /*background: transparent url(../images/star.png) [coords for empty star];*/
+         background-color: red;
+         height: 20;
+         width: 20;
+         background-repeat: False;
+    }
 
+    .star.favorite {
+         /*background-position: [coordinates for favorited star];*/
+         background-color: blue;
+    }
+  </style>
+{% endblock %}
 {% block main %}
 {% if query_list or dashboard_list %}
     <table id='query_list_table' class="table table-striped dataTable">
@@ -23,9 +40,10 @@
       </thead>
       <tbody>
         {% for query in query_list %}
+        <div >
         <tr>
           <td> Q{{query.id}} </td>
-          <td> {{query.fav}} </td>
+          <td> <a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a> </td>
           <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
           <td> Query </td>
           <td> {{query.create_time}} </td>
@@ -36,12 +54,14 @@
           <td> {{query.tags.names|join:", " }}
 
           </td>
-        </tr>        
+        </tr>   
+        </div>     
         {% endfor %}
         {% for dash in dashboard_list %}
-        <tr>
+        <div >
+          <tr>
           <td> D{{dash.id}} </td> 
-          <td> {{dash.fav}} </td>
+          <td> <a id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='star {% if dash.fav %}favorite{% endif %}'>{{dash.fav}}</a> </td>
           <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
           <td> Dashboard </td>
           <td> {{dash.create_time}} </td>
@@ -53,7 +73,8 @@
           <td>  {{ dash.tags.names|join:", " |truncatechars_html:4 }}
 
           </td>
-        </tr>        
+        </tr>  
+        </tr>      
         {% endfor %}        
       </tbody>
     </table>
@@ -69,6 +90,39 @@
         }
       });
     } );
+    </script>
+    <script>
+      $(function() { 
+      $('.star').click(function() {
+        var id = $(this).attr('id');
+        var target_model = $(this).attr('target_model');
+        var state = $(this).hasClass('favorite');
+        console.log(id + ' ' + target_model + ' ' + state);
+        if (state == true) {
+          $.get('/favit/remove', 
+            {'target_model' : target_model, 'target_object_id': id},
+              function(data) { 
+                console.log(data);
+              }
+          );
+        } else if (state == false) {
+          $.get('/favit/add-or-remove', 
+            {'target_model' : target_model, 'target_object_id': id},
+              function(data) { 
+                console.log(data);
+              }
+          );
+        }
+        /*if (data.status == 'added'){
+          $(this).addClass('favorite');
+        } else if (data.status == 'deleted'){
+          $(this).remove('favorite');
+        }*/
+        $(this).toggleClass('favorite');
+          
+
+      });
+    });
     </script>
 {% else %}
     <p>No Queries or Dashboards are available.</p>
