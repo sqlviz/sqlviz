@@ -29,10 +29,17 @@
 
 {% block main %}
 <div id='sortable'>
+<script>
+  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
+</script>  
 {% if query_list %}
   {% for query in query_list %}    
     <div class='jumbotron' id='div_{{query.id}}'>
-    <h2>{{query.title}}</h2>
+    <h2><a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
+      {{query.title}}
+    </h2>
+    
+
     <div class='hide_{{query.id}}'>
     <div id='div_table_{{query.id}}'></div>
     
@@ -131,4 +138,3 @@
  No Defaults Found
  {% endif %}
 {% endblock %}
-

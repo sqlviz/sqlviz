@@ -43,8 +43,8 @@ def index(request, filter= None):
             setattr(q,'fav',True)
         else:
             setattr(q,'fav',False)
+
     dash_favorites = favit.models.Favorite.objects.for_user(user, model = models.Dashboard)
-    dash_fav_dict = {}
     dash_fav_dict = dict([(i.target_object_id, i) for i in dash_favorites])
     #logging.warning('%s coco puffs' % (dash_fav_dict))
     for d in dashboard_list:
@@ -92,11 +92,21 @@ def query_view(request, query_ids):
     query_id_array = query_ids.split(',')
     #TODO filter to make sure only this applies to queries which exist
     query_list = [m for m in models.Query.objects.filter(id__in =query_id_array)] #[0] for i in query_id_array]]
-    #logging.warning(query_id_array)
-    #logging.warning(query_list)
+
+    # Get Favorites 
+    # TODO get rid of copy paste job here with queries
+    user = User.objects.get(username = request.user)
+    query_favorites = favit.models.Favorite.objects.for_user(user, model = models.Query)
+    query_fav_dict = dict([(i.target_object_id, i) for i in query_favorites])
+
     replacement_dict = {}
     json_get = {}
     for q in query_list:
+        if q.id in query_fav_dict:
+            setattr(q,'fav',True)
+        else:
+            setattr(q,'fav',False)
+
         DM = query.DataManager(q.id, request)
         DM.prepareQuery()
         q.query_text = DM.query_text
