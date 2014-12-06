@@ -1,8 +1,7 @@
 from django.conf.urls import patterns, url
-#from django.contrib.auth.decorators import login_required, permission_required
 
-from views import *
-
-urlpatterns = patterns('',
-   	url(r'^api/fav/$', favorite_set_api, name='favorite_set_api')
+urlpatterns = patterns('favs.views',
+   	url(r'^add-or-remove$', 'add_or_remove',name='add_or_remove'),
+   	url(r'^add$', 'add',name='add'),
+    url(r'^remove$', 'remove', name='remove'),
 )

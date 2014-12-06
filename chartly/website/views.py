@@ -54,7 +54,8 @@ def index(request, filter= None):
             setattr(d,'fav',False)
 
     return render_to_response('website/index.html',
-            {'query_list': query_list, 'dashboard_list' : dashboard_list,
+            {'query_list': query_list,
+                    'dashboard_list' : dashboard_list,
                     'query_favorites' : query_fav_dict},
             context_instance = RequestContext(request))
 
