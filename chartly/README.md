@@ -42,7 +42,7 @@ python manage.py runserver
 #### Setting up a database
 * In Admin Panel add Database
   * Currently supported Databases: MYSQL, Postgres
-  * TODO: Oracle, MSSQL, Hive 2, GBQ
+* TODO: Oracle, MSSQL, Hive 2, GBQ
 * Add port, username and password
 * Password is encrypyed in database
 * Make sure account is readonly only (http://www.symantec.com/business/support/index?page=content&id=HOWTO30408)
@@ -99,5 +99,21 @@ python manage.py runserver
   * They are in a group that shares a name with the database or the query
 
 
-### Licensing
-* Highcharts is licensed
+#### Licensing
+* Highcharts licensing is required.
+  * http://shop.highsoft.com/highcharts.html
+
+#### Thanks
+* Django
+* Jquery
+* Jquery UI
+* Django Taggit
+* Django Favorits
+* Django Encrpyed
+* Highcharts
+* PhantomJS
+* Datatables JS
+* ACE.js
+* Django ACE
+* Bootstrap
+* Django Cron
