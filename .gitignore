@@ -103,3 +103,6 @@ fieldkeys/
 
 # SFTP File
 sftp-config.json
+
+# Thumbnails
+/chartly/media/thumbnails/

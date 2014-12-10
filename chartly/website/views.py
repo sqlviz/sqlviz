@@ -6,20 +6,24 @@ from django.utils import timezone
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
-import models
-import json
 from django.utils.functional import Promise
 from django.utils.encoding import force_text
 from django.core.serializers.json import DjangoJSONEncoder
-import query
+from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
+
+import json
 import time
 import datetime
 import logging
 import sys
 import traceback
+
 import favit.models
-from django.forms.models import model_to_dict
-from django.contrib.auth.models import User
+import query
+import models
+import sql_manager
+from date_time_encoder import *
 
 logger = logging.getLogger(__name__)
 
@@ -61,22 +65,26 @@ def index(request, filter= None):
 
 @login_required
 def query_api(request, query_id):
-    try:
+    if True:#try:
         startTime = time.time()
-        DM = query.DataManager(query_id, request)
-        DM.prepareQuery()
-        response_data = DM.runQuery()
-        try:
-            DM.saveToSQLTable()
-        except Exception:
-            logging.warning(sys.exc_info())
+        LQ = query.Load_Query(query_id = query_id,
+                    user = request.user,
+                    parameters = request.GET.dict())
+        q = LQ.prepare_query()
+        q.run_query()
+        q.run_manipulations()
+        response_data = q.data_array
+        if True: #try:
+            q.save_to_mysql()
+        #except Exception:
+        #    logging.warning(sys.exc_info())
         time_elapsed = time.time() - startTime
         return_data = {
                         "data":
                             {"columns" : response_data.pop(0), "data" : response_data},
                         "time_elapsed" : time_elapsed,
                         "error" : False}
-    except Exception, e:
+    """except Exception, e:
             #logging.warning(str(sys.exc_info()) + str(e))
             logging.warning(traceback.format_exc())
             return_data = {
@@ -84,7 +92,7 @@ def query_api(request, query_id):
                                     str(e),
                             "time_elapsed" : 0,
                             "error" : True,
-                        }
+                        }"""
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
 @login_required
@@ -107,10 +115,12 @@ def query_view(request, query_ids):
         else:
             setattr(q,'fav',False)
 
-        DM = query.DataManager(q.id, request)
-        DM.prepareQuery()
-        q.query_text = DM.query_text
-        for k,v in DM.replacement_dict.iteritems():
+        LQ = query.Load_Query(query_id = q.id, 
+                    user = request.user,
+                    parameters = request.GET.dict())
+        LQ.prepare_query()
+        q.query_text = LQ.query.query_text
+        for k,v in LQ.target_parameters.iteritems():
             replacement_dict[k] = v # This dict has target, replacement, and data_type
             json_get[v['search_for']] = v['replace_with']
     return render_to_response('website/query.html', 
@@ -155,16 +165,19 @@ def query_interactive_api(request):
     # Create DataManager, run and return as JSON schema
     try:
         query_text  = request.POST['query_text']
-        db  = request.POST['db']
+        db  = models.Db.objects.filter(id = request.POST['db'])[0]
         pivot  =  True if request.POST['pivot'].lower() == 'true' else False
         cumulative  =  True if request.POST['cumulative'].lower() == 'true' else False
         startTime = time.time()
-        DM = query.DataManager()
-        DM.setQuery(query_text) # TODO clean this cruft up and consolidate
-        DM.setDB(db)
-        DM.setPivot(pivot)
-        DM.setCumulative(cumulative)
-        response_data = DM.runQuery()
+        MD = query.Manipulate_Data(query_text = query_text, db = db, user = request.user)
+        MD.prepare_safety()
+        MD.run_query()
+        if pivot:
+            MD.pivot()
+        if cumulative:
+            MD.cumulative()
+        MD.pandas_to_array()
+        response_data = MD.numericalize_data_array()
         time_elapsed = time.time() - startTime # TODO get rid of this copy-pasta
         return_data = {
                         "data":
@@ -202,9 +215,9 @@ def database_explorer_api(request):
         
         # Switch in database Type
         if con.type == 'MySQL':
-            DMM = query.MySQLManager(con)
+            DMM = sql_manager.MySQLManager(con, request)
         elif con.type == 'Postgres':
-            DMM = query.PSQLManager(con)
+            DMM = sql_manager.PSQLManager(con, request)
         else:
             raise ValueError("Database cannot be explorered yet only supported types are 'MySQL','Postgres'")
 
@@ -219,13 +232,15 @@ def database_explorer_api(request):
             raise ValueError("""ERROR: con_id is needed,
                     db_id needed for to produce table list,
                     table_id needed to procude column list""")
-        response_data = DMM.runQuery()
+        
+        DMM.run_query()
+        response_data = DMM.RQ.numericalize_data_array()
+        logging.warning(""" BINGO %s """ % response_data)
         return_data = {
-                "data":
-                    {"columns" : response_data.pop(0), "data" : response_data},
-                "error" : False}    
-        return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
-                content_type="application/json")
+                        "data":
+                            {"columns" : response_data.pop(0), "data" : response_data},
+                        "error" : False}   
+        return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
     except Exception, e:
             logging.warning(traceback.format_exc())
             return_data = {
@@ -238,13 +253,3 @@ def database_explorer_api(request):
             content_type="application/json")
 
 
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
-        elif isinstance(obj, datetime.date):
-            return obj.isoformat()
-        elif isinstance(obj, datetime.timedelta):
-            return (datetime.datetime.min + obj).time().isoformat()
-        else:
-            return super(DateTimeEncoder, self).default(obj)

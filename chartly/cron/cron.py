@@ -62,33 +62,13 @@ class Job:
                     'table' : table, 'title': query.title,
                     'description': query.description}
 
-    def generate_image(self, data):
-        """
-        does some subprocess magic on the js files to create images in the tmp folder
-        """
-        # Transform data into json file using Phantom JS
-
-
-        static_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'website/static'))
-        print static_path
-        file_output = uuid.uuid1()
-        cli = """phantomjs %s/js/phantom_make_chart.js '%s' //tmp/%s.json""" % (static_path, json.dumps(data), file_output)
-        print cli
-        subprocess.call([cli], shell = True)
-        # Transform JSON file into image using CLI and Phantom JS
-        output_image = '//tmp/%s.png' % (file_output)
-        cli = """phantomjs %s/Highcharts-4.0.3/exporting-server/phantomjs/highcharts-convert.js -infile //tmp/%s.json -outfile %s -scale 2.5 -width 400""" % (static_path, file_output, output_image)
-        print cli
-        subprocess.call([cli], shell = True)
-        return output_image
-
     def generate_images(self):
         """
         operates on self.result_data and returns a dict of {qry_id: img_location}
         """
         for k, v in self.return_dict.iteritems():
             #print k,v
-            self.return_dict[k]['img'] = self.generate_image(v['data'])
+            self.return_dict[k]['img'] = generate_image(v['data'])
 
     def delete_images(self):
         """
@@ -135,6 +115,24 @@ class Job:
         send_mail('JOB FAILURE : %s' % (self.id), trace_string,self.owner.email,
             [self.owner.email], fail_silently=False)
 
+def generate_image(data):
+    """
+    does some subprocess magic on the js files to create images in the tmp folder
+    """
+    # Transform data into json file using Phantom JS
+    static_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'website/static'))
+    print static_path
+    file_output = uuid.uuid1()
+    cli = """phantomjs %s/js/phantom_make_chart.js '%s' //tmp/%s.json""" % (static_path, json.dumps(data), file_output)
+    print cli
+    subprocess.call([cli], shell = True)
+    # Transform JSON file into image using CLI and Phantom JS
+    output_image = '//tmp/%s.png' % (file_output)
+    cli = """phantomjs %s/Highcharts-4.0.3/exporting-server/phantomjs/highcharts-convert.js -infile //tmp/%s.json -outfile %s -scale 2.5 -width 400""" % (static_path, file_output, output_image)
+    print cli
+    subprocess.call([cli], shell = True)
+    return output_image
+    
 def scheduled_job(frequency):
     """
     Run this every n hours and send out each email for that particular frequency

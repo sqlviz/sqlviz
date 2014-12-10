@@ -1,16 +1,19 @@
-import datetime
-
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from encrypted_fields import EncryptedCharField
 from django.core.exceptions import ValidationError
 from taggit.managers import TaggableManager
+from django.conf import settings
+from django.db.models.signals import post_save
+from dateutil.relativedelta import relativedelta
 import re
 import time
 import json
-#from query import DataManager
-#import MySQLdb
+import datetime
+
+import query
 
 class Db(models.Model):
     name_short = models.CharField(unique=True,max_length=10)
@@ -38,20 +41,21 @@ class Query(models.Model):
     description_long = models.TextField(max_length=  1024, blank = True)
     query_text = models.TextField(max_length = 2048, help_text = 'Query to Run')
     insert_limit = models.BooleanField(default = True, help_text = 'Insert limit 1000 to end of query')
-    database = models.ForeignKey(Db)
+    db = models.ForeignKey(Db)
     owner = models.ForeignKey(User)
     hide_index = models.BooleanField(default=False, help_text = 'Hide from Main Search')
     hide_table = models.BooleanField(default=False, help_text = 'Supress Data output in display')
-    pivot_data = models.BooleanField(default=False,  help_text = 'Pivot data around first/second columns.  Nulls filled with 0')
-    cumulative = models.BooleanField(default=False,  help_text = 'Run cumulatie sum')
-    log_scale_y = models.BooleanField(default=False,  help_text = 'Log scale Y axis')
     chart_type = models.CharField(max_length=10,
                                       choices=(('None','None'),('line','line'),('bar','bar'),('column','column'),('area','area')),
                                       default='None')
+    pivot_data = models.BooleanField(default=False,  help_text = 'Pivot data around first/second columns.  Nulls filled with 0')
+    cumulative = models.BooleanField(default=False,  help_text = 'Run cumulatie sum')
+    log_scale_y = models.BooleanField(default=False,  help_text = 'Log scale Y axis')
     stacked = models.BooleanField(default=False, help_text = 'Stack graph Type')
     create_time = models.DateTimeField(auto_now_add = True, editable = False)
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
-    graph_extra = models.TextField(help_text = 'JSON form of highcharts formatting') # SHOULD INCLUDE default={} in ADMIN!
+    graph_extra = models.TextField(blank = True, help_text = 'JSON form of highcharts formatting') # SHOULD INCLUDE default={} in ADMIN!
+    image = models.ImageField(upload_to = settings.MEDIA_ROOT + '/thumbnails', max_length = 2048, blank = True)
     tags = TaggableManager(blank=True)
 
     def __unicode__(self):
@@ -59,7 +63,9 @@ class Query(models.Model):
 
     def __str__(self):
         return self.__unicode__
-        
+    def get_absolute_url(self):
+        return reverse('website.query', args=[str(self.id)])
+
     def clean(self):
         # dont allow queries to contain blacklist words
         blacklist = ['delete','insert','update','alter','drop']
@@ -71,15 +77,31 @@ class Query(models.Model):
         if self.chart_type == 'None' and self.stacked == 1:
             raise ValidationError("Can't stack an invisible chart")
 
+        if self.graph_extra == "" or self.graph_extra is None:
+            self.graph_extra = "{}"
         try:
             json.loads(self.graph_extra)
         except:
             raise ValidationError("Graph Extra must be JSON!")
+        
         # Validate that query runs!
-        # TODO
+        try:
+            try:
+                Q = query.Manipulate_Data(query_text = 'explain ' + self.query_text, db = self.db, user = self.owner)
+                Q.run_query()
+            except Exception, e:
+                # Somethings are un-explainable
+                Q = query.Manipulate_Data(query_text = self.query_text, db = self.db, user = self.owner)
+                Q.run_query()
+        except Exception, e:
+            raise ValidationError("Query must run: %s" % (e))
 
-class QueryChart(models.Model):
+class QueryProcessing(models.Model):
+    class Meta:
+        unique_together = ['query', 'attribute']
     query = models.ForeignKey(Query)
+    attribute = models.CharField(max_length=16)
+    value = models.CharField(max_length=128)
 
 class QueryDefault(models.Model):
     class Meta:
@@ -141,18 +163,18 @@ class DashboardQuery(models.Model):
     def __str__(self):
         return "%s : %s" % (self.query, self.dashboard)
 
-"""class QueryFavorite(models.Model):
-    user = models.ForeignKey(User)
+class QueryCache(models.Model):
     query = models.ForeignKey(Query)
-
+    table_name = models.CharField(unique=True,max_length=128)
+    run_time = models.DateTimeField(auto_now_add = True, editable = False)
     def __str__(self):
-        return "%s : %s" % (self.user, self.query)
+        return "%s : %s" % (self.query, self.table_name)
 
-class DashboardFavorite(models.Model):
-    user = models.ForeignKey(User)
-    dashboard = models.ForeignKey(Dashboard)    
-    def __str__(self):
-        return "%s : %s" % (self.user, self.dashboard)"""
+    def expired(self):
+        if self.run_time + relativedelta(days = 1) < datetime.date.today():
+            return True
+        else:
+            return False
 
 class QueryView(models.Model):
     user = models.ForeignKey(User)
@@ -160,3 +182,18 @@ class QueryView(models.Model):
     view_time = models.DateTimeField(auto_now_add = True, editable = False)
     def __str__(self):
         return "%s : %s : %s" % (self.user, self.query, self.view_time)
+
+## POST SAVE TO CREATE IMAGE FOR QUERY  
+
+def post_save_handler_query(sender, instance, **kwargs):
+    post_save.disconnect(post_save_handler_query, sender=Query)
+    if instance.chart_type != 'None':
+        LQ = query.Load_Query(query_id = instance.id, user = instance.owner)
+        Q = LQ.prepare_query()
+        Q.run_query()
+        Q.run_manipulations()
+        image = Q.generate_image()
+        instance.image = image
+        instance.save()
+    post_save.connect(post_save_handler_query, sender=Query)
+post_save.connect(post_save_handler_query, sender=Query)

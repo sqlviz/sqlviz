@@ -108,7 +108,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'propagate': True,
             },
         'django_crontab': {
@@ -118,7 +118,7 @@ LOGGING = {
     }
 }
 
-if DEBUG:
+if False: #DEBUG:
     # make all loggers use the console.
     for logger in LOGGING['loggers']:
         LOGGING['loggers'][logger]['handlers'] = ['console']
@@ -186,3 +186,6 @@ if DEBUG == True:
     EMAIL_HOST_PASSWORD = 'uydzgtfqwxcghzxl'
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
+
+MEDIA_ROOT = BASE_DIR + '/media/'
+MEDIA_URL = '/media/'

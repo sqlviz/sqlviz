@@ -11,6 +11,8 @@ class QueryPrecedentAdmin(admin.TabularInline):
     model = QueryPrecedent    
     fk_name = "final_query"
 
+class QueryProcessingAdmin(admin.TabularInline):
+    model = QueryProcessing
 
 class QueryAdminForm(forms.ModelForm):
     class Meta:
@@ -20,14 +22,14 @@ class QueryAdminForm(forms.ModelForm):
 
 class QueryAdmin(admin.ModelAdmin):
     form = QueryAdminForm
-    inlines = [QueryDefaultAdmin, QueryPrecedentAdmin]
-    list_display = ('id', 'title', 'database','owner','chart_type','modified_time')
+    inlines = [QueryDefaultAdmin, QueryPrecedentAdmin, QueryProcessingAdmin]
+    list_display = ('id', 'title', 'db','owner','chart_type','modified_time')
     save_as = True
 
 class DbAdminForm(forms.ModelForm):
     class Meta:
         model = Db
-        widgets = {'password_encrptyed' : PasswordInput()}
+        widgets = {'password_encrypted' : PasswordInput()}
         exclude = ()
 
 class DbAdmin(admin.ModelAdmin):
