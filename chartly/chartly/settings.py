@@ -47,7 +47,8 @@ INSTALLED_APPS = (
     'django_crontab',
     'cron',
     'favit',
-    'favs'
+    'favs',
+    'csv_upload'
 )
 
 MIDDLEWARE_CLASSES = (
