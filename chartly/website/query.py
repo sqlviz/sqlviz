@@ -351,7 +351,7 @@ class Manipulate_Data(Run_Query):
                 'title' : self.query_model.title
             }
         static_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'website/static'))
-        logging.warning(static_path)
+        #logging.warning(static_path)
         guid = str(uuid.uuid1())
         json_data_file = '//tmp/%s.json' % (guid)
         cli = """phantomjs %s/js/phantom_make_chart.js '%s' %s""" % (
