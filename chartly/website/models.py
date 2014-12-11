@@ -62,7 +62,8 @@ class Query(models.Model):
         return "%s: %s" % (self.id, self.title)
 
     def __str__(self):
-        return self.__unicode__
+        return "%s: %s" % (self.id, self.title)
+        
     def get_absolute_url(self):
         return reverse('website.query', args=[str(self.id)])
 
@@ -151,7 +152,7 @@ class Dashboard(models.Model):
         return "%s: %s" % (self.id, self.title)
 
     def __str__(self):
-        return self.__unicode__
+        return "%s: %s" % (self.id, self.title)
 
 class DashboardQuery(models.Model):
     class Meta:
@@ -161,6 +162,9 @@ class DashboardQuery(models.Model):
     order = models.IntegerField(default = 1)
 
     def __str__(self):
+        return "%s : %s" % (self.query, self.dashboard)
+
+    def __unicode__(self):
         return "%s : %s" % (self.query, self.dashboard)
 
 class QueryCache(models.Model):
@@ -184,7 +188,6 @@ class QueryView(models.Model):
         return "%s : %s : %s" % (self.user, self.query, self.view_time)
 
 ## POST SAVE TO CREATE IMAGE FOR QUERY  
-
 def post_save_handler_query(sender, instance, **kwargs):
     post_save.disconnect(post_save_handler_query, sender=Query)
     if instance.chart_type != 'None':

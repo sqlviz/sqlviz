@@ -173,6 +173,7 @@ LOGIN_URL = '/accounts/login'
 
 # Cronjobs
 CRONJOBS = [
+    ('* * * * *', 'cron.cron.scheduled_job', ['hourly']),
     ('0 * * * *', 'cron.cron.scheduled_job', ['hourly']),
     ('0 0 * * *', 'cron.cron.scheduled_job', ['daily']),
     ('0 0 * * 0', 'cron.cron.scheduled_job', ['weekly']),
