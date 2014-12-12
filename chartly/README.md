@@ -14,9 +14,13 @@ Create a MySQL Database with access locally.
 ### MySQL 
 TODO add this to deploy.sh
 ```
-CREATE DATABASE IF NOT EXISTS DJANGO;
-CREATE USER DJANGO IDENTIFIED BY DJANGO;
-GRANT ALL ON DJANGO.* TO DJANGO;
+CREATE DATABASE IF NOT EXISTS django;
+CREATE DATABASE IF NOT EXISTS scratch;
+
+CREATE USER django IDENTIFIED BY django;
+GRANT ALL ON `django`.* TO 'django'@'127.0.0.1'
+GRANT ALL ON ON `scatch`.* TO 'django'@'127.0.0.1';
+
 ```
 
 ### Create Django Encryped Keys

@@ -174,12 +174,15 @@ LOGIN_URL = '/accounts/login'
 
 # Cronjobs
 CRONJOBS = [
-    ('* * * * *', 'cron.cron.scheduled_job', ['hourly']),
     ('0 * * * *', 'cron.cron.scheduled_job', ['hourly']),
     ('0 0 * * *', 'cron.cron.scheduled_job', ['daily']),
     ('0 0 * * 0', 'cron.cron.scheduled_job', ['weekly']),
     ('0 0 1 * *', 'cron.cron.scheduled_job', ['monthly'])
 ]
+
+# Add minutely scheduele for testing
+if DEBUG = TRUE:
+    CRONJOBS.append(('0 * * * *', 'cron.cron.scheduled_job', ['hourly']))
 
 # EMAIL MODE FOR TEST
 if DEBUG == True:
