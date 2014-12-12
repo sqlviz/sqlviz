@@ -27,4 +27,3 @@ seaborn==0.5.0
 simplejson==3.6.5
 six==1.8.0
 wsgiref==0.1.2
-splinter[django]==0.7.0
