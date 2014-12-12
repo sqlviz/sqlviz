@@ -3,6 +3,10 @@ dependencies:
     - pip install -U -r requirements/test.txt codecov
 
 test:
+  pre:
+    - mkdir fieldkeys
+    - keyczart create --location=fieldkeys --purpose=crypt
+    - keyczart addkey --location=fieldkeys --status=primary --size=256
   override:
     - coverage run manage.py test
   post:
