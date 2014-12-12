@@ -181,7 +181,7 @@ CRONJOBS = [
 ]
 
 # Add minutely scheduele for testing
-if DEBUG = TRUE:
+if DEBUG == True:
     CRONJOBS.append(('0 * * * *', 'cron.cron.scheduled_job', ['hourly']))
 
 # EMAIL MODE FOR TEST
