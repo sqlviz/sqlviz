@@ -64,3 +64,13 @@ To start the Django server on port 7878:
     $ ./manage.py runserver 7878
 
 Now visit http://localhost:7878/ in your browser.
+
+
+Keyset for Encryption Fields
+----------------------------
+
+.. code-block:: bash
+
+    $ mkdir fieldkeys
+    $ keyczart create --location=fieldkeys --purpose=crypt
+    $ keyczart addkey --location=fieldkeys --status=primary --size=256
