@@ -1,6 +1,6 @@
 machine:
   environment:
-    DATABASE_URL: mysql://ubuntu:localhost/circle_test
+    DATABASE_URL: mysql://ubuntu:@localhost/circle_test
 
 dependencies:
   override:
