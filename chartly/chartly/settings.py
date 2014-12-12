@@ -138,7 +138,7 @@ DATABASES = {
     },
     'write_to': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'test',
+        'NAME' : 'scratch',
         'USER' : 'django',
         'PASSWORD' : 'django',
         'HOST' : '127.0.0.1',
