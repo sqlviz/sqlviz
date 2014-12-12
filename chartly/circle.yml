@@ -1,0 +1,9 @@
+dependencies:
+  override:
+    - pip install -U -r requirements/test.txt codecov
+
+test:
+  override:
+    - coverage run manage.py test
+  post:
+    - codecov --token=e40d6920-9464-459f-9bdf-5ff4f57fe6c5
