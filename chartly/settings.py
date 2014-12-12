@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import os
 import logging
 
+import dj_database_url
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -128,14 +129,8 @@ if False: #DEBUG:
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'django',
-        'USER' : 'django',
-        'PASSWORD' : 'django',
-        'HOST' : '127.0.0.1',
-        'PORT' : 3306
-    },
+    'default': dj_database_url.config(
+        default='mysql://django:django@localhost/django'),
     'write_to': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME' : 'test',

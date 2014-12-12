@@ -1,3 +1,7 @@
+machine:
+  environment:
+    DATABASE_URL: mysql://ubuntu:localhost/circle_test
+
 dependencies:
   override:
     - pip install -U -r requirements/test.txt codecov
