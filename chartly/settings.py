@@ -137,7 +137,7 @@ DATABASES = {
 CUSTOM_DATABASES = {
     'write_to': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'test',
+        'NAME' : 'scratch',
         'USER' : 'django',
         'PASSWORD' : 'django',
         'HOST' : '127.0.0.1',
@@ -173,12 +173,15 @@ LOGIN_URL = '/accounts/login'
 
 # Cronjobs
 CRONJOBS = [
-    ('* * * * *', 'cron.cron.scheduled_job', ['hourly']),
     ('0 * * * *', 'cron.cron.scheduled_job', ['hourly']),
     ('0 0 * * *', 'cron.cron.scheduled_job', ['daily']),
     ('0 0 * * 0', 'cron.cron.scheduled_job', ['weekly']),
     ('0 0 1 * *', 'cron.cron.scheduled_job', ['monthly'])
 ]
+
+# Add minutely scheduele for testing
+if DEBUG == True:
+    CRONJOBS.append(('0 * * * *', 'cron.cron.scheduled_job', ['hourly']))
 
 # EMAIL MODE FOR TEST
 if DEBUG == True:
@@ -190,3 +193,5 @@ if DEBUG == True:
 
 MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'
+
+STATIC_ROOT = '/var/www/chartly/static/'

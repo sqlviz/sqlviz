@@ -65,7 +65,7 @@ def index(request, filter= None):
 
 @login_required
 def query_api(request, query_id):
-    if True:#try:
+    try:
         startTime = time.time()
         LQ = query.Load_Query(query_id = query_id,
                     user = request.user,
@@ -84,7 +84,7 @@ def query_api(request, query_id):
                             {"columns" : response_data.pop(0), "data" : response_data},
                         "time_elapsed" : time_elapsed,
                         "error" : False}
-    """except Exception, e:
+    except Exception, e:
             #logging.warning(str(sys.exc_info()) + str(e))
             logging.warning(traceback.format_exc())
             return_data = {
@@ -92,7 +92,7 @@ def query_api(request, query_id):
                                     str(e),
                             "time_elapsed" : 0,
                             "error" : True,
-                        }"""
+                        }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
 @login_required
