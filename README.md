@@ -30,7 +30,6 @@ mkdir fieldkeys
 keyczart create --location=fieldkeys --purpose=crypt
 keyczart addkey --location=fieldkeys --status=primary --size=256
 ```
-
 ### Setting Up
 
 Follow these steps in the chartly folder to set up django and run the test server
@@ -40,6 +39,11 @@ python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ````
+### Turning on Crons
+Execute to set up script to run reporting
+```
+python manage.py crontab add
+```
 
 ### Using Chartly
 

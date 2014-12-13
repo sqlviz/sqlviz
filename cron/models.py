@@ -7,6 +7,8 @@ class Job(models.Model):
     type = models.CharField(max_length=10,
                                   choices=(('hourly','hourly'),
                                     ('daily','daily'),
+                                    ('daily_9am','daily_9am'),
+                                    ('daily_7pm','daily_7pm'),
                                     ('weekly','weekly'),
                                     ('monthly','monthly')),
                                   default='hourly')

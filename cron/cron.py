@@ -112,9 +112,9 @@ def scheduled_job(frequency):
     for job in jobs:  # Iterate through all jobs
         # 1 job = 1 dashboard
         j = Job(job.id, job.dashboard_id, job.owner)
-        if True:#try:
+        try:
             j.run()
             job.save()
-        """except Exception, e:
+        except Exception, e:
             print str(sys.exc_info()) + str(e)
-            j.failure(str(sys.exc_info()) + str(e))"""
+            j.failure(str(sys.exc_info()) + str(e))
