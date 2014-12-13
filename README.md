@@ -19,7 +19,7 @@ CREATE DATABASE IF NOT EXISTS scratch;
 
 CREATE USER django IDENTIFIED BY django;
 GRANT ALL ON `django`.* TO 'django'@'127.0.0.1'
-GRANT ALL ON ON `scatch`.* TO 'django'@'127.0.0.1';
+GRANT ALL ON `scatch`.* TO 'django'@'127.0.0.1';
 
 ```
 
@@ -59,6 +59,7 @@ python manage.py runserver
 * Choose database to run against.
 * Set query replacement parameters.  These will search for strings in the Query and replace with parameters provided by user.  These will not be sanitized and present a possible injection source, which is why it is important to only use a readonly account.
 * Pivot will turn a three column query of the form A / B / C and pivot A against B with values C.  Nulls will be filled with 0.
+* If a query has a chart, the chart will be saved when it is saved and displayed as a thumbnail on the index page
 
 #### Precedent Queries
 * Queries can incldue precent queries.
@@ -102,6 +103,10 @@ python manage.py runserver
   * The query and database are untagged
   * They are in a group that shares a name with the database or the query
 
+
+#### CSV Upload
+* You can upload a csv to the scratch DB from the admin panel
+* Header should be provided in the first row and formatting is auto-detected as best as possible.
 
 #### Licensing
 * Highcharts licensing is required.
