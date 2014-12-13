@@ -1,19 +1,16 @@
 from django.contrib.auth.models import User
-from django.test import LiveServerTestCase
-from splinter import Browser
+
+from .testcases import TestCase
 
 
-class AdminLoginTest(LiveServerTestCase):
+class AdminLoginTest(TestCase):
 
     username = "username"
     password = "password"
 
     def setUp(self):
-        self.browser = Browser('django')
+        super(AdminLoginTest, self).setUp()
         self.browser.visit("%s/admin/" % self.live_server_url)
-
-    def tearDown(self):
-        self.browser.quit()
 
     def login(self):
         self.browser.fill('username', self.username)
