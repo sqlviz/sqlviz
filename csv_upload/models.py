@@ -20,7 +20,7 @@ class csv(models.Model):
 ## POST SAVE TO CREATE IMAGE FOR QUERY  
 def csv_to_sql(sender, instance, **kwargs):
     df = pd.io.parsers.read_csv(instance.file_name, header =0, infer_datetime_format = True)
-    db = settings.DATABASES['write_to']
+    db = settings.CUSTOM_DATABASES['write_to']
     con = MySQLdb.connect(host = db['HOST'], port = db['PORT'], 
                 user = db['USER'], passwd = db['PASSWORD'], db = db['NAME'])
     df.to_sql(instance.table_name, con, flavor='mysql', if_exists='replace', index= False)

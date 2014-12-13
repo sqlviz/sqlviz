@@ -1,6 +1,12 @@
 Chartly
 =======
 
+.. image:: https://circleci.com/gh/dataglu/chartly/tree/master.svg?style=svg
+    :target: https://circleci.com/gh/dataglu/chartly/tree/master
+
+.. image:: https://codecov.io/github/dataglu/chartly/coverage.svg?token=LQPKDYzyKr&branch=master
+    :target: https://codecov.io/github/dataglu/chartly?branch=master
+
 Requirements
 ------------
 
