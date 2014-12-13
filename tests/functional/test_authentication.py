@@ -7,10 +7,7 @@ class AdminLoginTest(TestCase):
 
     username = "username"
     password = "password"
-
-    def setUp(self):
-        super(AdminLoginTest, self).setUp()
-        self.browser.visit("%s/admin/" % self.live_server_url)
+    initial_url = "/admin/"
 
     def login(self):
         self.browser.fill('username', self.username)
