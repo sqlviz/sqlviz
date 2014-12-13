@@ -8,8 +8,8 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     #url(r'^favit/', include('favit.urls', namespace = 'favit')),
     url(r'^admin/', include(admin.site.urls), name='admin'),
-    url(r'^favs/', include('favs.urls', namespace = 'favs')),
-	url(r'^.*$', RedirectView.as_view(url='website/', permanent=False), name='index')
+    url(r'^favs/', include('favs.urls', namespace = 'favs'))
+	#,url(r'^.*$', RedirectView.as_view(url='website/', permanent=False), name='index')
  )
 
 

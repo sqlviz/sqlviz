@@ -194,3 +194,5 @@ if DEBUG == True:
 
 MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'
+
+STATIC_ROOT = '/var/www/chartly/static/'
