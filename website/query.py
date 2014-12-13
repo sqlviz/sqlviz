@@ -201,7 +201,7 @@ class Run_Query(Query):
         """
         if table_name is None:
             table_name = 'table_%s' % self.query_id
-        db = settings.DATABASES['write_to']
+        db = settings.CUSTOM_DATABASES['write_to']
         con = MySQLdb.connect(host = db['HOST'], port = db['PORT'], 
                     user = db['USER'], passwd = db['PASSWORD'], db = db['NAME'])
         

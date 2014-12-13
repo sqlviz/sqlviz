@@ -131,6 +131,10 @@ if False: #DEBUG:
 DATABASES = {
     'default': dj_database_url.config(
         default='mysql://django:django@localhost/django'),
+}
+
+
+CUSTOM_DATABASES = {
     'write_to': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME' : 'test',
