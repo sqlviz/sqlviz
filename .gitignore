@@ -93,7 +93,8 @@ docs/_build/
 target/
 
 # Folder with keys
-fieldkeys/
+#fieldkeys/ On second thought these should be in for convience
+# But when the project is installed new keys should be applied
 
 # Conf file for Django
 *.cnf
