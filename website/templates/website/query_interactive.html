@@ -175,9 +175,9 @@ $( "#append_list" ).on("click",'#close',function() {
   </form>
 </div>
 <script>
-$( "select" ).change(function () {  
+
+function selectDB () {
   //alert($( this ).attr('db_id'));
-  event.preventDefault(); // prevents scrolling up
   var con_id = $("#db option:selected").val();
   //var con_id = $( this ).attr('con_id')
   var data = {'con_id': con_id}
@@ -192,7 +192,14 @@ $( "select" ).change(function () {
     $('#table_selector').empty();
     $('#div_table_columns').empty();    
   });
+}
+
+$( "select" ).change(function () {
+  event.preventDefault(); // prevents scrolling up
+  selectDB();
 });
+selectDB(); // Trigger DB select on page load
+
 // run if the db is hit
 $( "#db_explorer" ).on("click",'.db',function() {
   //alert($( this ).attr('db_id'));
