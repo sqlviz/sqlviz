@@ -36,6 +36,8 @@ Create the databases and user permissions::
     GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
     CREATE DATABASE test CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON test.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
+    CREATE DATABASE scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
+    GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
 
 
 Database Migrations
