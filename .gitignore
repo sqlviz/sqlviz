@@ -104,6 +104,3 @@ target/
 
 # SFTP File
 sftp-config.json
-
-# Thumbnails
-/media/
