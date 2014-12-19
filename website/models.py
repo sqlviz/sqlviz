@@ -86,6 +86,7 @@ class Query(models.Model):
             raise ValidationError("Graph Extra must be JSON!")
         
         # Validate that query runs!
+        """
         try:
             try:
                 Q = query.Manipulate_Data(query_text = 'explain ' + self.query_text, db = self.db, user = self.owner)
@@ -95,7 +96,7 @@ class Query(models.Model):
                 Q = query.Manipulate_Data(query_text = self.query_text, db = self.db, user = self.owner)
                 Q.run_query()
         except Exception, e:
-            raise ValidationError("Query must run: %s" % (e))
+            raise ValidationError("Query must run: %s" % (e))"""
 
 class QueryProcessing(models.Model):
     class Meta:
