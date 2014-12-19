@@ -104,6 +104,14 @@ Create Django encrypted keys:
     $ keyczart create --location=fieldkeys --purpose=crypt
     $ keyczart addkey --location=fieldkeys --status=primary --size=256
 
+Enable Uploads
+----------------------------
+
+Grant Apache write access to media folder
+.. code-block:: bash
+
+    $ chmod  -R 777 media
+
 
 Using Chartly
 -------------
