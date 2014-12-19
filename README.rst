@@ -111,7 +111,7 @@ Using Chartly
 Setting up a database
 ~~~~~~~~~~~~~~~~~~~~~
 * In Admin Panel add Database
-  * Currently supported Databases: MYSQL, Postgres
+    * Currently supported Databases: MYSQL, Postgres
 * TODO: Oracle, MSSQL, Hive 2, GBQ
 * Add port, username and password
 * Password is encrypyed in database
@@ -172,9 +172,9 @@ Groups and Permissions
 * Tags are used not just to index queries, dashboards, and databases, but to give permission sets.
 * Create a group with the same name as tag, to allow access to that query.
 * A user will have access to the query iff:
-  * They are a super user
-  * The query and database are untagged
-  * They are in a group that shares a name with the database or the query
+    * They are a super user
+    * The query and database are untagged
+    * They are in a group that shares a name with the database or the query
 
 
 CSV Upload
@@ -185,7 +185,7 @@ CSV Upload
 Licensing
 ~~~~~~~~~
 * Highcharts licensing is required.
-  * http://shop.highsoft.com/highcharts.html
+    * http://shop.highsoft.com/highcharts.html
 
 Thanks
 ~~~~~~
