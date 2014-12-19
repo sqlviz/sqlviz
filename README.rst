@@ -1,7 +1,7 @@
 Chartly
 =======
 
-.. image:: https://circleci.com/gh/dataglu/chartly/tree/master.svg?style=svg
+.. image:: https://circleci.com/gh/dataglu/chartly/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
     :target: https://circleci.com/gh/dataglu/chartly/tree/master
 
 .. image:: https://codecov.io/github/dataglu/chartly/coverage.svg?token=LQPKDYzyKr&branch=master
