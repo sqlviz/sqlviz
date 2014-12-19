@@ -88,6 +88,7 @@ class Load_Query:
         self.query_id = query_id
         self.user = user
         self.parameters = parameters
+        logging.warning('PARAMETERS AT INIT %s' % parameters)
 
     def load_query(self):
         """
@@ -101,7 +102,6 @@ class Load_Query:
                     db = query.db, user = self.user,
                     query_id = self.query_id, query_model = query,
                     parameters = self.parameters)
-        
     def parameters_find(self):
         """
         Find default values, compare with those in request, and update
@@ -111,18 +111,18 @@ class Load_Query:
         preset_parameters = models.QueryDefault.objects.filter(query_id = 
                 self.query_id)
         target_parameters = {}
-        if self.parameters is not None:
-            for parameter in self.parameters:
-                # Compare with those from client request
-                if parameter.search_for in parameters:
-                    replace_with = parameters[parameter.search_for]
-                else:
-                    replace_with = parameter.replace_with_cleaned()
-                target_parameters[parameter.search_for] = {
-                        'data_type' : parameter.data_type,
-                        'search_for' : parameter.search_for,
-                        'replace_with' : replace_with
-                }
+        #if self.parameters is not None:
+        for parameter in preset_parameters:#self.parameters:
+            # Compare with those from client request
+            if parameter.search_for in self.parameters:
+                replace_with = self.parameters[parameter.search_for]
+            else:
+                replace_with = parameter.replace_with_cleaned()
+            target_parameters[parameter.search_for] = {
+                    'data_type' : parameter.data_type,
+                    'search_for' : parameter.search_for,
+                    'replace_with' : replace_with
+            }
         self.target_parameters = target_parameters
 
     def parameters_replace(self):
@@ -130,11 +130,13 @@ class Load_Query:
         For values in the target_parameters dict, update the query_text
         Replace key with target_value
         """
+        logging.warning("QUERY BEFORE %s " % self.query.query_text)
+        logging.warning("PARAMETERS %s " % self.target_parameters)
         for key, replacement_dict in  self.target_parameters.iteritems():
-            self.query.query_text = self.query.query_text(
+            self.query.query_text = self.query.query_text.replace(
                     replacement_dict['search_for'],
                     str(replacement_dict['replace_with']))
-
+        logging.warning("QUERY AFTER %s " % self.query.query_text)
     def get_parameters(self):
         return self.target_parameters
 
@@ -142,7 +144,6 @@ class Load_Query:
         self.load_query()
         self.parameters_find()
         self.parameters_replace()
-        #self.parameters_replace()
         return self.query
 
 class Run_Query(Query):
