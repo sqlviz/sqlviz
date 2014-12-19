@@ -83,6 +83,16 @@ Deploy
 Create a MySQL Database with access locally.
 
 
+Enabling Cron
+-------------
+
+Execute to set up script to run reporting:
+
+.. code-block:: bash
+
+    $ python manage.py crontab add
+
+
 Keyset for Encryption Fields
 ----------------------------
 
