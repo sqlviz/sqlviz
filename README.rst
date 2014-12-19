@@ -7,6 +7,8 @@ Chartly
 .. image:: https://codecov.io/github/dataglu/chartly/coverage.svg?token=LQPKDYzyKr&branch=master
     :target: https://codecov.io/github/dataglu/chartly?branch=master
 
+Chartly is a data visualization platform built on Django
+
 Requirements
 ------------
 
@@ -32,12 +34,15 @@ Setup the Database
 
 Create the databases and user permissions::
 
-    CREATE DATABASE django CHARACTER SET utf8 COLLATE utf8_general_ci;
+    CREATE DATABASE iIF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
-    CREATE DATABASE test CHARACTER SET utf8 COLLATE utf8_general_ci;
-    GRANT ALL PRIVILEGES ON test.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
-    CREATE DATABASE scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
+    CREATE DATABASE iIF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
+
+Create a test database also::
+
+    CREATE DATABASE iIF NOT EXISTS test CHARACTER SET utf8 COLLATE utf8_general_ci;
+    GRANT ALL PRIVILEGES ON test.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
 
 
 Database Migrations
@@ -68,8 +73,20 @@ To start the Django server on port 7878:
 Now visit http://localhost:7878/ in your browser.
 
 
+Deploy
+------
+
+.. code-block:: bash
+
+    $ pip install -r requirements.txt
+
+Create a MySQL Database with access locally.
+
+
 Keyset for Encryption Fields
 ----------------------------
+
+Create Django encrypted keys:
 
 .. code-block:: bash
 
