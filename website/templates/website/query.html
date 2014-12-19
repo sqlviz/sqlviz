@@ -32,6 +32,11 @@
 <script>
   make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
 </script>  
+<script>
+jQuery.escapeSelector = function(str) {
+  return str.replace(/[!"#$%&'()*+,./:;<=>?@\[\\\]^`{|}~]/g, "\\$&");
+}
+</script>
 {% if query_list %}
   {% for query in query_list %}    
     <div class='jumbotron' id='div_{{query.id}}'>
@@ -116,7 +121,7 @@
           </p>
         <script>
           $(function(){
-            $('#selector_{{default_dict.search_for}}').datepicker({ dateFormat: 'yy-mm-dd' });
+            $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
           });
         </script>
       {% elif default_dict.data_type == 'Numeric' %}
