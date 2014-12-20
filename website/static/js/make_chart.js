@@ -73,29 +73,44 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
         credits: {'enabled':false},
         exporting: {'enabled':true},
     }
-    series = []
+    var series = [];
     $.each( columns, function( index, val ) {
       if (index > 0){
         series.push({"name":val,"data":[]})  
       }
     });
-    $.each(data, function( key, row ) {
-      $.each(row, function( index, value ) {
-        if (index == 0){
-          options.xAxis.categories.push(value)
-        } else {
-          series[index -1].data.push(value)  
-        }
+    // Check that the first column is a date
+    console.log(is_date(data));
+    if (is_date(data)){
+      console.log('is a date');
+      $.each(data, function( key, row ) {
+        $.each(row, function( index, value ) {
+          if (index != 0){
+            series[index -1].data.push([Date.parse(row[0]),value])  
+          }
+        });
       });
-    });
-    options.series = series;
-    //console.log(options)
+      options.xAxis = {type: 'datetime'}
+    } else {
+      console.log('is NOT a date');
+      $.each(data, function( key, row ) {
+        $.each(row, function( index, value ) {
+          if (index == 0){
+            options.xAxis.categories.push(value)
+          } else {
+            series[index -1].data.push(value)  
+          }
+        });
+      });
+      if (options.xAxis.categories.length > 14){
+        options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)}
+      }
+    }
+    options.series = series; 
+    console.log(options)
     if (stacked == 'True'){
       options.plotOptions = {};
       options.plotOptions[chart_type] = {'stacking' :'normal'};
-    }
-    if (options.xAxis.categories.length > 14){
-      options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)}
     }
     if (yAxis_log == 'True'){
       options.yAxis.type = 'logarithmic'
@@ -103,4 +118,15 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
     $.extend(options, graph_extra); // MUNGE GRAPH SETTINGS
     //var chart = new Highcharts.Chart(options);
     return options;
+}
+function is_date(data) {
+  return_flag = true;
+  $.each( data, function( key, row ) {
+    if (isNaN(Date.parse(row[0]))) {
+      console.log('not a date!');
+      return_flag = false;
+      return false;
+    }
+  });
+  return return_flag;
 }
