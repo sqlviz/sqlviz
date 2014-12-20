@@ -52,7 +52,7 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
         },
         yAxis: {
             title: {
-                text: yAxis
+                text: columns[1]
             },
             plotLines: [{
                 value: 0,
@@ -90,7 +90,8 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
           }
         });
       });
-      options.xAxis = {type: 'datetime'}
+      delete options.xAxis.categories;
+      options.xAxis.type = 'datetime';
     } else {
       console.log('is NOT a date');
       $.each(data, function( key, row ) {
