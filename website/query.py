@@ -199,7 +199,6 @@ class Run_Query(Query):
         if table_name is None:
             table_name = 'table_%s' % self.query_id
         db = settings.CUSTOM_DATABASES['write_to']
-        logging.warning(db)
         engine_string = '%s://%s:%s@%s:%s/%s' % (
                 db['ENGINE'].split('.')[-1].lower(), 
                 db['USER'],
