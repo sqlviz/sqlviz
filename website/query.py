@@ -88,7 +88,6 @@ class Load_Query:
         self.query_id = query_id
         self.user = user
         self.parameters = parameters
-        logging.warning('PARAMETERS AT INIT %s' % parameters)
 
     def load_query(self):
         """
@@ -130,13 +129,10 @@ class Load_Query:
         For values in the target_parameters dict, update the query_text
         Replace key with target_value
         """
-        logging.warning("QUERY BEFORE %s " % self.query.query_text)
-        logging.warning("PARAMETERS %s " % self.target_parameters)
         for key, replacement_dict in  self.target_parameters.iteritems():
             self.query.query_text = self.query.query_text.replace(
                     replacement_dict['search_for'],
                     str(replacement_dict['replace_with']))
-        logging.warning("QUERY AFTER %s " % self.query.query_text)
     def get_parameters(self):
         return self.target_parameters
 
@@ -203,12 +199,17 @@ class Run_Query(Query):
         if table_name is None:
             table_name = 'table_%s' % self.query_id
         db = settings.CUSTOM_DATABASES['write_to']
-        con = MySQLdb.connect(host = db['HOST'], port = db['PORT'], 
-                    user = db['USER'], passwd = db['PASSWORD'], db = db['NAME'])
-        
-        self.data.to_sql(table_name, con, flavor='mysql',
+        logging.warning(db)
+        engine_string = '%s://%s:%s@%s:%s/%s' % (
+                db['ENGINE'].split('.')[-1].lower(), 
+                db['USER'],
+                urlquote(db['PASSWORD']),
+                db['HOST'], 
+                db['PORT'], 
+                db['NAME'])
+        engine = sqlalchemy.create_engine(engine_string,)
+        self.data.to_sql(table_name, con = engine,
                     if_exists='replace')
-        con.close()
         QC = models.QueryCache.objects.filter(query = self.query_model).filter(table_name = table_name).first()
         
         if QC is None:
