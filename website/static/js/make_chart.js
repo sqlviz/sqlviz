@@ -80,7 +80,7 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
       }
     });
     // Check that the first column is a date
-    console.log(is_date(data));
+    //console.log(is_date(data));
     if (is_date(data)){
       console.log('is a date');
       $.each(data, function( key, row ) {
@@ -93,7 +93,7 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
       delete options.xAxis.categories;
       options.xAxis.type = 'datetime';
     } else {
-      console.log('is NOT a date');
+      //console.log('is NOT a date');
       $.each(data, function( key, row ) {
         $.each(row, function( index, value ) {
           if (index == 0){
@@ -108,7 +108,7 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
       }
     }
     options.series = series; 
-    console.log(options)
+    //console.log(options)
     if (stacked == 'True'){
       options.plotOptions = {};
       options.plotOptions[chart_type] = {'stacking' :'normal'};
@@ -124,7 +124,7 @@ function is_date(data) {
   return_flag = true;
   $.each( data, function( key, row ) {
     if (isNaN(Date.parse(row[0]))) {
-      console.log('not a date!');
+      //console.log('not a date!');
       return_flag = false;
       return false;
     }
