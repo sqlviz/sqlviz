@@ -63,6 +63,11 @@
             <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
             {% endblock links %}
           </ul>
+
+            <form class="navbar-form navbar-left" action='{% url 'website:home' %}' method = 'get'>
+              <input class='form-control' type = 'text' name = 'q' id = 'q' value = '{{request.GET.q}}'></input>
+              <button type = "submit" class = "btn btn-success">Seach</button>
+            </form>
           <ul class="nav navbar-nav navbar-right">
             {% if user.username %}
               <li><a href="{% url 'accounts:logout_confirm' %}">

@@ -11,6 +11,7 @@ from django.utils.encoding import force_text
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 import json
 import time
@@ -28,20 +29,20 @@ from date_time_encoder import *
 logger = logging.getLogger(__name__)
 
 @login_required
-def index(request, filter= None):
-    if filter == None:
+def index(request):
+    if request.GET.get('q',None) == None:
         query_list = models.Query.objects.filter(hide_index = 0)
         dashboard_list = models.Dashboard.objects.filter(hide_index = 0)
     else:
-        query_list = models.Query.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
-        dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(tags__name__in=[filter]).distinct()
+        filter = request.GET.get('q',None)
+        query_list = models.Query.objects.filter(hide_index = 0).filter(Q(title__contains=filter) | Q(description__contains=filter)).distinct()
+        dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(Q(title__contains=filter) | Q(description__contains=filter)).distinct()
 
     # Get Favorites
     user = User.objects.get(username = request.user)
     query_favorites = favit.models.Favorite.objects.for_user(user, model = models.Query)
     query_fav_dict = {}
     query_fav_dict = dict([(i.target_object_id, i) for i in query_favorites])
-    #logging.warning('%s waldo' % (query_fav_dict))
     for q in query_list:
         if q.id in query_fav_dict:
             setattr(q,'fav',True)
