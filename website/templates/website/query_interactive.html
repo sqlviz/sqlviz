@@ -140,8 +140,12 @@ group by
       if (json_data.error == false) {
         $("#error_" + run_count ).hide();
         make_table(json_data.data.columns, json_data.data.data, 'table_' + run_count);
+        console.log('graph = ' + graph);
         if (graph != 'none'){
-          make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', '' ,'False');  
+          //console.log("TRYING TO MAKE A GRAPH");
+          //console.log(json_data.data);
+          options = make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', '' ,'False');
+          var chart = new Highcharts.Chart(options);
         } else {
           $('#chart_' + run_count).empty();
         }
