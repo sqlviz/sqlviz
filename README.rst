@@ -27,6 +27,7 @@ Install Python dependencies (in a virtualenv preferably):
 .. code-block:: bash
 
     $ pip install -r requirements/local.txt
+    $ pip install -r requirements/base.txt
 
 
 Setup the Database
@@ -34,14 +35,14 @@ Setup the Database
 
 Create the databases and user permissions::
 
-    CREATE DATABASE iIF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
-    CREATE DATABASE iIF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
 
 Create a test database also::
 
-    CREATE DATABASE iIF NOT EXISTS test CHARACTER SET utf8 COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS test CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON test.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
 
 
@@ -73,16 +74,6 @@ To start the Django server on port 7878:
 Now visit http://localhost:7878/ in your browser.
 
 
-Deploy
-------
-
-.. code-block:: bash
-
-    $ pip install -r requirements.txt
-
-Create a MySQL Database with access locally.
-
-
 Enabling Cron
 -------------
 
@@ -108,6 +99,7 @@ Enable Uploads
 ----------------------------
 
 Grant Apache write access to media folder
+
 .. code-block:: bash
 
     $ chmod  -R 777 media
