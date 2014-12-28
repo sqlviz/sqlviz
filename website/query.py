@@ -165,7 +165,7 @@ class Run_Query(Query):
         else:
             query_tags = set([str(i) for i in self.query_model.tags.all()])
         union_set = db_tags | query_tags
-        if len(union_set & user_group)  > 0:
+        if len(union_set & user_groups)  > 0:
             # User tag is in either query or DB set
             return True
         elif len(db_tags) == 0:
