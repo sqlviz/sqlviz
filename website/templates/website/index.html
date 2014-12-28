@@ -7,6 +7,25 @@
 
 {% endblock %}
 {% block main %}
+
+  <div align='center' padding='3px'><button align='right' type="submit" id="toggle_table" class="btn btn-info">Show Images</button>
+  </div>
+
+<script>
+  $(document).ready(function() {
+    $('#toggle_table').click(function() {
+      $("#table_group").toggleClass("hide");
+      $("#img_group").toggleClass("hide");
+      if ($.trim($(this).text()) === 'Show Images') {
+        $(this).text('Show Table');
+      } else {
+        $(this).text('Show Images');
+      }
+    });
+  });
+</script>
+<div id='table_group'>
+
 {% if query_list or dashboard_list %}
     <table id='query_list_table' class="table table-striped dataTable">
       <thead>
@@ -30,7 +49,8 @@
           <td> Q{{query.id}} </td>
           <td> <a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a> </td>
           <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
-          <td> <img src='{{query.image}}' width = '100px' height = '100px'></td>
+          <td> 
+            {% if query.image %}<img src='{{query.image}}' width = '100px' height = '100px'> {% endif %}</td>
           <td> Query </td>
           <td> {{query.create_time}} </td>
           <td> {{query.description}}  {{query.description_long}}</td>
@@ -45,7 +65,7 @@
           <td> D{{dash.id}} </td> 
           <td> <a id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='star {% if dash.fav %}favorite{% endif %}'>{{dash.fav}}</a> </td>
           <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
-          <td> <img src='{{dash.image}}' width = '100px' height = '100px'></td>
+          <td> </td>
 
           <td> Dashboard </td>
           <td> {{dash.create_time}} </td>
@@ -78,5 +98,27 @@
 {% else %}
     <p>No Queries or Dashboards are available.</p>
 {% endif %}
+</div>
+
+<div id='img_group' class='hide'>
+  {% if query_list or dashboard_list %}
+    {% for query in query_list %}
+      {% if query.image %}
+        <div class='col-lg-3'>
+          <a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
+          <a href="{% url 'website:query' query.id %}">
+           Q{{query.id}} - {{query.title}} 
+          <img src='{{query.image}}' width = '200px' height = '200px' alt='{{query.description}}  {{query.description_long}}'>
+          </a>
+        </div>
+      {% endif %}
+    {% endfor %}
+      <script>
+        make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
+      </script>
+  {% else %}
+      <p>No Queries Images available.</p>
+  {% endif %}
+</div>
 {% endblock %}
 

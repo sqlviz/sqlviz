@@ -75,10 +75,10 @@ def query_api(request, query_id):
         q.run_query()
         q.run_manipulations()
         response_data = q.data_array
-        if True: #try:
+        try:
             q.save_to_mysql()
-        #except Exception:
-        #    logging.warning(sys.exc_info())
+        except Exception:
+            logging.warning(sys.exc_info())
         time_elapsed = time.time() - startTime
         return_data = {
                         "data":
@@ -100,7 +100,7 @@ def query_api(request, query_id):
 def query_view(request, query_ids):
     query_id_array = query_ids.split(',')
     #TODO filter to make sure only this applies to queries which exist
-    query_list = [m for m in models.Query.objects.filter(id__in =query_id_array)] #[0] for i in query_id_array]]
+    query_list = [m for m in models.Query.objects.filter(id__in = query_id_array)]
 
     # Get Favorites 
     # TODO get rid of copy paste job here with queries
@@ -122,7 +122,8 @@ def query_view(request, query_ids):
         LQ.prepare_query()
         q.query_text = LQ.query.query_text
         for k,v in LQ.target_parameters.iteritems():
-            replacement_dict[k] = v # This dict has target, replacement, and data_type
+            # This dict has target, replacement, and data_type
+            replacement_dict[k] = v 
             json_get[v['search_for']] = v['replace_with']
     return render_to_response('website/query.html', 
                 {
@@ -136,10 +137,6 @@ def query_view(request, query_ids):
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
     query_list_string = ','.join([str(m.id) for m in models.Query.objects.filter(title__in = query_name_array)])
-    #query_id_array = []
-    #for q in query_list:
-    #    query_id_array.append(str(q.id))
-    #query_list_string  = ','.join(query_id_array)
     return query_view(request, query_list_string)
 
 @login_required
@@ -220,7 +217,8 @@ def database_explorer_api(request):
         elif con.type == 'Postgres':
             DMM = sql_manager.PSQLManager(con, request)
         else:
-            raise ValueError("Database cannot be explorered yet only supported types are 'MySQL','Postgres'")
+            raise ValueError("""Database cannot be explorered yet.
+Only supported types are 'MySQL','Postgres'""")
 
         # Get proper response data
         if db_id is None:
@@ -236,7 +234,7 @@ def database_explorer_api(request):
         
         DMM.run_query()
         response_data = DMM.RQ.numericalize_data_array()
-        logging.warning(""" BINGO %s """ % response_data)
+        #logging.warning(""" BINGO %s """ % response_data)
         return_data = {
                         "data":
                             {"columns" : response_data.pop(0), "data" : response_data},
@@ -252,5 +250,3 @@ def database_explorer_api(request):
                         }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), 
             content_type="application/json")
-
-
