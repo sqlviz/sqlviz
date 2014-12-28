@@ -40,7 +40,7 @@ jQuery.escapeSelector = function(str) {
 {% if query_list %}
   {% for query in query_list %}    
     <div class='jumbotron' id='div_{{query.id}}'>
-    <h2><a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
+    <h2><a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
       {{query.title}}
     </h2>
     

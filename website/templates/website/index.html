@@ -47,7 +47,7 @@
         {% for query in query_list %}
         <tr>
           <td> Q{{query.id}} </td>
-          <td> <a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a> </td>
+          <td> <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a> </td>
           <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
           <td> 
             {% if query.image %}<img src='{{query.image}}' width = '100px' height = '100px'> {% endif %}</td>
@@ -92,20 +92,17 @@
       });
     } );
     </script>
-    <script>
-      make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
-    </script>
 {% else %}
     <p>No Queries or Dashboards are available.</p>
 {% endif %}
 </div>
-
+{% if 1 == 1 %}
 <div id='img_group' class='hide'>
   {% if query_list or dashboard_list %}
     {% for query in query_list %}
       {% if query.image %}
         <div class='col-lg-3'>
-          <a id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
+          <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
           <a href="{% url 'website:query' query.id %}">
            Q{{query.id}} - {{query.title}} 
           <img src='{{query.image}}' width = '200px' height = '200px' alt='{{query.description}}  {{query.description_long}}'>
@@ -113,12 +110,12 @@
         </div>
       {% endif %}
     {% endfor %}
-      <script>
-        make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
-      </script>
   {% else %}
       <p>No Queries Images available.</p>
   {% endif %}
 </div>
+{% endif %}
+<script>
+  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
+</script>
 {% endblock %}
-

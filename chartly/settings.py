@@ -116,11 +116,15 @@ LOGGING = {
         'django_crontab': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'favs': {
+            'handlers': ['console'],
+            'level': 'INFO',
         }
     }
 }
 
-if False: #DEBUG:
+if DEBUG:
     # make all loggers use the console.
     for logger in LOGGING['loggers']:
         LOGGING['loggers'][logger]['handlers'] = ['console']
