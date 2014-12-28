@@ -82,9 +82,7 @@ jQuery.escapeSelector = function(str) {
     </script>
     <script>
     $( "#error_{{query.id}}" ).hide();
-    $.getJSON('{% url "website:query_api" query.id %}', {{json_get|safe}}, function( json_data ) { //TODO add URL reverse here
-      //console.log(json_data);
-      //console.log('chart_{{query.id}}');
+    $.getJSON('{% url "website:query_api" query.id %}', {{json_get|safe}}, function( json_data ) {
       $( "#waiting_{{query.id}}" ).empty();
       if (json_data.error == false){
         if ('{{query.hide_table}}' ==  'False') {
@@ -98,7 +96,10 @@ jQuery.escapeSelector = function(str) {
         $( "#error_{{query.id}}" ).show();
         $( "#error_{{query.id}} pre" ).text(json_data.data);
       }
-
+    }).fail(function() {
+      $( "#waiting_{{query.id}}" ).empty();
+      $( "#error_{{query.id}}" ).show();
+      $( "#error_{{query.id}} pre" ).text('Unknown Error Occured');
     });
     </script>
   {% endfor %}

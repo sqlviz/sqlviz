@@ -154,7 +154,11 @@ group by
         $("#error_" + run_count).show();
         $("#error_" + run_count + " pre").text(json_data.data);
       }
+    }).fail(function() {
+        $("#error_" + run_count).show();
+        $("#error_" + run_count + " pre").text('Unknown Error Occured');
     });
+    ;
   };
   var run_count = 0;
   $( "#chart_data" ).submit(function( event ) {
