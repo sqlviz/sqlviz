@@ -21,10 +21,20 @@
 {% endblock %}
           
 {% block links %}
-  <li><a href="{% url 'website:home' %}">Home</a></li>
-  <li><a href="/admin/">Admin</a></li>
-  <li class="active"><a href="/admin/website/query/{% with query_list|first as first_query %}{{ first_query.id }}{% endwith %}">Edit</a></li>
-  <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
+<li>
+  <a href="{% url 'website:home' %}">Home</a>
+</li>
+{% if user.is_staff %}
+  <li>
+    <a href="{% url 'admin:index' %}">Admin</a>
+  </li>
+  <li class='active'>
+    <a href=" {% url 'admin:website_query_change' query_list.0.id %}">Edit</a>
+  </li>
+  <li>
+    <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
+  </li>
+{% endif %}
 {% endblock %}
 
 {% block main %}
@@ -54,7 +64,8 @@ jQuery.escapeSelector = function(str) {
     </div>
     <div id ='chart_{{query.id}}'></div>
       <ul class='hide_{{query.id}}'>
-        <li><a href="/admin/website/query/{{ query.id }}">Edit</a></li>
+
+        <li><a href="{% url 'admin:website_query_change' query.id %}">Edit</a></li>
         <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
         <li>Description Short: {{query.description}}</li>
         {% if query.description_long %}

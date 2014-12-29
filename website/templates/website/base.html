@@ -57,11 +57,31 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
           {% block links %}
-            <li class="active"><a href="{% url 'website:home' %}">Home</a></li>
-            <li><a href="/admin/">Admin</a></li>
-            <li><a href="/admin/website/query">Edit</a></li>
-            <li><a href="{% url 'website:query_interactive' %}">Interactive Mode</a></li>
-            {% endblock links %}
+            {% url 'website:home' as home %}
+            {% url 'website:query_interactive' as query_interactive %}
+            {% url 'website:query' as query_url %}
+            <li 
+            {% if request.path = home %}
+              class="active"
+            {% endif %}>
+              <a href="{% url 'website:home' %}">Home                </a>
+            </li>
+            {% if user.is_staff %}
+              <li>
+                <a href="{% url 'admin:index' %}">Admin</a>
+              </li>
+              <li>
+                <a href="{% url 'admin:website_query_add' %}">Edit</a>
+              </li>
+              <li
+                {% if request.path = query_interactive %}
+                  class="active"
+                {% endif %}
+              >
+                <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
+              </li>
+            {% endif %}
+          {% endblock links %}
           </ul>
 
             <form class="navbar-form navbar-left" action='{% url 'website:home' %}' method = 'get'>
