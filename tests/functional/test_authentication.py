@@ -76,8 +76,22 @@ class LoginPageTest(TestCase):
         User.objects.create_user(
             username=self.username,
             email="u@example.com",
-            password=self.password,
+            password=self.password
+        )
+        assert "Interactive Mode" not in self.browser.find_by_css('body').text
+        self.login()
+        assert "Interactive Mode" not in self.browser.find_by_css('body').text
+        assert "No Queries or Dashboards are available" in self.browser.find_by_css('body').text
+        assert "Admin" not in self.browser.find_by_css('body').text
+
+    def test_valid_credentials_not_staff(self):
+        """Ensure logging in with valid credentials redirects to admin."""
+        User.objects.create_superuser(
+            username=self.username,
+            email="u@example.com",
+            password=self.password
         )
         assert "Interactive Mode" not in self.browser.find_by_css('body').text
         self.login()
         assert "Interactive Mode" in self.browser.find_by_css('body').text
+        assert "Admin" in self.browser.find_by_css('body').text
