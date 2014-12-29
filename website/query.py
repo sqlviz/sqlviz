@@ -314,7 +314,7 @@ class Manipulate_Data(Run_Query):
         """
         TODO Make this actually do cumulative statistics
         """
-        self.data = self.data.cumsum()
+        self.data = self.data[self.data.columns[1:]].cumsum()
 
     def rotate(self):
         """
@@ -334,6 +334,7 @@ class Manipulate_Data(Run_Query):
         Returns a Pandas HTML Array from the data DataFrame
         """
         return(self.data.to_html(index= False))
+
     def generate_image(self, file_output = None, width = 400, height = 300):
         """
         create a picture!
@@ -374,23 +375,13 @@ class Manipulate_Data(Run_Query):
         """
         Gets Processing steps from DB and executes them in order
         """
-        def exists_and_equals(dictionary, key, value):
-            if key in dictionary:
-                if dictionary[key] == value:
-                    return True
-            return False
+        query = models.Query.objects.filter(id = self.query_id)[0]
 
-        d = {}
-        QP = models.QueryProcessing.objects.filter(query = self.query_id)
-        for i in QP:
-            d[i.attribute] = i.value
-
-        if exists_and_equals(d, 'pivot','True'):
+        if query.pivot_data == True:#if exists_and_equals(d, 'pivot','True'):
             self.pivot()
-        if exists_and_equals(d,'rotate','True'):
-            self.rotate()
-        if exists_and_equals(d,'cumulative','True'):
+        if query.cumulative == True:
             self.cumulative()
+
         self.pandas_to_array()
         self.numericalize_data_array()
 
