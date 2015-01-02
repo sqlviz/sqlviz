@@ -46,7 +46,7 @@ class Query(models.Model):
     hide_index = models.BooleanField(default=False, help_text = 'Hide from Main Search')
     hide_table = models.BooleanField(default=False, help_text = 'Supress Data output in display')
     chart_type = models.CharField(max_length=10,
-                                      choices=(('None','None'),('line','line'),('bar','bar'),('column','column'),('area','area')),
+                                      choices=(('None','None'),('line','line'),('bar','bar'),('column','column'),('area','area'),('country','country')),
                                       default='None')
     pivot_data = models.BooleanField(default=False,  help_text = 'Pivot data around first/second columns.  Nulls filled with 0')
     cumulative = models.BooleanField(default=False,  help_text = 'Run cumulatie sum')

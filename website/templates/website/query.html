@@ -15,9 +15,15 @@
 {% endblock %}
 {% block style %}
   <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-  <script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
+  
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+  <!-- For country charts -->
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.src.js"></script>
+  <script src="http://code.highcharts.com/maps/modules/map.src.js"></script>
+<script src="http://code.highcharts.com/maps/modules/exporting.js"></script>
+<script src="http://code.highcharts.com/mapdata/custom/world.js"></script>
+
 {% endblock %}
           
 {% block links %}
@@ -99,7 +105,11 @@ jQuery.escapeSelector = function(str) {
         if ('{{query.hide_table}}' ==  'False') {
           make_table(json_data.data.columns, json_data.data.data, '{{query.id}}');  
         }
-        if ('{{query.chart_type}}' != 'None'){
+        if ('{{query.chart_type}}' == 'country'){
+          options = make_chart_country(json_data.data.columns, json_data.data.data, '{{query.title}}','custom/world')
+          $('#chart_' + {{query.id}}).highcharts('Map', options);
+        }
+        else if ('{{query.chart_type}}' != 'None'){
           options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
             var chart = new Highcharts.Chart(options);
           };          

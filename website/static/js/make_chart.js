@@ -32,93 +32,137 @@ function make_table(columns, data, target){
     });    
     return html; 
 };
-
-function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yAxis, yAxis_log, graph_extra){
+function make_chart_country(columns,data, title, map_name){
+  map_name = 'custom/world'
+  /* Assume data is array of arrays with first column being country
+  and second value being numeric for chloropleth color */
+  map_data = []
+  $.each( data, function( index, val ) {
+    map_data.push({"hc-key":val[0],"value":val[1]})  
+  });
   options = {
-        chart: {
-          type : chart_type,
-          renderTo: target,
-          zoomType: 'xy'
+        title : {
+            text : title
         },
-        title: {
-            text: title,
-            x: -20 //center
-        },
-        xAxis: {
-            categories: [],
-            title: {
-              text: columns[0]
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
             }
         },
-        yAxis: {
-            title: {
-                text: columns[1]
+        series : [{
+            data : map_data,
+            mapData: Highcharts.maps[map_name],
+            joinBy: 'hc-key',
+            name: columns[1],
+            states: {
+                hover: {
+                    color: '#BADA55'
+                }
             },
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }]
-        },
-        tooltip: {
-            valueSuffix: ''
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
-        series: [],
-        credits: {'enabled':false},
-        exporting: {'enabled':true},
-    }
-    var series = [];
-    $.each( columns, function( index, val ) {
-      if (index > 0){
-        series.push({"name":val,"data":[]})  
-      }
-    });
-    // Check that the first column is a date
-    //console.log(is_date(data));
-    if (is_date(data)){
-      console.log('is a date');
-      $.each(data, function( key, row ) {
-        $.each(row, function( index, value ) {
-          if (index != 0){
-            series[index -1].data.push([Date.parse(row[0]),value])  
-          }
-        });
-      });
-      delete options.xAxis.categories;
-      options.xAxis.type = 'datetime';
-    } else {
-      //console.log('is NOT a date');
-      $.each(data, function( key, row ) {
-        $.each(row, function( index, value ) {
-          if (index == 0){
-            options.xAxis.categories.push(value)
-          } else {
-            series[index -1].data.push(value)  
-          }
-        });
-      });
-      if (options.xAxis.categories.length > 14){
-        options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)}
-      }
-    }
-    options.series = series; 
-    //console.log(options)
-    if (stacked == 'True'){
-      options.plotOptions = {};
-      options.plotOptions[chart_type] = {'stacking' :'normal'};
-    }
-    if (yAxis_log == 'True'){
-      options.yAxis.type = 'logarithmic'
-    }
-    $.extend(options, graph_extra); // MUNGE GRAPH SETTINGS
-    //var chart = new Highcharts.Chart(options);
+            dataLabels: {
+                enabled: true,
+                format: '{point.name}'
+            }
+          }],
+          colorAxis: {
+              type: 'linear'
+          },
+    };
+    console.log(JSON.stringify(map_data));
     return options;
+}
+
+function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yAxis, yAxis_log, graph_extra){
+  if (chart_type == 'country') {
+    return make_chart_country(columns,data,title,map_name);
+  } else {
+    options = {
+          chart: {
+            type : chart_type,
+            renderTo: target,
+            zoomType: 'xy'
+          },
+          title: {
+              text: title,
+              x: -20 //center
+          },
+          xAxis: {
+              categories: [],
+              title: {
+                text: columns[0]
+              }
+          },
+          yAxis: {
+              title: {
+                  text: columns[1]
+              },
+              plotLines: [{
+                  value: 0,
+                  width: 1,
+                  color: '#808080'
+              }]
+          },
+          tooltip: {
+              valueSuffix: ''
+          },
+          legend: {
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'middle',
+              borderWidth: 0
+          },
+          series: [],
+          credits: {'enabled':false},
+          exporting: {'enabled':true},
+      }
+      var series = [];
+      $.each( columns, function( index, val ) {
+        if (index > 0){
+          series.push({"name":val,"data":[]})  
+        }
+      });
+      // Check that the first column is a date
+      //console.log(is_date(data));
+      if (is_date(data)){
+        console.log('is a date');
+        $.each(data, function( key, row ) {
+          $.each(row, function( index, value ) {
+            if (index != 0){
+              series[index -1].data.push([Date.parse(row[0]),value])  
+            }
+          });
+        });
+        delete options.xAxis.categories;
+        options.xAxis.type = 'datetime';
+      } else {
+        //console.log('is NOT a date');
+        $.each(data, function( key, row ) {
+          $.each(row, function( index, value ) {
+            if (index == 0){
+              options.xAxis.categories.push(value)
+            } else {
+              series[index -1].data.push(value)  
+            }
+          });
+        });
+        if (options.xAxis.categories.length > 14){
+          options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)}
+        }
+      }
+      options.series = series; 
+      //console.log(options)
+      if (stacked == 'True'){
+        options.plotOptions = {};
+        options.plotOptions[chart_type] = {'stacking' :'normal'};
+      }
+      if (yAxis_log == 'True'){
+        options.yAxis.type = 'logarithmic'
+      }
+      $.extend(options, graph_extra); // MUNGE GRAPH SETTINGS
+      //var chart = new Highcharts.Chart(options);
+      return options;    
+  }
 }
 function is_date(data) {
   return_flag = true;
