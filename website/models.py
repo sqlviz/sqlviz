@@ -191,7 +191,7 @@ class QueryView(models.Model):
 ## POST SAVE TO CREATE IMAGE FOR QUERY  
 def post_save_handler_query(sender, instance, **kwargs):
     post_save.disconnect(post_save_handler_query, sender=Query)
-    if instance.chart_type != 'None':
+    if instance.chart_type not in ['None','country']:
         LQ = query.Load_Query(query_id = instance.id, user = instance.owner)
         Q = LQ.prepare_query()
         Q.run_query()
