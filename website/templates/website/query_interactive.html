@@ -34,10 +34,14 @@
 {% block main %}
 
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-<script type="text/javascript" src="{% static 'Highcharts-4.0.3/js/highcharts.js' %}"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
-<!-- TODO FIX CSS BUG HERE -->
+
+<script type="text/javascript" src="{% static 'Highcharts-4.0.4/js/highcharts.src.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highmaps-1.0.4/js/modules/map.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highmaps-1.0.4/js/modules/exporting.js' %}"></script>
+<script src="http://code.highcharts.com/mapdata/custom/world-highres.js"></script>
+
 
 <div id='run_block'>
   <div class='jumbotron'>
@@ -82,6 +86,7 @@ group by
           <input type='radio' name='graph' id='graph' value='bar' label='Bar'>Bar
           <input type='radio' name='graph' id='graph' value='column' label='Column'>Column
           <input type='radio' name='graph' id='graph' value='scatter' label='Scatter'>Scatter
+          <input type='radio' name='graph' id='graph' value='country' label='Scatter'>Country
         </p>
       </div>
     </div>
@@ -135,12 +140,14 @@ group by
       if (json_data.error == false) {
         $("#error_" + run_count ).hide();
         make_table(json_data.data.columns, json_data.data.data, 'table_' + run_count);
-        console.log('graph = ' + graph);
         if (graph != 'none'){
-          //console.log("TRYING TO MAKE A GRAPH");
-          //console.log(json_data.data);
-          options = make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', '' ,'False');
-          var chart = new Highcharts.Chart(options);
+          if (graph == 'country') {
+            options = make_chart_country(json_data.data.columns, json_data.data.data, '{{query.title}}','custom/world')
+            $('#chart_' + run_count).highcharts('Map', options);
+          } else {
+            options = make_chart(json_data.data.columns, json_data.data.data, 'chart_' + run_count, 'False', graph, 'Interactive Query Mode', 'xAxis Title', '' ,'False');
+            var chart = new Highcharts.Chart(options);            
+          }
         } else {
           $('#chart_' + run_count).empty();
         }

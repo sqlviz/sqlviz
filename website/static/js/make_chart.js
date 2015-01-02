@@ -33,7 +33,7 @@ function make_table(columns, data, target){
     return html; 
 };
 function make_chart_country(columns,data, title, map_name){
-  map_name = 'custom/world'
+  map_name = 'custom/world-highres'
   /* Assume data is array of arrays with first column being country
   and second value being numeric for chloropleth color */
   map_data = []
@@ -69,7 +69,6 @@ function make_chart_country(columns,data, title, map_name){
               type: 'linear'
           },
     };
-    console.log(JSON.stringify(map_data));
     return options;
 }
 
