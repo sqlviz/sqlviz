@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- TODO <link rel="icon" href="{% templatetag openblock %} static 'img/favicon.ico' {% templatetag closeblock %} ">-->
+    <link rel="icon" href="{% static 'fav.ico' %}">
 
     <title>{% block title %}(no title){% endblock %}</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -46,12 +46,6 @@
     <div class="navbar navbar-default navbar-static-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
           <a class="navbar-brand" href="{% url 'website:home' %}">Chartly</a>
         </div>
         <div class="navbar-collapse collapse">
@@ -76,8 +70,7 @@
               <li
                 {% if request.path = query_interactive %}
                   class="active"
-                {% endif %}
-              >
+                {% endif %}>
                 <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
               </li>
             {% endif %}
@@ -96,7 +89,7 @@
               </li>
             {% endif %}
           </ul>
-        </div><!--/.nav-collapse -->
+        </div>
       </div>
     </div>
 
@@ -119,5 +112,5 @@
 
     ga('create', 'UA-55739949-1', 'auto');
     ga('send', 'pageview');
-  
+    </script>
 </html>
