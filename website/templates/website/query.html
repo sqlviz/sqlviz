@@ -168,22 +168,22 @@
       <h3 class='label-danger'>No Queries found with that namespace or permission denied.  Are you sure it is there?</h3>
   {% endif %}
   {% if replacement_dict %}
-    <div class='jumbotron'>
+    <section class='well' id='parameters_insert'>
+      <h3>Re-Run with Parameters</h3>
       <form action ='{{request.path}}' method='GET'>
         {% for key, default_dict in replacement_dict.items %}
           {%if default_dict.data_type = 'Date' %}
-          <h3>Rerun with Parameters </h3>
             {# DATEPICKER #}
-              <p> {{default_dict.search_for}} 
-              <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
-              name = "{{default_dict.search_for}}"
-              >
-              </p>
-            <script>
-              $(function(){
-                $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
-              });
-            </script>
+            <p> {{default_dict.search_for}} 
+            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
+            name = "{{default_dict.search_for}}"
+            >
+            </p>
+          <script>
+            $(function(){
+              $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
+            });
+          </script>
           {% elif default_dict.data_type == 'Numeric' %}
             {# NUMERIC #}
             <p> {{default_dict.search_for}}
@@ -197,8 +197,8 @@
           {% endif %}
         {% endfor %}
         <input type="submit" class='btn btn-primary' value="Submit"/>
-      </form>
-      </div>
+        </form>
+      </section>
     {% else %}
       No Defaults Found
     {% endif %}
@@ -215,6 +215,11 @@
             >{{query.title}}</a>
           </li>
         {% endfor %}
+        {% if replacement_dict %}
+          <li>
+            <a href="#parameters_insert">Paramters</a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   {% endif %}
