@@ -41,7 +41,7 @@
     {% block style %}{% endblock %}
 
   </head>
-  <body>
+  <body {% block body %}{% endblock %}>
     <!-- Static navbar -->
     <div class="navbar navbar-default navbar-static-top" role="navigation">
       <div class="container">
@@ -64,7 +64,7 @@
             {% if request.path = home %}
               class="active"
             {% endif %}>
-              <a href="{% url 'website:home' %}">Home                </a>
+              <a href="{% url 'website:home' %}">Home</a>
             </li>
             {% if user.is_staff %}
               <li>
@@ -83,49 +83,41 @@
             {% endif %}
           {% endblock links %}
           </ul>
-
             <form class="navbar-form navbar-left" action='{% url 'website:home' %}' method = 'get'>
               <input class='form-control' type = 'text' name = 'q' id = 'q' value = '{{request.GET.q}}'></input>
               <button type = "submit" class = "btn btn-success">Seach</button>
             </form>
           <ul class="nav navbar-nav navbar-right">
             {% if user.username %}
-              <li><a href="{% url 'accounts:logout_confirm' %}">
-                  Username: {{ user.username }}</a></li>
+              <li>
+                <a href="{% url 'accounts:logout_confirm' %}">
+                  Username: {{ user.username }}
+                </a>
+              </li>
             {% endif %}
-
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </div>
 
-
-    <div class="container">
-
-      <!-- Main component for a primary marketing message or call to action -->
-      <div class="">
+    <div class="container-fluid">
         {% block main %}(no content){% endblock main %}
-      </div>
-      
-    </div> <!-- /container -->
+    </div>
     <div class="footer">
-        <div class="container">
-        <p class="text-muted">Copyright 2014 Matthew Feldman</p>
-        </div>
+      <div class="container">
+        <p class="text-muted">
+          Copyright 2014 Matthew Feldman
+        </p>
       </div>
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+    </div>
   </body>
   <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-55739949-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
+    ga('create', 'UA-55739949-1', 'auto');
+    ga('send', 'pageview');
+  
 </html>

@@ -1,13 +1,11 @@
-
 {% extends 'website/base.html' %}
 
 {% load staticfiles %}
 
-
 {% block title %} 
   {% if query_list %}
     {% for query in query_list %}  
-    {{query.title}}
+      {{query.title}}
     {% endfor %}
   {% else %}
       No Matched Query
@@ -15,156 +13,204 @@
 {% endblock %}
 {% block style %}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+<link x="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 <!-- For country charts -->
-
 <script type="text/javascript" src="{% static 'Highcharts-4.0.4/js/highcharts.src.js' %}"></script>
 <!--<script src="http://code.highcharts.com/maps/modules/map.src.js"></script>-->
 <script type="text/javascript" src="{% static 'Highmaps-1.0.4/js/modules/map.js' %}"></script>
 <!--<script src="http://code.highcharts.com/maps/modules/exporting.js"></script>-->
 <script type="text/javascript" src="{% static 'Highmaps-1.0.4/js/modules/exporting.js' %}"></script>
 <script src="http://code.highcharts.com/mapdata/custom/world-highres.js"></script>
-
+<style type="text/css" media="screen">
+    ul.nav-tabs {
+      width: 140px;
+      margin-top: 20px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+    }
+    ul.nav-tabs li {
+      margin: 0;
+      border-top: 1px solid #ddd;
+    }
+    ul.nav-tabs li:first-child {
+      border-top: none;
+    }
+    ul.nav-tabs li a {
+      margin: 0;
+      padding: 8px 16px;
+      border-radius: 0;
+    }
+    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
+      color: #fff;
+      background: #0088cc;
+      border: 1px solid #0088cc;
+    }
+    ul.nav-tabs li:first-child a {
+      border-radius: 4px 4px 0 0;
+    }
+    ul.nav-tabs li:last-child a {
+      border-radius: 0 0 4px 4px;
+    }
+    ul.nav-tabs.affix {
+      top: 30px; /* Set the top position of pinned element */
+    }
+</style>
 {% endblock %}
-          
+
+{% block body %}
+data-spy="scroll" data-target="#myScrollspy"
+{% endblock %}
+
 {% block links %}
-<li>
-  <a href="{% url 'website:home' %}">Home</a>
-</li>
-{% if user.is_staff %}
   <li>
-    <a href="{% url 'admin:index' %}">Admin</a>
+    <a href="{% url 'website:home' %}">Home</a>
   </li>
-  <li class='active'>
-    <a href=" {% url 'admin:website_query_change' query_list.0.id %}">Edit</a>
-  </li>
-  <li>
-    <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
-  </li>
-{% endif %}
+  {% if user.is_staff %}
+    <li>
+      <a href="{% url 'admin:index' %}">Admin</a>
+    </li>
+    <li class='active'>
+      <a href=" {% url 'admin:website_query_change' query_list.0.id %}">Edit</a>
+    </li>
+    <li>
+      <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
+    </li>
+  {% endif %}
 {% endblock %}
 
 {% block main %}
-<div id='sortable'>
-<script>
-  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
-</script>  
-<script>
-jQuery.escapeSelector = function(str) {
-  return str.replace(/[!"#$%&'()*+,./:;<=>?@\[\\\]^`{|}~]/g, "\\$&");
-}
-</script>
-{% if query_list %}
-  {% for query in query_list %}    
-    <div class='jumbotron' id='div_{{query.id}}'>
-    <h2><a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
-      {{query.title}}
-    </h2>
-    
-
-    <div class='hide_{{query.id}}'>
-    <div id='div_table_{{query.id}}'></div>
-    
-    <div id="waiting_{{query.id}}"><img src='{% static 'ajax-loader.gif' %}'>
-    </div>
-    <div id="error_{{query.id}}" class = "alert alert-error alert-block"><pre></pre></div>
-    </div>
-    <div id ='chart_{{query.id}}'></div>
-      <ul class='hide_{{query.id}}'>
-
-        <li><a href="{% url 'admin:website_query_change' query.id %}">Edit</a></li>
-        <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
-        <li>Description Short: {{query.description}}</li>
-        {% if query.description_long %}
-        <li>Description Long: {{query.description_long}}</li>
-        {% endif %}
-        <li>Query Text: <div id='sql_{{query.id}}'><pre>{{query.query_text}}</pre>  </div></li>
-        <li>Query Creation: {{query.create_time}}</li>
-        <li>Query Last Modified: {{query.modified_time}}</li>
-        <li>Database: {{query.db}}</li>
-      </ul>
-      </br>
-      <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">Hide</button>
-    </div>
-    <script>
+  <script>
+    make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
+  </script>  
+  <script>
+  jQuery.escapeSelector = function(str) {
+    return str.replace(/[!"#$%&'()*+,./:;<=>?@\[\\\]^`{|}~]/g, "\\$&");
+  }
+  </script>
+  <div class='col-xs-9 content' role='main'>
+  {% if query_list %}
+    {% for query in query_list %}    
+      <section class='well' id='div_{{query.id}}'>
+        <h2>
+          <a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>
+            {{query.fav}}
+          </a>
+          {{query.title}}
+        </h2>
+        <div class='hide_{{query.id}}'>
+          <div id='div_table_{{query.id}}'></div>
+          <div id="waiting_{{query.id}}"><img src='{% static 'ajax-loader.gif' %}'>
+          </div>
+          <div id="error_{{query.id}}" class = "alert alert-error alert-block">
+            <pre></pre>
+          </div>
+        </div>
+        <div id ='chart_{{query.id}}'></div>
+        <ul class='hide_{{query.id}}'>
+          <li><a href="{% url 'admin:website_query_change' query.id %}">Edit</a></li>
+          <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
+          <li>Description Short: {{query.description}}</li>
+          {% if query.description_long %}
+          <li>Description Long: {{query.description_long}}</li>
+          {% endif %}
+          <li>Query Text: <div id='sql_{{query.id}}'><pre>{{query.query_text}}</pre>  </div></li>
+          <li>Query Creation: {{query.create_time}}</li>
+          <li>Query Last Modified: {{query.modified_time}}</li>
+          <li>Database: {{query.db}}</li>
+        </ul>
+        <br />
+        <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">
+          Hide
+        </button>
+      </section>
+      <script>
         $(document).ready(function() {
-        $('#toggle_{{query.id}}').click(function() {
-        $(".hide_{{query.id}}").toggleClass("hide");
-        if ($.trim($(this).text()) === 'Hide') {
-          $(this).text('Show');
-        } else {
-          $(this).text('Hide');
-        }
-      });
-    });
-    </script>
-    <script>
-    $( "#error_{{query.id}}" ).hide();
-    $.getJSON('{% url "website:query_api" query.id %}', {{json_get|safe}}, function( json_data ) {
-      $( "#waiting_{{query.id}}" ).empty();
-      if (json_data.error == false){
-        if ('{{query.hide_table}}' ==  'False') {
-          make_table(json_data.data.columns, json_data.data.data, '{{query.id}}');  
-        }
-        if ('{{query.chart_type}}' == 'country'){
-          options = make_chart_country(json_data.data.columns, json_data.data.data, '{{query.title}}','custom/world')
-          $('#chart_' + {{query.id}}).highcharts('Map', options);
-        }
-        else if ('{{query.chart_type}}' != 'None'){
-          options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
-            var chart = new Highcharts.Chart(options);
-          };          
-      } else {
-        $( "#error_{{query.id}}" ).show();
-        $( "#error_{{query.id}} pre" ).text(json_data.data);
-      }
-    }).fail(function() {
-      $( "#waiting_{{query.id}}" ).empty();
-      $( "#error_{{query.id}}" ).show();
-      $( "#error_{{query.id}} pre" ).text('Unknown Error Occured');
-    });
-    </script>
-  {% endfor %}
-{% else %}
-    <h3 class='label-danger'>No Queries found with that namespace or permission denied.  Are you sure it is there?</h3>
-{% endif %}
-</div>
-
-{% if replacement_dict %}
-  <div class='jumbotron'>
-    <form action ='{{request.path}}' method='GET'>
-    {% for key, default_dict in replacement_dict.items %}
-      {%if default_dict.data_type = 'Date' %}
-      <h3>Rerun with Parameters </h3>
-        {# DATEPICKER #}
-          <p> {{default_dict.search_for}} 
-          <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
-          name = "{{default_dict.search_for}}"
-          >
-          </p>
-        <script>
-          $(function(){
-            $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
+          $('#toggle_{{query.id}}').click(function() {
+            $(".hide_{{query.id}}").toggleClass("hide");
+            if ($.trim($(this).text()) === 'Hide') {
+              $(this).text('Show');
+            } else {
+              $(this).text('Hide');
+            }
           });
-        </script>
-      {% elif default_dict.data_type == 'Numeric' %}
-        {# NUMERIC #}
-        <p> {{default_dict.search_for}}
-          <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
-        </p>
-      {% else %}
-        {# STRING #}
-        <p> {{default_dict.search_for}}
-          <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
-        </p>
-      {% endif %}
+        });
+      </script>
+      <script>
+        $( "#error_{{query.id}}" ).hide();
+        $.getJSON('{% url "website:query_api" query.id %}', {{json_get|safe}}, function( json_data ) {
+          $( "#waiting_{{query.id}}" ).empty();
+          if (json_data.error == false){
+            if ('{{query.hide_table}}' ==  'False') {
+              make_table(json_data.data.columns, json_data.data.data, '{{query.id}}');  
+            }
+            if ('{{query.chart_type}}' == 'country'){
+              options = make_chart_country(json_data.data.columns, json_data.data.data, '{{query.title}}','custom/world')
+              $('#chart_' + {{query.id}}).highcharts('Map', options);
+            }
+            else if ('{{query.chart_type}}' != 'None'){
+              options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
+                var chart = new Highcharts.Chart(options);
+              };          
+          } else {
+            $( "#error_{{query.id}}" ).show();
+            $( "#error_{{query.id}} pre" ).text(json_data.data);
+          }
+        }).fail(function() {
+          $( "#waiting_{{query.id}}" ).empty();
+          $( "#error_{{query.id}}" ).show();
+          $( "#error_{{query.id}} pre" ).text('Unknown Error Occured');
+        });
+      </script>
     {% endfor %}
-    <input type="submit" class='btn btn-primary' value="Submit"/>
-  </form>
-</div>
-{% else %}
- No Defaults Found
- {% endif %}
+  {% else %}
+      <h3 class='label-danger'>No Queries found with that namespace or permission denied.  Are you sure it is there?</h3>
+  {% endif %}
+  {% if replacement_dict %}
+    <div class='jumbotron'>
+      <form action ='{{request.path}}' method='GET'>
+      {% for key, default_dict in replacement_dict.items %}
+        {%if default_dict.data_type = 'Date' %}
+        <h3>Rerun with Parameters </h3>
+          {# DATEPICKER #}
+            <p> {{default_dict.search_for}} 
+            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
+            name = "{{default_dict.search_for}}"
+            >
+            </p>
+          <script>
+            $(function(){
+              $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
+            });
+          </script>
+        {% elif default_dict.data_type == 'Numeric' %}
+          {# NUMERIC #}
+          <p> {{default_dict.search_for}}
+            <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
+          </p>
+        {% else %}
+          {# STRING #}
+          <p> {{default_dict.search_for}}
+            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
+          </p>
+        {% endif %}
+      {% endfor %}
+      <input type="submit" class='btn btn-primary' value="Submit"/>
+    </form>
+    {% else %}
+      No Defaults Found
+    {% endif %}
+  </div>
+  {% if query_list %}
+    <div class="col-xs-3" id="myScrollspy">
+      <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="200">
+        {% for query in query_list %}
+          <li>
+            <a href="#div_{{query.id}}">{{query.title}}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
 {% endblock %}
