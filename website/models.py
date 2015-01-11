@@ -56,6 +56,7 @@ class Query(models.Model):
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
     graph_extra = models.TextField(blank = True, help_text = 'JSON form of highcharts formatting') # SHOULD INCLUDE default={} in ADMIN!
     image = models.ImageField(upload_to = settings.MEDIA_ROOT + '/thumbnails', max_length = 2048, blank = True)
+    cacheable = models.BooleanField(default = True, help_text = 'allows this query result to be cached')
     tags = TaggableManager(blank=True)
 
     def __unicode__(self):
@@ -170,8 +171,10 @@ class DashboardQuery(models.Model):
 
 class QueryCache(models.Model):
     query = models.ForeignKey(Query)
-    table_name = models.CharField(unique=True,max_length=128)
+    table_name = models.CharField(unique=True, max_length=128)
     run_time = models.DateTimeField(auto_now_add = True, editable = False)
+    hash = models.CharField(max_length=1024)
+
     def __str__(self):
         return "%s : %s" % (self.query, self.table_name)
 

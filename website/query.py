@@ -14,6 +14,7 @@ import json
 import subprocess
 import sys
 import copy
+import digest # TODO GET RIGHT NAME HERE
 
 import models
 from date_time_encoder import *
@@ -66,10 +67,12 @@ class Query:
         """
         Adds comments before query for the DBAs to blame
         """
-        comment_char = {'MySQL' : '#','Postgres':'--','Hive' : '--'}
+        COMMENT_CHAR = {'MySQL' : '#','Postgres':'--','Hive' : '--'}
+
         self.query_text = "%s Chartly Running Query Id: %s \n %s" % (
-                comment_char[self.db.type], self.query_id,
+                COMMENT_CHAR[self.db.type], self.query_id,
                 self.query_text)
+
 
     def prepare_safety(self):
         """
@@ -140,7 +143,12 @@ class Load_Query:
         self.load_query()
         self.parameters_find()
         self.parameters_replace()
+        self.query_hash()
         return self.query
+
+    def query_hash(self):
+        self.query_hash = digest.md5(self.query_text)
+        return self.query_hash
 
 class Run_Query(Query):
     def check_permission(self):
@@ -208,13 +216,17 @@ class Run_Query(Query):
                 db['NAME'])
         engine = sqlalchemy.create_engine(engine_string,)
         self.data.to_sql(table_name, con = engine,
-                    if_exists='replace')
+                    if_exists='replace', index = False)
         QC = models.QueryCache.objects.filter(query = self.query_model).filter(table_name = table_name).first()
         
+
         if QC is None:
+            # TODO fix hash
             models.QueryCache.objects.create(query = self.query_model,
-                    table_name = table_name)
+                    table_name = table_name,
+                    hash = self.query_hash)
         else:
+            QC.parameters = json.dumps(self.parameters)
             QC.save()
 
         return table_name
@@ -279,6 +291,39 @@ class Run_Query(Query):
         c.close()
 
         return df
+
+    def check_cache(self):
+        """
+        Checks to see if this query's cache matches
+        another previous and fresh query_tags
+        returns table name / False
+        """
+        QC = models.Query.objects.filter(
+                query_id = self.query_id).filter(
+                hash = LQ.hash).filter(
+                expired = False).order_by('run_time').first()
+        if QC != None:
+            return False
+        else:
+            return QC.table_name
+
+    def retrieve_cache(self):
+        """
+        sets self.data from the query's cache
+        """
+        db = settings.CUSTOM_DATABASES['write_to']
+        engine_string = '%s://%s:%s@%s:%s/%s' % (
+                db['ENGINE'].split('.')[-1].lower(), 
+                db['USER'],
+                urlquote(db['PASSWORD']),
+                db['HOST'], 
+                db['PORT'], 
+                db['NAME'])
+        engine = sqlalchemy.create_engine(engine_string,)
+        self.data = pd.run_sql(table_name, con = engine,
+                    if_exists='replace', index = False)
+
+
 
 class Manipulate_Data(Run_Query):
 

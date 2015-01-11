@@ -72,6 +72,12 @@ def query_api(request, query_id):
                     user = request.user,
                     parameters = request.GET.dict())
         q = LQ.prepare_query()
+        # Check hash to see if has been run before
+        if request.GET.get('cache', True): # Try to use the cache
+            QC = models.Query.objects.filter(
+                    query_id = query_id).filter(
+                    hash = LQ.hash).filter(
+                    expired = False).order_by('run_time').first()
         q.run_query()
         q.run_manipulations()
         response_data = q.data_array
