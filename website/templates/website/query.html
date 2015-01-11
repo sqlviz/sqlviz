@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block body %}
-data-spy="scroll" data-target="#myScrollspy"
+  data-spy="scroll" data-target="#myScrollspy"
 {% endblock %}
 
 {% block links %}
@@ -170,34 +170,35 @@ data-spy="scroll" data-target="#myScrollspy"
   {% if replacement_dict %}
     <div class='jumbotron'>
       <form action ='{{request.path}}' method='GET'>
-      {% for key, default_dict in replacement_dict.items %}
-        {%if default_dict.data_type = 'Date' %}
-        <h3>Rerun with Parameters </h3>
-          {# DATEPICKER #}
-            <p> {{default_dict.search_for}} 
-            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
-            name = "{{default_dict.search_for}}"
-            >
+        {% for key, default_dict in replacement_dict.items %}
+          {%if default_dict.data_type = 'Date' %}
+          <h3>Rerun with Parameters </h3>
+            {# DATEPICKER #}
+              <p> {{default_dict.search_for}} 
+              <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"
+              name = "{{default_dict.search_for}}"
+              >
+              </p>
+            <script>
+              $(function(){
+                $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
+              });
+            </script>
+          {% elif default_dict.data_type == 'Numeric' %}
+            {# NUMERIC #}
+            <p> {{default_dict.search_for}}
+              <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
             </p>
-          <script>
-            $(function(){
-              $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
-            });
-          </script>
-        {% elif default_dict.data_type == 'Numeric' %}
-          {# NUMERIC #}
-          <p> {{default_dict.search_for}}
-            <input type="range" class="" value="{{default_dict.replace_with}}" min=-1000 max=1000 id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
-          </p>
-        {% else %}
-          {# STRING #}
-          <p> {{default_dict.search_for}}
-            <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
-          </p>
-        {% endif %}
-      {% endfor %}
-      <input type="submit" class='btn btn-primary' value="Submit"/>
-    </form>
+          {% else %}
+            {# STRING #}
+            <p> {{default_dict.search_for}}
+              <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}" name = "{{default_dict.search_for}}">
+            </p>
+          {% endif %}
+        {% endfor %}
+        <input type="submit" class='btn btn-primary' value="Submit"/>
+      </form>
+      </div>
     {% else %}
       No Defaults Found
     {% endif %}
@@ -207,7 +208,11 @@ data-spy="scroll" data-target="#myScrollspy"
       <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="200">
         {% for query in query_list %}
           <li>
-            <a href="#div_{{query.id}}">{{query.title}}</a>
+            <a href="#div_{{query.id}}"
+            {% if query == query_list|first %}
+              class='active'
+            {% endif %}
+            >{{query.title}}</a>
           </li>
         {% endfor %}
       </ul>
