@@ -94,10 +94,12 @@
     {% for query in query_list %}    
       <section class='well' id='div_{{query.id}}'>
         <h2>
-          <a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>
-            {{query.fav}}
-          </a>
-          {{query.title}}
+          <div class='inline'>
+            <a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>
+              {{query.fav}}
+            </a>
+            {{query.title}}
+          </div>
         </h2>
         <div class='hide_{{query.id}}'>
           <div id='div_table_{{query.id}}'></div>
@@ -204,7 +206,7 @@
     {% endif %}
   </div>
   {% if query_list %}
-    <div class="col-xs-3" id="myScrollspy">
+    <div class="col-xs-3 hidden-sm hidden-xs" id="myScrollspy">
       <ul class="nav nav-tabs nav-stacked affix-top" data-spy="affix" data-offset-top="200">
         {% for query in query_list %}
           <li>
@@ -217,7 +219,7 @@
         {% endfor %}
         {% if replacement_dict %}
           <li>
-            <a href="#parameters_insert">Paramters</a>
+            <a href="#parameters_insert">Parameters</a>
           </li>
         {% endif %}
       </ul>
