@@ -5,6 +5,16 @@ import factory
 from website.models import Db, Query
 
 
+class TagsFactory(factory.DjangoModelFactory):
+    class Meta:
+        abstract = True
+
+    @factory.post_generation
+    def tags(self, create, extracted):
+        if create and extracted:
+            self.tags.add(*extracted)
+
+
 class UserFactory(factory.DjangoModelFactory):
     class Meta:
         model = User
@@ -14,7 +24,7 @@ class UserFactory(factory.DjangoModelFactory):
     password = factory.PostGenerationMethodCall('set_password', "password")
 
 
-class DbFactory(factory.DjangoModelFactory):
+class DbFactory(TagsFactory):
     class Meta:
         model = Db
         exclude = ('DB',)
@@ -30,7 +40,7 @@ class DbFactory(factory.DjangoModelFactory):
     password_encrypted = factory.LazyAttribute(lambda a: a.DB['PASSWORD'])
 
 
-class QueryFactory(factory.DjangoModelFactory):
+class QueryFactory(TagsFactory):
     class Meta:
         model = Query
 
@@ -39,3 +49,4 @@ class QueryFactory(factory.DjangoModelFactory):
     db = factory.SubFactory(DbFactory)
     owner = factory.SubFactory(UserFactory)
     graph_extra = "{}"
+    query_text = "select id, username from auth_user"
