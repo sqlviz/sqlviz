@@ -1,4 +1,5 @@
 # Test dependencies go here.
 -r base.txt
 coverage==3.7.1
+factory_boy==2.4.1
 splinter[django]==0.7.0

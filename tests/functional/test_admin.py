@@ -1,23 +1,7 @@
 from django.contrib.auth.models import User
-from django.conf import settings
 
-from website.models import Db
-
+from ..factories import DbFactory
 from .testcases import TestCase
-
-
-def make_default_db():
-    db = settings.DATABASES['default']
-    return Db.objects.create(
-        name_short="default",
-        name_long="default",
-        type="MySQL",
-        host=db['HOST'],
-        db=db['NAME'],
-        port=db['PORT'] or "3306",
-        username=db['NAME'],
-        password_encrypted=db['PASSWORD'],
-    )
 
 
 class AdminQueryPageTest(TestCase):
@@ -44,7 +28,7 @@ class AdminQueryPageTest(TestCase):
         self.browser.find_by_value('Log in').click()
 
     def test_invalid_query_id(self):
-        db = make_default_db()
+        db = DbFactory.create()
         self.browser.find_link_by_href("/admin/website/query/add/").click()
         self.browser.fill_form({
             'title': "GDP",
