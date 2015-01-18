@@ -36,6 +36,7 @@ class QueryAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(data, {
+            'cached': False,
             'time_elapsed': 0,
             'data': "list index out of range",
             'error': True,
@@ -59,6 +60,7 @@ class QueryAPITest(TransactionTestCase):
         self.assertLess(data['time_elapsed'], 1)
         del data['time_elapsed']
         self.assertEqual(data, {
+            'cached': False,
             'error': False,
             'data': {
                 'columns': ['id', 'username'],
