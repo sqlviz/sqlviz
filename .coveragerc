@@ -1,2 +1,3 @@
 [run]
 source = .
+omit = chartly/wsgi.py
