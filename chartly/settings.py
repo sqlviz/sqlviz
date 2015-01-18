@@ -139,14 +139,8 @@ DATABASES = {
 
 
 CUSTOM_DATABASES = {
-    'write_to': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'scratch',
-        'USER' : 'django',
-        'PASSWORD' : 'django',
-        'HOST' : '127.0.0.1',
-        'PORT' : 3306
-    },
+    'write_to': dj_database_url.config(
+        default='mysql://django:django@localhost:3306/scratch'),
 }
 
 
