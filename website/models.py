@@ -12,6 +12,7 @@ import re
 import time
 import json
 import datetime
+import logging
 
 import query
 
@@ -56,6 +57,7 @@ class Query(models.Model):
     modified_time = models.DateTimeField(auto_now = True, editable =  False)
     graph_extra = models.TextField(blank = True, help_text = 'JSON form of highcharts formatting') # SHOULD INCLUDE default={} in ADMIN!
     image = models.ImageField(upload_to = settings.MEDIA_ROOT + '/thumbnails', max_length = 2048, blank = True)
+    cacheable = models.BooleanField(default = True, help_text = 'allows this query result to be cached')
     tags = TaggableManager(blank=True)
 
     def __unicode__(self):
@@ -170,13 +172,17 @@ class DashboardQuery(models.Model):
 
 class QueryCache(models.Model):
     query = models.ForeignKey(Query)
-    table_name = models.CharField(unique=True,max_length=128)
-    run_time = models.DateTimeField(auto_now_add = True, editable = False)
-    def __str__(self):
-        return "%s : %s" % (self.query, self.table_name)
+    table_name = models.CharField(unique=True, max_length=128)
+    run_time = models.DateTimeField(auto_now = True, editable = False)
+    hash = models.CharField(max_length=1024)
 
-    def expired(self):
-        if self.run_time + relativedelta(days = 1) < datetime.date.today():
+    def __str__(self):
+        return "%s : %s : %s" % (self.query, self.table_name, self.run_time)
+
+    def is_expired(self, days_back = -1):
+        logging.warning(self.run_time)
+        logging.warning(timezone.now() + relativedelta(days = days_back))
+        if self.run_time < timezone.now() + relativedelta(days = days_back):
             return True
         else:
             return False

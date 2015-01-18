@@ -121,6 +121,7 @@
           <li>Query Creation: {{query.create_time}}</li>
           <li>Query Last Modified: {{query.modified_time}}</li>
           <li>Database: {{query.db}}</li>
+          <li id='execution_info_{{query.id}}'></li>
         </ul>
         <br />
         <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">
@@ -154,7 +155,8 @@
             else if ('{{query.chart_type}}' != 'None'){
               options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
                 var chart = new Highcharts.Chart(options);
-              };          
+            };
+            $( "#execution_info_{{query.id}}").text("Cache Status : " + json_data.cached + " Run Time : " + json_data.time_elapsed);
           } else {
             $( "#error_{{query.id}}" ).show();
             $( "#error_{{query.id}} pre" ).text(json_data.data);
