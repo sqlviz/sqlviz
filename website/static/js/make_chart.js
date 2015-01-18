@@ -124,7 +124,7 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
       // Check that the first column is a date
       //console.log(is_date(data));
       if (is_date(data)){
-        console.log('is a date');
+        //console.log('is a date');
         $.each(data, function( key, row ) {
           $.each(row, function( index, value ) {
             if (index != 0){

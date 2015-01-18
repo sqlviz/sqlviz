@@ -154,7 +154,7 @@ class Run_Query(Query):
         m = md5.new()
         m.update(self.query_text)
         self.query_hash = m.hexdigest()
-        logging.warning(self.query_hash)
+        #logging.warning(self.query_hash)
         return self.query_hash
 
     def check_permission(self):
@@ -196,7 +196,7 @@ class Run_Query(Query):
         Saves query browsing for ACL purposes
         """
         if self.user is None or self.query_id is None:
-            logging.info("Runnig query without a user or query")
+            logging.error("Running query without a user or query")
         else:
             QV = models.QueryView(user = self.user,
                 query = self.query_model)
@@ -223,16 +223,16 @@ class Run_Query(Query):
         engine = sqlalchemy.create_engine(engine_string,)
         self.data.to_sql(table_name, con = engine,
                     if_exists='replace', index = False)
-        logging.warning('Save to MySQL')
+        #logging.warning('Save to MySQL')
         QC = models.QueryCache.objects.filter(query = self.query_model).filter(table_name = table_name).first()
-        logging.warning(QC)
+        #logging.warning(QC)
         if QC is None:
-            logging.warning('CREATE SOMETHING')
+            #logging.warning('CREATE SOMETHING')
             models.QueryCache.objects.create(query = self.query_model,
                     table_name = table_name,
                     hash = self.query_hash)
         else:
-            logging.warning('modify something')
+            #logging.warning('modify something')
             #QC.asdferasd = json.dumps(self.parameters)
             QC.hash = self.query_hash
             QC.save()
@@ -280,7 +280,7 @@ class Run_Query(Query):
 
         if len(self.data) == 0:
             raise Exception("No Data Returned")
-        self.save_to_mysql()    
+        self.save_to_mysql('table_%s_%s' % (self.query_id, self.query_hash))
         return self.data
 
     def run_SQL_query(self):
