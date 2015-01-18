@@ -49,4 +49,4 @@ class QueryFactory(TagsFactory):
     db = factory.SubFactory(DbFactory)
     owner = factory.SubFactory(UserFactory)
     graph_extra = "{}"
-    query_text = "select id, username from auth_user"
+    query_text = "select app, name from django_migrations"
