@@ -14,7 +14,7 @@ import json
 import subprocess
 import sys
 import copy
-import digest # TODO GET RIGHT NAME HERE
+import md5
 
 import models
 from date_time_encoder import *
@@ -77,8 +77,10 @@ class Query:
     def prepare_safety(self):
         """
         Runs safety check and adds limit if it is in the model
+        Also saves hash before mutating query
         """
         self.check_safety()
+        self.run_query_hash()
         if self.query_model is not None:
             if self.query_model.insert_limit == True:
                 self.add_limit()
@@ -104,6 +106,7 @@ class Load_Query:
                     db = query.db, user = self.user,
                     query_id = self.query_id, query_model = query,
                     parameters = self.parameters)
+
     def parameters_find(self):
         """
         Find default values, compare with those in request, and update
@@ -143,14 +146,17 @@ class Load_Query:
         self.load_query()
         self.parameters_find()
         self.parameters_replace()
-        self.query_hash()
         return self.query
 
-    def query_hash(self):
-        self.query_hash = digest.md5(self.query_text)
-        return self.query_hash
 
 class Run_Query(Query):
+    def run_query_hash(self):
+        m = md5.new()
+        m.update(self.query_text)
+        self.query_hash = m.hexdigest()
+        logging.warning(self.query_hash)
+        return self.query_hash
+
     def check_permission(self):
         """
         return true is user has permission on query, false otherwise
@@ -217,16 +223,18 @@ class Run_Query(Query):
         engine = sqlalchemy.create_engine(engine_string,)
         self.data.to_sql(table_name, con = engine,
                     if_exists='replace', index = False)
+        logging.warning('Save to MySQL')
         QC = models.QueryCache.objects.filter(query = self.query_model).filter(table_name = table_name).first()
-        
-
+        logging.warning(QC)
         if QC is None:
-            # TODO fix hash
+            logging.warning('CREATE SOMETHING')
             models.QueryCache.objects.create(query = self.query_model,
                     table_name = table_name,
                     hash = self.query_hash)
         else:
-            QC.parameters = json.dumps(self.parameters)
+            logging.warning('modify something')
+            #QC.asdferasd = json.dumps(self.parameters)
+            QC.hash = self.query_hash
             QC.save()
 
         return table_name
@@ -255,18 +263,25 @@ class Run_Query(Query):
         
         # Run Precedents
         self.run_precedents()
-        # Get DB creds
+        # Attempt to use Cache
+        table_cache = self.check_cache()
+        if table_cache:
+            self.retrieve_cache(table_cache)
+            self.cached = True
+            return self.data
+        # Get DB Type    
         if self.db.type in ['MySQL','Postgres']:
-            data = self.run_SQL_query()
+            self.cached = False
+            self.data = self.run_SQL_query()
         elif self.db.type == 'Hive':
             raise ValueError("HIVE NOT YET IMPLMENTED TODO")
         else:
             raise ValueError('DB Type not in MySQL, Postgres, Hive')
 
-        if len(data) == 0:
+        if len(self.data) == 0:
             raise Exception("No Data Returned")
-        self.data = data
-        return data
+        self.save_to_mysql()    
+        return self.data
 
     def run_SQL_query(self):
         """
@@ -291,23 +306,29 @@ class Run_Query(Query):
         c.close()
 
         return df
-
+    def get_cache_status(self):
+        """
+        Returns if query used cache
+        """
+        return self.cached
+        
     def check_cache(self):
         """
         Checks to see if this query's cache matches
         another previous and fresh query_tags
         returns table name / False
         """
-        QC = models.Query.objects.filter(
-                query_id = self.query_id).filter(
-                hash = LQ.hash).filter(
-                expired = False).order_by('run_time').first()
-        if QC != None:
+        QC = models.QueryCache.objects.filter(
+                query_id = self.query_id,
+                hash = self.query_hash).order_by('run_time').first()
+        if QC == None:
+            return False
+        elif QC.is_expired():
             return False
         else:
             return QC.table_name
 
-    def retrieve_cache(self):
+    def retrieve_cache(self, table_name):
         """
         sets self.data from the query's cache
         """
@@ -320,10 +341,8 @@ class Run_Query(Query):
                 db['PORT'], 
                 db['NAME'])
         engine = sqlalchemy.create_engine(engine_string,)
-        self.data = pd.run_sql(table_name, con = engine,
-                    if_exists='replace', index = False)
-
-
+        self.data = pd.read_sql_table(table_name, con = engine)
+        return self.data
 
 class Manipulate_Data(Run_Query):
 
@@ -345,7 +364,6 @@ class Manipulate_Data(Run_Query):
 
     def pivot(self, null_fill = 0):
         # use pandas TODO to make the pivot
-        #logging.warning(self.data)
         if len(set(self.data.columns)) != len(self.data.columns):
             raise ValueError("Two or more columns have the same name")
         df2 = pd.pivot_table(self.data, values=self.data.columns[2],

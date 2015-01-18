@@ -66,40 +66,38 @@ def index(request):
 
 @login_required
 def query_api(request, query_id):
-    try:
+    if True:#try:
+        logging.debug('debug')
+        logging.info('info')
+        logging.warning('warning')
+        logging.error('error')
+        logging.critical('critical')
         startTime = time.time()
         LQ = query.Load_Query(query_id = query_id,
                     user = request.user,
                     parameters = request.GET.dict())
         q = LQ.prepare_query()
         # Check hash to see if has been run before
-        if request.GET.get('cache', True): # Try to use the cache
-            QC = models.Query.objects.filter(
-                    query_id = query_id).filter(
-                    hash = LQ.hash).filter(
-                    expired = False).order_by('run_time').first()
         q.run_query()
         q.run_manipulations()
         response_data = q.data_array
-        try:
-            q.save_to_mysql()
-        except Exception:
-            logging.warning(sys.exc_info())
         time_elapsed = time.time() - startTime
         return_data = {
                         "data":
                             {"columns" : response_data.pop(0), "data" : response_data},
-                        "time_elapsed" : time_elapsed,
+                        "time_elapsed" : round(time_elapsed,2),
+                        "cached" : q.get_cache_status(),
                         "error" : False}
-    except Exception, e:
-            #logging.warning(str(sys.exc_info()) + str(e))
-            logging.warning(traceback.format_exc())
-            return_data = {
-                            "data": #str(traceback.format_exc()),
-                                    str(e),
-                            "time_elapsed" : 0,
-                            "error" : True,
-                        }
+    else:#except Exception, e:
+        #logging.warning(str(sys.exc_info()) + str(e))
+        logging.warning(traceback.format_exc())
+        return_data = {
+                        "data": #str(traceback.format_exc()),
+                                str(e),
+                        "time_elapsed" : 0,
+                        "cached" : False,
+                        "error" : True,
+                    }
     return HttpResponse(json.dumps(return_data, cls = DateTimeEncoder), content_type="application/json")
 
 @login_required

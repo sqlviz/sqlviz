@@ -12,6 +12,7 @@ import re
 import time
 import json
 import datetime
+import logging
 
 import query
 
@@ -172,14 +173,16 @@ class DashboardQuery(models.Model):
 class QueryCache(models.Model):
     query = models.ForeignKey(Query)
     table_name = models.CharField(unique=True, max_length=128)
-    run_time = models.DateTimeField(auto_now_add = True, editable = False)
+    run_time = models.DateTimeField(auto_now = True, editable = False)
     hash = models.CharField(max_length=1024)
 
     def __str__(self):
-        return "%s : %s" % (self.query, self.table_name)
+        return "%s : %s : %s" % (self.query, self.table_name, self.run_time)
 
-    def expired(self):
-        if self.run_time + relativedelta(days = 1) < datetime.date.today():
+    def is_expired(self, days_back = -1):
+        logging.warning(self.run_time)
+        logging.warning(timezone.now() + relativedelta(days = days_back))
+        if self.run_time < timezone.now() + relativedelta(days = days_back):
             return True
         else:
             return False
