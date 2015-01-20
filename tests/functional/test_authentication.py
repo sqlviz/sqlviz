@@ -81,7 +81,8 @@ class LoginPageTest(TestCase):
         assert "Interactive Mode" not in self.browser.find_by_css('body').text
         self.login()
         assert "Interactive Mode" not in self.browser.find_by_css('body').text
-        assert "No Queries or Dashboards are available" in self.browser.find_by_css('body').text
+        assert ("No Queries or Dashboards are available" in
+                self.browser.find_by_css('body').text)
         assert "Admin" not in self.browser.find_by_css('body').text
 
     def test_valid_credentials_not_staff(self):
