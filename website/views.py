@@ -89,8 +89,7 @@ def query_api(request, query_id):
         #logging.warning(str(sys.exc_info()) + str(e))
         logging.warning(traceback.format_exc())
         return_data = {
-                        "data": #str(traceback.format_exc()),
-                                str(e),
+                        "data": str(e),
                         "time_elapsed" : 0,
                         "cached" : False,
                         "error" : True,

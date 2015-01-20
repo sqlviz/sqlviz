@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from urllib import quote_plus as urlquote
 import logging
@@ -14,8 +14,7 @@ import json
 import subprocess
 import sys
 import copy
-import md5
-
+import hashlib
 import models
 from date_time_encoder import *
 import get_db_engine
@@ -107,7 +106,7 @@ class Load_Query:
         Set parameters
         create Query Object
         """
-        query = models.Query.objects.filter(id = self.query_id).first()
+        query = get_object_or_404(models.Query, pk =self.query_id)
         # Manipulate is the final form of Query
         #logging.warning("Set By User %s Set by DB %s" % (self.cacheable, query.cacheable))
         if self.cacheable == None: # User has not set
@@ -165,7 +164,7 @@ class Load_Query:
 
 class Run_Query(Query):
     def run_query_hash(self):
-        m = md5.new()
+        m = hashlib.md5()
         m.update(self.query_text)
         self.query_hash = m.hexdigest()
         #logging.warning(self.query_hash)
