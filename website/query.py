@@ -289,7 +289,14 @@ class Run_Query(Query):
         """
         Runs SQL query in DB
         """
-        engine = get_db_engine.get_db_engine()
+        engine_string = '%s://%s:%s@%s:%s/%s' % (
+                self.db.type.lower(),
+                self.db.username,
+                urlquote(self.db.password_encrypted),
+                self.db.host,
+                self.db.port,
+                self.db.db)
+        engine = sqlalchemy.create_engine(engine_string,)
         c = engine.connect()
         query_text = self.query_text.replace('%', '%%')  # SQLAlchemy Esc
         result = c.execute(query_text)
