@@ -11,8 +11,6 @@ from email.MIMEImage import MIMEImage
 import subprocess
 import sys
 import logging
-#import chartly.settings as settings
-#import datetime
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from website.get_db_engine import get_db_engine
