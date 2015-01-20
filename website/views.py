@@ -68,7 +68,7 @@ def index(request):
 def query_api(request, query_id):
     try:
         startTime = time.time()
-        logging.warning('Cache Status View %s' % (request.GET.get('cacheable')))
+        #logging.warning('Cache Status View %s' % (request.GET.get('cacheable')))
         LQ = query.Load_Query(query_id = query_id,
                     user = request.user,
                     parameters = request.GET.dict(),
@@ -78,7 +78,7 @@ def query_api(request, query_id):
         q.run_manipulations()
         response_data = q.data_array
         time_elapsed = time.time() - startTime
-        logging.warning('Cache Status View %s' % (q.get_cache_status()))
+        #logging.warning('Cache Status View %s' % (q.get_cache_status()))
         return_data = {
                         "data":
                             {"columns" : response_data.pop(0), "data" : response_data},
