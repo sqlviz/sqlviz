@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 import simplejson
 from favit.models import Favorite
-import logging
+
 
 @login_required
 def add_or_remove(request):
@@ -13,7 +13,6 @@ def add_or_remove(request):
         obj_id = int(request.POST["target_object_id"])
     except (KeyError, ValueError):
         return HttpResponseBadRequest()
-
 
     fav = Favorite.objects.get_favorite(user, obj_id, model=app_model)
 
@@ -33,6 +32,7 @@ def add_or_remove(request):
         simplejson.dumps(response, ensure_ascii=False)
     )
 
+
 @login_required
 def add(request):
     user = request.user
@@ -41,7 +41,6 @@ def add(request):
         obj_id = int(request.POST["target_object_id"])
     except (KeyError, ValueError):
         return HttpResponseBadRequest()
-
 
     fav = Favorite.objects.get_favorite(user, obj_id, model=app_model)
 
@@ -56,7 +55,9 @@ def add(request):
 
     return HttpResponse(
         simplejson.dumps(response, ensure_ascii=False)
-    )    
+    )
+
+
 @login_required
 def remove(request):
     user = request.user
