@@ -1,9 +1,10 @@
 import json
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 
 from ..factories import QueryFactory
+
 
 class QueryAPITest(TransactionTestCase):
 
@@ -18,16 +19,16 @@ class QueryAPITest(TransactionTestCase):
         )
 
     def create_users(self, count):
-        first_names = ['John','Bob','Dilbert']
-        last_names = ['Smith','Brown','Yu','Green']
+        first_names = ['John', 'Bob', 'Dilbert']
+        last_names = ['Smith', 'Brown', 'Yu', 'Green']
         user_array = []
         for i in range(count):
             user_array.append(User.objects.create_superuser(
-                username="%s_%s" % (i,self.username),
-                password="%s_%s" % (i,self.password),
-                first_name = first_names[i % len(first_names)],
-                last_name = last_names[i % len(last_names)],
-                email="%s_%s" % (i,'u@example.com'),
+                username="%s_%s" % (i, self.username),
+                password="%s_%s" % (i, self.password),
+                first_name=first_names[i % len(first_names)],
+                last_name=last_names[i % len(last_names)],
+                email="%s_%s" % (i, 'u@example.com'),
             ))
         return user_array
 
@@ -126,12 +127,13 @@ class QueryAPITest(TransactionTestCase):
                 'data': [[user.id, user.username]],
             },
         })
+
     def test_pivot(self):
         """
         Create test user data set and run pivot on it
         """
         self.create_users(100)
-        user  = self.create_user()
+        user = self.create_user()
         self.login()
         query = QueryFactory(
             query_text="""
@@ -144,8 +146,8 @@ class QueryAPITest(TransactionTestCase):
                 group by
                     1,2
             """,
-            owner = user,
-            pivot_data = True
+            owner=user,
+            pivot_data=True
         )
         response = self.client.get('/app/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
@@ -157,12 +159,13 @@ class QueryAPITest(TransactionTestCase):
             'data': {
                 'columns': ['first_name', 'Brown', 'Green', 'Smith', 'Yu'],
                 'data': [
-                            [u'Bob', 9.0, 8.0, 8.0, 8.0],
-                            [u'Dilbert', 8.0, 8.0, 8.0, 9.0],
-                            [u'John', 8.0, 9.0, 9.0, 8.0]
-                        ]
+                    [u'Bob', 9.0, 8.0, 8.0, 8.0],
+                    [u'Dilbert', 8.0, 8.0, 8.0, 9.0],
+                    [u'John', 8.0, 9.0, 9.0, 8.0]
+                ]
             },
-        })        
+        })
+
 
 class QueryAPIPermissionTest(TransactionTestCase):
 
