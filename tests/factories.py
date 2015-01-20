@@ -50,3 +50,4 @@ class QueryFactory(TagsFactory):
     owner = factory.SubFactory(UserFactory)
     graph_extra = "{}"
     query_text = "select app, name from django_migrations"
+    cacheable = 1
