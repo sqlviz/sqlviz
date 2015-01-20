@@ -66,12 +66,7 @@ def index(request):
 
 @login_required
 def query_api(request, query_id):
-    if True:#try:
-        logging.debug('debug')
-        logging.info('info')
-        logging.warning('warning')
-        logging.error('error')
-        logging.critical('critical')
+    try:
         startTime = time.time()
         logging.warning('Cache Status View %s' % (request.GET.get('cacheable')))
         LQ = query.Load_Query(query_id = query_id,
@@ -79,7 +74,6 @@ def query_api(request, query_id):
                     parameters = request.GET.dict(),
                     cacheable = request.GET.get('cacheable', None))
         q = LQ.prepare_query()
-        # Check hash to see if has been run before
         q.run_query()
         q.run_manipulations()
         response_data = q.data_array
@@ -91,7 +85,7 @@ def query_api(request, query_id):
                         "time_elapsed" : round(time_elapsed,2),
                         "cached" : q.get_cache_status(),
                         "error" : False}
-    else:#except Exception, e:
+    except Exception, e:
         #logging.warning(str(sys.exc_info()) + str(e))
         logging.warning(traceback.format_exc())
         return_data = {

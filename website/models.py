@@ -180,8 +180,6 @@ class QueryCache(models.Model):
         return "%s : %s : %s" % (self.query, self.table_name, self.run_time)
 
     def is_expired(self, days_back = -1):
-        logging.warning(self.run_time)
-        logging.warning(timezone.now() + relativedelta(days = days_back))
         if self.run_time < timezone.now() + relativedelta(days = days_back):
             return True
         else:

@@ -99,8 +99,5 @@ target/
 # Conf file for Django
 *.cnf
 
-# Do not migrate migrations
-*migrations/
-
 # SFTP File
 sftp-config.json

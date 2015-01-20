@@ -13,7 +13,7 @@
 {% endblock %}
 {% block style %}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-<link x="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+<link type="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 <!-- For country charts -->
 <script type="text/javascript" src="{% static 'Highcharts-4.0.4/js/highcharts.src.js' %}"></script>
@@ -156,7 +156,7 @@
               options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
                 var chart = new Highcharts.Chart(options);
             };
-            $( "#execution_info_{{query.id}}").text("Cache Status : " + json_data.cached + " Run Time : " + json_data.time_elapsed);
+            $( "#execution_info_{{query.id}}").text("Cache Status : " + json_data.cached + " Run Time : " + json_data.time_elapsed + ' seconds');
           } else {
             $( "#error_{{query.id}}" ).show();
             $( "#error_{{query.id}} pre" ).text(json_data.data);
@@ -176,7 +176,7 @@
       <h3>Re-Run with Parameters</h3>
       <form action ='{{request.path}}' method='GET'>
         {% for key, default_dict in replacement_dict.items %}
-          {%if default_dict.data_type = 'Date' %}
+          {% if default_dict.data_type == 'Date' %}
             {# DATEPICKER #}
             <p> {{default_dict.search_for}} 
             <input type="text" class="" value="{{default_dict.replace_with}}" id="selector_{{default_dict.search_for}}" label="{{default_dict.search_for}}"

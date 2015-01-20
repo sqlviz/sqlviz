@@ -210,7 +210,7 @@ class Run_Query(Query):
         Saves query browsing for ACL purposes
         """
         if self.user is None or self.query_id is None:
-            logging.warning("Runnig query without a user or query")
+            logging.error("Running query without a user or query")
         else:
             QV = models.QueryView(user = self.user,
                 query = self.query_model)
@@ -229,8 +229,12 @@ class Run_Query(Query):
         engine = get_db_engine.get_db_engine()
         # TODO put in limits for data size (cols x rows to insert data)
         self.data.to_sql(table_name, con = engine,
+<<<<<<< HEAD
                     if_exists='replace', index = False,
                     chunksize = batch_size)
+=======
+                    if_exists='replace', index = False)
+>>>>>>> master
         #logging.warning('Save to MySQL')
         QC = models.QueryCache.objects.filter(query = self.query_model).filter(table_name = table_name).first()
         #logging.warning(QC)
@@ -241,6 +245,10 @@ class Run_Query(Query):
                     hash = self.query_hash)
         else:
             #logging.warning('modify something')
+<<<<<<< HEAD
+=======
+            #QC.asdferasd = json.dumps(self.parameters)
+>>>>>>> master
             QC.hash = self.query_hash
             QC.save()
 
@@ -293,7 +301,7 @@ class Run_Query(Query):
 
         if len(self.data) == 0:
             raise Exception("No Data Returned")
-        self.save_to_mysql()    
+        self.save_to_mysql('table_%s_%s' % (self.query_id, self.query_hash))
         return self.data
 
     def run_SQL_query(self):
