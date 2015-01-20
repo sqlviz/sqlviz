@@ -73,15 +73,18 @@ def query_api(request, query_id):
         logging.error('error')
         logging.critical('critical')
         startTime = time.time()
+        logging.warning('Cache Status View %s' % (request.GET.get('cacheable')))
         LQ = query.Load_Query(query_id = query_id,
                     user = request.user,
-                    parameters = request.GET.dict())
+                    parameters = request.GET.dict(),
+                    cacheable = request.GET.get('cacheable', None))
         q = LQ.prepare_query()
         # Check hash to see if has been run before
         q.run_query()
         q.run_manipulations()
         response_data = q.data_array
         time_elapsed = time.time() - startTime
+        logging.warning('Cache Status View %s' % (q.get_cache_status()))
         return_data = {
                         "data":
                             {"columns" : response_data.pop(0), "data" : response_data},
@@ -129,6 +132,11 @@ def query_view(request, query_ids):
             # This dict has target, replacement, and data_type
             replacement_dict[k] = v 
             json_get[v['search_for']] = v['replace_with']
+        # Add on requests for Cacheable / other needed parameters
+        json_get_extra_array = ['cacheable']
+        for k in json_get_extra_array:
+            if request.GET.get(k,None) != None:
+                json_get[k] = request.GET.get(k)
     return render_to_response('website/query.html', 
                 {
                     'query_list': query_list,

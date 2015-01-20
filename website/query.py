@@ -18,13 +18,14 @@ import md5
 
 import models
 from date_time_encoder import *
+import get_db_engine
 
 logger = logging.getLogger(__name__)
 MAX_DEPTH_RECURSION = 10
 
 class Query:
     def __init__(self, query_text, db, depth = 0, user = None,
-                query_id = None, query_model = None, parameters = None):
+                query_id = None, query_model = None, parameters = None, cacheable = True):
         self.query_text = query_text
         self.db = db
         self.query_id = query_id
@@ -32,8 +33,13 @@ class Query:
         self.depth = depth
         self.query_model = query_model
         self.parameters = parameters
+        self.cacheable = cacheable
         if depth > MAX_DEPTH_RECURSION:
             raise IOError("Recursion Limit Reached")
+        print self
+
+    def __str__(self):
+        return "%s %s %s" % (self.query_text, self.db, self.cacheable)
 
     def set_query_text(self, query_text):
         self.query_text = query_text
@@ -88,10 +94,11 @@ class Query:
 
 
 class Load_Query:
-    def __init__(self, query_id, user,parameters = {},
-                ):
+    def __init__(self, query_id, user, cacheable = None,
+            parameters = {}):
         self.query_id = query_id
         self.user = user
+        self.cacheable = cacheable
         self.parameters = parameters
 
     def load_query(self):
@@ -100,12 +107,19 @@ class Load_Query:
         Set parameters
         create Query Object
         """
-        query = models.Query.objects.filter(id = self.query_id)[0]
+        query = models.Query.objects.filter(id = self.query_id).first()
         # Manipulate is the final form of Query
+        #logging.warning("Set By User %s Set by DB %s" % (self.cacheable, query.cacheable))
+        if self.cacheable == None: # User has not set
+            self.cacheable = query.cacheable
+        else: # Convert to boolean
+            self.cacheable = string_to_boolean(self.cacheable)
+        #logging.warning("Set By User %s Set by DB %s" % (self.cacheable, query.cacheable))            
         self.query = Manipulate_Data(query_text = query.query_text,
                     db = query.db, user = self.user,
                     query_id = self.query_id, query_model = query,
-                    parameters = self.parameters)
+                    parameters = self.parameters,
+                    cacheable = self.cacheable)
 
     def parameters_find(self):
         """
@@ -154,7 +168,7 @@ class Run_Query(Query):
         m = md5.new()
         m.update(self.query_text)
         self.query_hash = m.hexdigest()
-        logging.warning(self.query_hash)
+        #logging.warning(self.query_hash)
         return self.query_hash
 
     def check_permission(self):
@@ -196,7 +210,7 @@ class Run_Query(Query):
         Saves query browsing for ACL purposes
         """
         if self.user is None or self.query_id is None:
-            logging.info("Runnig query without a user or query")
+            logging.warning("Runnig query without a user or query")
         else:
             QV = models.QueryView(user = self.user,
                 query = self.query_model)
@@ -205,35 +219,28 @@ class Run_Query(Query):
     def return_data_array(self):
         return self.data
 
-    def save_to_mysql(self, table_name = None):
+    def save_to_mysql(self, table_name = None, batch_size = 1000):
         """
         Writes output to MySQL table
         Pandas is depricating this function.  TODO rewrite
         """
         if table_name is None:
             table_name = 'table_%s' % self.query_id
-        db = settings.CUSTOM_DATABASES['write_to']
-        engine_string = '%s://%s:%s@%s:%s/%s' % (
-                db['ENGINE'].split('.')[-1].lower(), 
-                db['USER'],
-                urlquote(db['PASSWORD']),
-                db['HOST'], 
-                db['PORT'], 
-                db['NAME'])
-        engine = sqlalchemy.create_engine(engine_string,)
+        engine = get_db_engine.get_db_engine()
+        # TODO put in limits for data size (cols x rows to insert data)
         self.data.to_sql(table_name, con = engine,
-                    if_exists='replace', index = False)
-        logging.warning('Save to MySQL')
+                    if_exists='replace', index = False,
+                    chunksize = batch_size)
+        #logging.warning('Save to MySQL')
         QC = models.QueryCache.objects.filter(query = self.query_model).filter(table_name = table_name).first()
-        logging.warning(QC)
+        #logging.warning(QC)
         if QC is None:
-            logging.warning('CREATE SOMETHING')
+            #logging.warning('CREATE SOMETHING')
             models.QueryCache.objects.create(query = self.query_model,
                     table_name = table_name,
                     hash = self.query_hash)
         else:
-            logging.warning('modify something')
-            #QC.asdferasd = json.dumps(self.parameters)
+            #logging.warning('modify something')
             QC.hash = self.query_hash
             QC.save()
 
@@ -247,7 +254,8 @@ class Run_Query(Query):
             # TODO 
             LQ = Load_Query(query_id = QP.preceding_query_id,
                         user = self.user,
-                        parameters = self.parameters)
+                        parameters = self.parameters,
+                        cacheable = True)
             Q = LQ.run()
             Q.run_query()
             table_name = '%s_%s' % (run_guid, LQ.query_id)
@@ -265,10 +273,15 @@ class Run_Query(Query):
         self.run_precedents()
         # Attempt to use Cache
         table_cache = self.check_cache()
-        if table_cache:
-            self.retrieve_cache(table_cache)
-            self.cached = True
-            return self.data
+        #logging.warning('Cache Tables %s %s' % (table_cache, self.cacheable))
+        if table_cache and self.cacheable:
+            try:
+                self.retrieve_cache(table_cache)
+                self.cached = True
+                return self.data
+            except Exception, e:
+                logging.error("""CACHE IS MISSING FOR TABLE 
+                        %s -- %s""" % (table_cache, str(e)))
         # Get DB Type    
         if self.db.type in ['MySQL','Postgres']:
             self.cached = False
@@ -287,14 +300,7 @@ class Run_Query(Query):
         """
         Runs SQL query in DB
         """
-        engine_string = '%s://%s:%s@%s:%s/%s' % (
-                self.db.type.lower(), 
-                self.db.username,
-                urlquote(self.db.password_encrypted),
-                self.db.host, 
-                self.db.port, 
-                self.db.db)
-        engine = sqlalchemy.create_engine(engine_string,)
+        engine = get_db_engine.get_db_engine()
         c = engine.connect()
         query_text = self.query_text.replace('%','%%') # SQLAlchemy Esc
         result = c.execute(query_text)
@@ -333,14 +339,7 @@ class Run_Query(Query):
         sets self.data from the query's cache
         """
         db = settings.CUSTOM_DATABASES['write_to']
-        engine_string = '%s://%s:%s@%s:%s/%s' % (
-                db['ENGINE'].split('.')[-1].lower(), 
-                db['USER'],
-                urlquote(db['PASSWORD']),
-                db['HOST'], 
-                db['PORT'], 
-                db['NAME'])
-        engine = sqlalchemy.create_engine(engine_string,)
+        engine = get_db_engine.get_db_engine()
         self.data = pd.read_sql_table(table_name, con = engine)
         return self.data
 
@@ -351,9 +350,6 @@ class Manipulate_Data(Run_Query):
         Checks for numbers encoded as strings due to bad database encoding
         """
         def num(foo):
-            #try:
-            #    return float(foo)
-            #except (ValueError, TypeError) as e:
             try:
                 return float(foo)
             except (ValueError, TypeError) as e:
@@ -454,3 +450,16 @@ class Manipulate_Data(Run_Query):
             self.query_model.image = fileout
             self.query_model.save()
         """
+
+def string_to_boolean(string = '', default = False):
+    """
+    returns a boolean from a given string
+    """
+    if string in [True, False]:
+        return string
+    if string.lower() == 'false':
+        return False
+    elif string.lower() == 'true':
+        return True
+    else:
+        return default

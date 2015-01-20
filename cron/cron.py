@@ -10,6 +10,12 @@ from django.template.loader import render_to_string
 from email.MIMEImage import MIMEImage
 import subprocess
 import sys
+import logging
+#import chartly.settings as settings
+#import datetime
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+from website.get_db_engine import get_db_engine
 
 class Job:
     def __init__(self, id, dashboard_id, owner):
@@ -103,7 +109,31 @@ class Job:
             [self.owner.email], fail_silently=False)
 
 
-    
+def cache_buster(days_back = 2):
+    """
+    When run will remove all tables that are for old cache
+    """
+    # Get all dead tables
+    QC = website.models.QueryCache.objects.filter(
+                run_time__lt=timezone.now() - relativedelta(days = days_back)
+                ).order_by('run_time').all()[:100]
+    for Q in QC:
+        if Q.is_expired:
+            # Drop them like they are hot!
+            logging.warning('Dropping table %s' % (Q.table_name))
+            drop_table(Q.table_name)
+            Q.delete()
+
+def drop_table(table_name):
+    """
+    Drops given table from the scratch disk
+    """
+    engine = get_db_engine()
+    c = engine.connect()
+    query_text = """drop table %s""" % (table_name)
+    result = c.execute(query_text)
+    c.close()
+
 def scheduled_job(frequency):
     """
     Run this every n hours and send out each email for that particular frequency

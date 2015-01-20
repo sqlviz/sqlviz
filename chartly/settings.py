@@ -182,7 +182,8 @@ CRONJOBS = [
     ('9 0 * * *', 'cron.cron.scheduled_job', ['daily_9am']),
     ('18 0 * * *', 'cron.cron.scheduled_job', ['daily_7pm']),
     ('0 0 * * 0', 'cron.cron.scheduled_job', ['weekly']),
-    ('0 0 1 * *', 'cron.cron.scheduled_job', ['monthly'])
+    ('0 0 1 * *', 'cron.cron.scheduled_job', ['monthly']),
+    ('0 0 * * *', 'cron.cron.scheduled_job', ['monthly'])
 ]
 
 # Add minutely scheduele for testing
