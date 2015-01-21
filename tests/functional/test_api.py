@@ -59,6 +59,31 @@ class QueryAPITest(TransactionTestCase):
             'error': True,
         })
 
+    def test_unsafe_query(self):
+        user = self.create_user()
+        self.login()
+        query = QueryFactory(
+            query_text="""
+                delete
+                    *
+                from
+                    auth_user
+                where
+                    id < 0
+                """,
+            owner=user,
+        )
+        response = self.client.get('/app/api/query/{}'.format(query.id))
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertLess(data['time_elapsed'], 1)
+        del data['time_elapsed']
+        self.assertEqual(data, {
+            'cached': False,
+            'error': True,
+            'data': 'Query contained delete -- Can not be run',
+        })
+
     def test_valid_query(self):
         user = self.create_user()
         self.login()

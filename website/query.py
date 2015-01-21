@@ -36,12 +36,6 @@ class Query:
         if depth > MAX_DEPTH_RECURSION:
             raise IOError("Recursion Limit Reached")
 
-    def __str__(self):
-        return "%s %s %s" % (self.query_text, self.db, self.cacheable)
-
-    def set_query_text(self, query_text):
-        self.query_text = query_text
-
     def check_safety(self):
         """
         Check for dangerous database things
@@ -55,9 +49,11 @@ class Query:
 
     def add_limit(self):
         """
-        Adds limit 1000 to the end of the query
+        Adds limit 1000 to the end of the query if query does not
+        currently have a limit set
         """
-        if len(re.findall('limit(\s)*(\d)*(\s)*(;)(\s)*?$', self.query_text)) == 0:
+        if len(re.findall('limit(\s)*(\d)*(\s)*(;)?(\s)*?$',
+                          self.query_text)) == 0:
             # check for semicolon
             if len(re.findall('[;](\s)*$', self.query_text)) == 0:
                 # No Semicolon
