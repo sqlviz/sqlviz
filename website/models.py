@@ -65,7 +65,7 @@ class Query(models.Model):
 
     def __str__(self):
         return "%s: %s" % (self.id, self.title)
-        
+
     def get_absolute_url(self):
         return reverse('website.query', args=[str(self.id)])
 
@@ -86,7 +86,7 @@ class Query(models.Model):
             json.loads(self.graph_extra)
         except:
             raise ValidationError("Graph Extra must be JSON!")
-        
+
         # Validate that query runs!
         """
         try:
@@ -121,7 +121,7 @@ class QueryDefault(models.Model):
 
     def replace_with_cleaned(self):
         if self.data_type == "Date" and self.replace_with.lower() == 'today':
-            return time.strftime("%Y-%m-%d") 
+            return time.strftime("%Y-%m-%d")
         else:
             return self.replace_with
 
@@ -192,7 +192,7 @@ class QueryView(models.Model):
     def __str__(self):
         return "%s : %s : %s" % (self.user, self.query, self.view_time)
 
-## POST SAVE TO CREATE IMAGE FOR QUERY  
+## POST SAVE TO CREATE IMAGE FOR QUERY
 def post_save_handler_query(sender, instance, **kwargs):
     post_save.disconnect(post_save_handler_query, sender=Query)
     if instance.chart_type not in ['None','country']:
