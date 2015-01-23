@@ -173,8 +173,8 @@ def query_interactive_api(request):
     try:
         query_text = request.POST['query_text']
         db = models.Db.objects.filter(id=request.POST['db']).first()
-        pivot = True if request.POST['pivot'].lower() == 'true' else False
-        cumulative = True if request.POST['cumulative'].lower() == 'true' else False
+        pivot = request.POST['pivot'].lower() == 'true'
+        cumulative = request.POST['cumulative'].lower() == 'true'
         start_time = time.time()
         MD = query.Manipulate_Data(
             query_text=query_text,
@@ -233,8 +233,9 @@ def database_explorer_api(request):
         elif con.type == 'Postgres':
             DMM = sql_manager.PSQLManager(con, request)
         else:
-            raise ValueError("""Database cannot be explorered yet.
-Only supported types are 'MySQL','Postgres'""")
+            raise ValueError(
+                "Database cannot be explored yet. "
+                "Only supported types are 'MySQL','Postgres'")
 
         # Get proper response data
         if db_id is None:
@@ -244,9 +245,10 @@ Only supported types are 'MySQL','Postgres'""")
         elif table_id is not None:
             DMM.describeTable(db_id, table_id)
         else:
-            raise ValueError("""ERROR: con_id is needed,
-                    db_id needed for to produce table list,
-                    table_id needed to procude column list""")
+            raise ValueError(
+                "ERROR: con_id is needed, "
+                "db_id needed for to produce table list, "
+                "table_id needed to procude column list")
 
         DMM.run_query()
         response_data = DMM.RQ.numericalize_data_array()
