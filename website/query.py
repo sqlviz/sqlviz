@@ -188,9 +188,10 @@ class Run_Query(Query):
             # No Permissions set at either user or DB level
             return
         else:
-            raise Exception("""User does not have permission to view.
-                Requires membership in at least one of these groups:  %s
-                """ % (union_set))
+            raise Exception(
+                "User does not have permission to view. "
+                "Requires membership in at least one of these groups:  "
+                "%s" % (union_set))
 
     def record_query_execution(self):
         """
@@ -264,8 +265,9 @@ class Run_Query(Query):
                 self.cached = True
                 return self.data
             except Exception, e:
-                logging.error("""CACHE IS MISSING FOR TABLE
-                        %s -- %s""" % (table_cache, str(e)))
+                logging.error(
+                    "CACHE IS MISSING FOR TABLE %s -- %s"
+                    % (table_cache, str(e)))
         # Get DB Type
         if self.db.type in ['MySQL', 'Postgres']:
             self.cached = False
@@ -406,7 +408,7 @@ class Manipulate_Data(Run_Query):
         # logging.warning(static_path)
         guid = str(uuid.uuid1())
         json_data_file = '//tmp/%s.json' % (guid)
-        cli = """phantomjs %s/js/phantom_make_chart.js '%s' %s""" % (
+        cli = "phantomjs %s/js/phantom_make_chart.js '%s' %s" % (
             static_path,
             json.dumps(graph_data, cls=DateTimeEncoder),
             json_data_file)
@@ -418,7 +420,11 @@ class Manipulate_Data(Run_Query):
             output_image = '%sthumbnails/%s.png' % (settings.MEDIA_ROOT, self.query_id)
         else:
             output_image = file_output
-        cli = """phantomjs %s/Highcharts-4.0.3/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (static_path, json_data_file, output_image, width, height)
+        cli = (
+            "phantomjs %s/Highcharts-4.0.3/exporting-server/"
+            "phantomjs/highcharts-convert.js "
+            "-infile %s -outfile %s -scale 2.5 -width %s - height %s") % (
+                static_path, json_data_file, output_image, width, height))
         # print cli
         subprocess.call([cli], shell=True)
         return output_image
