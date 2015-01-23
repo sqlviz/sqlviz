@@ -163,17 +163,17 @@ class Run_Query(Query):
 
     def check_permission(self):
         """
-        Return True is user has permission on query, raise exception otherwise
+        Raise exception if user lacks permission on query
         """
         if self.user is None:
             # TODO THIS BYPASSES UNAUTHENTICATED USERS AND MAY BE BAD?
-            return True
+            return
         if self.user.is_active is False:
             # logging.warning("NOT ACTIVE")
             raise Exception("User is not Active!")
         if self.user.is_superuser is True:
             # logging.warning("SUPER USER")
-            return True
+            return
         user_groups = set(self.user.groups.values_list('name', flat=True))
         db_tags = set([str(i) for i in self.db.tags.all()])
         if self.query_model is None:  # Interactive Modes
@@ -183,10 +183,10 @@ class Run_Query(Query):
         union_set = db_tags | query_tags
         if len(union_set & user_groups) > 0:
             # User tag is in either query or DB set
-            return True
+            return
         elif len(db_tags) == 0:
             # No Permissions set at either user or DB level
-            return True
+            return
         else:
             raise Exception("""User does not have permission to view.
                 Requires membership in at least one of these groups:  %s
