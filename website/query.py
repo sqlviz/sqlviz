@@ -163,7 +163,7 @@ class Run_Query(Query):
 
     def check_permission(self):
         """
-        return true is user has permission on query, false otherwise
+        Return True is user has permission on query, raise exception otherwise
         """
         if self.user is None:
             # TODO THIS BYPASSES UNAUTHENTICATED USERS AND MAY BE BAD?
@@ -171,7 +171,6 @@ class Run_Query(Query):
         if self.user.is_active is False:
             # logging.warning("NOT ACTIVE")
             raise Exception("User is not Active!")
-            return False
         if self.user.is_superuser is True:
             # logging.warning("SUPER USER")
             return True
@@ -192,7 +191,6 @@ class Run_Query(Query):
             raise Exception("""User does not have permission to view.
                 Requires membership in at least one of these groups:  %s
                 """ % (union_set))
-            return False
 
     def record_query_execution(self):
         """
