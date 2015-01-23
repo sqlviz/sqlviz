@@ -42,4 +42,4 @@ class PSQLManager(Manager):
                 table_catalog = '%s' and table_name = '%s'""" % (db, table)
 
     def describeIndexTable(self, db, table):
-        self.RQ.query_text =  "show index from %s in %s" % (table, db)        
+        self.RQ.query_text =  "show index from %s in %s" % (table, db)

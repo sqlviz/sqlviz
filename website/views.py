@@ -139,7 +139,7 @@ def query_view(request, query_ids):
         },
         context_instance=RequestContext(request))
 
-@login_required    
+@login_required
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
     query_list_string = ','.join([str(m.id) for m in models.Query.objects.filter(title__in = query_name_array)])

@@ -8,10 +8,10 @@ def get_db_engine(db_name = 'write_to'):
     """
     db = settings.CUSTOM_DATABASES[db_name]
     engine_string = '%s://%s:%s@%s:%s/%s' % (
-            db['ENGINE'].split('.')[-1].lower(), 
+            db['ENGINE'].split('.')[-1].lower(),
             db['USER'],
             urlquote(db['PASSWORD']),
-            db['HOST'], 
-            db['PORT'], 
+            db['HOST'],
+            db['PORT'],
             db['NAME'])
     return sqlalchemy.create_engine(engine_string,)
