@@ -173,8 +173,8 @@ def query_interactive_api(request):
     try:
         query_text = request.POST['query_text']
         db = models.Db.objects.filter(id=request.POST['db']).first()
-        pivot = True if request.POST['pivot'].lower() == 'true' else False
-        cumulative = True if request.POST['cumulative'].lower() == 'true' else False
+        pivot = request.POST['pivot'].lower() == 'true'
+        cumulative = request.POST['cumulative'].lower() == 'true'
         start_time = time.time()
         MD = query.Manipulate_Data(
             query_text=query_text,
