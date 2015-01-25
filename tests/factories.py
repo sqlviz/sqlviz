@@ -56,7 +56,7 @@ class QueryFactory(TagsFactory):
 class QueryDefaultFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = QueryDefault
-    query = factory.SubFactory(QueryFactor)
+    query = factory.SubFactory(QueryFactory)
     search_for = "<DEFAULT>"
     replace_with = ""
     data_type = 'String'
