@@ -35,6 +35,20 @@ class QueryAPITest(TransactionTestCase):
     def login(self):
         self.client.login(username=self.username, password=self.password)
 
+    def mock_valid_user_and_query(self):
+        user = self.create_user()
+        self.login()
+        query = QueryFactory(
+            query_text="""
+                select
+                    id, username
+                from
+                    auth_user
+            """,
+            owner=user,
+        )
+        return (user, query)
+
     def test_not_logged_in(self):
         response = self.client.get('/app/api/query/1')
         self.assertEqual(response.status_code, 302)
@@ -85,17 +99,7 @@ class QueryAPITest(TransactionTestCase):
         })
 
     def test_valid_query(self):
-        user = self.create_user()
-        self.login()
-        query = QueryFactory(
-            query_text="""
-                select
-                    id, username
-                from
-                    auth_user
-            """,
-            owner=user,
-        )
+        (user, query) = self.mock_valid_user_and_query()
         response = self.client.get('/app/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -103,49 +107,6 @@ class QueryAPITest(TransactionTestCase):
         del data['time_elapsed']
         self.assertEqual(data, {
             'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['id', 'username'],
-                'data': [[user.id, user.username]],
-            },
-        })
-
-    def test_used_cache(self):
-        """
-        Runs query twice to see if caching goes from False to True
-        """
-        user = self.create_user()
-        self.login()
-        query = QueryFactory(
-            query_text="""
-                select
-                    id, username
-                from
-                    auth_user
-            """,
-            owner=user,
-        )
-        response = self.client.get('/app/api/query/{}'.format(query.id))
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertLess(data['time_elapsed'], 1)
-        # TODO make this run a longer query and validate the cache is faster
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['id', 'username'],
-                'data': [[user.id, user.username]],
-            },
-        })
-        response = self.client.get('/app/api/query/{}'.format(query.id))
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': True,
             'error': False,
             'data': {
                 'columns': ['id', 'username'],
@@ -188,6 +149,77 @@ class QueryAPITest(TransactionTestCase):
                     [u'Dilbert', 8.0, 8.0, 8.0, 9.0],
                     [u'John', 8.0, 9.0, 9.0, 8.0]
                 ]
+            },
+        })
+
+
+class QueryParametersTest(QueryAPITest):
+    def test_parameters_default(self):
+        pass
+
+    def test_parameters_request(self):
+        pass
+
+    def test_parameters_typed(self):
+        pass
+
+    def test_parameters_wrong_typed(self):
+        pass
+
+
+class QueryCacheTest(QueryAPITest):
+    def test_used_cache(self):
+        """
+        Runs query twice to see if caching goes from False to True
+        """
+        (user, query) = self.mock_valid_user_and_query()
+        response = self.client.get('/app/api/query/{}'.format(query.id))
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertLess(data['time_elapsed'], 1)
+        # TODO make this run a longer query and validate the cache is faster
+        del data['time_elapsed']
+        self.assertEqual(data, {
+            'cached': False,
+            'error': False,
+            'data': {
+                'columns': ['id', 'username'],
+                'data': [[user.id, user.username]],
+            },
+        })
+        response = self.client.get('/app/api/query/{}'.format(query.id))
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertLess(data['time_elapsed'], 1)
+        del data['time_elapsed']
+        self.assertEqual(data, {
+            'cached': True,
+            'error': False,
+            'data': {
+                'columns': ['id', 'username'],
+                'data': [[user.id, user.username]],
+            },
+        })
+        return (user, query)
+
+    def test_no_cache_request(self):
+        # Run Suite from before
+        (user, query) = self.test_used_cache()
+        # Now run with caching turned off
+        # TODO use a url parameter in get here
+        response = self.client.get(
+            '/app/api/query/%s?%s' % (query.id, 'cacheable=false')
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertLess(data['time_elapsed'], 1)
+        del data['time_elapsed']
+        self.assertEqual(data, {
+            'cached': False,
+            'error': False,
+            'data': {
+                'columns': ['id', 'username'],
+                'data': [[user.id, user.username]],
             },
         })
 
