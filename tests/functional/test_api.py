@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 
 from ..factories import QueryFactory, QueryDefaultFactory
-import logging
 
 
 class QueryAPITest(TransactionTestCase):
