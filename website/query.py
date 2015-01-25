@@ -125,8 +125,12 @@ class Load_Query:
             # Compare with those from client request
             if parameter.search_for in self.parameters:
                 replace_with = self.parameters[parameter.search_for]
+                # TODO add data type check here
+                # data_type = parameters.data_type
+                # assert isinstance(replace_with, data_type)
             else:
                 replace_with = parameter.replace_with_cleaned()
+
             target_parameters[parameter.search_for] = {
                 'data_type': parameter.data_type,
                 'search_for': parameter.search_for,

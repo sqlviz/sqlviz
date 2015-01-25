@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 import factory
 
-from website.models import Db, Query
+from website.models import Db, Query, QueryDefault
 
 
 class TagsFactory(factory.DjangoModelFactory):
@@ -51,3 +51,12 @@ class QueryFactory(TagsFactory):
     graph_extra = "{}"
     query_text = "select username, last_login from auth_user"
     pivot_data = False
+
+
+class QueryDefaultFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = QueryDefault
+    query = factory.SubFactory(QueryFactory)
+    search_for = "<DEFAULT>"
+    replace_with = ""
+    data_type = 'String'
