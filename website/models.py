@@ -143,7 +143,7 @@ class QueryPrecedent(models.Model):
 
 class Dashboard(models.Model):
     title =  models.CharField(unique = True, max_length = 124, help_text = 'Primary Short Name Used for URL mappings')
-    description = models.TextField(max_length=  200)
+    description = models.TextField(max_length= 200)
     description_long = models.TextField(max_length=  1024)
     owner = models.ForeignKey(User)
     hide_index = models.BooleanField(default=False, help_text = 'Hide from Main Search')
