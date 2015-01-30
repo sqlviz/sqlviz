@@ -10,7 +10,7 @@ class QueryAPITest(TransactionTestCase):
 
     username = "username"
     password = "password"
-    user_creation_count = 5
+    user_creation_count = 100
 
     def create_user(self):
         return User.objects.create_superuser(
@@ -115,7 +115,7 @@ class QueryAPITest(TransactionTestCase):
             },
         })
 
-    def slow_test_pivot(self):
+    def test_pivot(self):
         """
         Create test user data set and run pivot on it
         """
