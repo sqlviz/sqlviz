@@ -19,11 +19,11 @@ class QueryAPITest(TransactionTestCase):
             email="u@example.com",
         )
 
-    def create_users(self):
+    def create_users(self, user_creation_count=user_creation_count):
         first_names = ['John', 'Bob', 'Dilbert']
         last_names = ['Smith', 'Brown', 'Yu', 'Green']
         user_array = []
-        for i in range(self.user_creation_count):
+        for i in range(user_creation_count):
             user_array.append(User.objects.create_user(
                 username="%s_%s" % (i, self.username),
                 password="%s_%s" % (i, self.password),

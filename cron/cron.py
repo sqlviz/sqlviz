@@ -2,13 +2,11 @@ import models
 import website.models
 import website.query
 from django.core.mail import send_mail
-# import json
 import uuid
 import os
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from email.MIMEImage import MIMEImage
-# import subprocess
 import sys
 import logging
 from django.utils import timezone
@@ -17,20 +15,24 @@ from website.get_db_engine import get_db_engine
 
 
 class Job:
-    def __init__(self, id, dashboard_id, owner):
+    def __init__(self, id):
         self.id = id
-        self.dashboard_id = dashboard_id
-        self.title = website.models.Dashboard.objects.filter(id=dashboard_id)[0].title
-        self.owner = owner
+        job = models.Job.objects.filter(id=id).first()
+        self.dashboard_id = job.dashboard_id
+        self.title = website.models.Dashboard.objects.filter(
+            id=self.dashboard_id
+        ).first().title
+        self.owner = job.owner
 
     def run(self):
         """
         does all the things and send the emails too!
         """
         self.get_email_list()
-        self.run_queries()
-        self.send_mail()
+        query_data = self.run_queries()
+        mail_msg = self.send_mail()
         self.delete_images()
+        return (query_data, mail_msg)
 
     def get_email_list(self):
         """
@@ -44,7 +46,8 @@ class Job:
         runs the dashboards queries and returns results to self.result_data
         """
         self.return_dict = {}
-        for dq in website.models.DashboardQuery.objects.filter(dashboard_id=self.dashboard_id):
+        for dq in website.models.DashboardQuery.objects.filter(
+                dashboard_id=self.dashboard_id):
             LQ = website.query.Load_Query(query_id=dq.query_id, user=None)
             Q = LQ.prepare_query()
             Q.run_query()
@@ -61,6 +64,7 @@ class Job:
                 'title': Q.query_model.title,
                 'description': Q.query_model.description,
                 'img': image}
+        return self.return_dict
 
     def delete_images(self):
         """
@@ -77,8 +81,12 @@ class Job:
         to_mail = self.email_list
 
         context = {'query_list': [v for k, v in self.return_dict.iteritems()]}
-        html_content = render_to_string(os.path.join('email_report.html'), context)
-        text_content = render_to_string(os.path.join('email_report.txt'), context)
+        html_content = render_to_string(
+            os.path.join('email_report.html'), context
+        )
+        text_content = render_to_string(
+            os.path.join('email_report.txt'), context
+        )
 
         msg = EmailMultiAlternatives(subject, text_content,
                                      sender, to_mail)
@@ -102,27 +110,33 @@ class Job:
         """
         send a stack trace to the owner of the mailing list
         """
-        subject = 'Email Failure Chartly!'
-        sender = self.owner.email
-        to_mail = self.owner.email
-        send_mail('JOB FAILURE : %s' % (self.id), trace_string,self.owner.email,
-            [self.owner.email], fail_silently=False)
+        # subject = 'Email Failure Chartly!'
+        # sender = self.owner.email
+        # to_mail = self.owner.email
+        send_mail(
+            'JOB FAILURE : %s' % (self.id),
+            trace_string,
+            self.owner.email,
+            [self.owner.email],
+            fail_silently=False
+        )
 
 
-def cache_buster(days_back = 2):
+def cache_buster(days_back=2):
     """
     When run will remove all tables that are for old cache
     """
     # Get all dead tables
     QC = website.models.QueryCache.objects.filter(
-                run_time__lt=timezone.now() - relativedelta(days = days_back)
-                ).order_by('run_time').all()[:100]
+        run_time__lt=timezone.now() - relativedelta(days=days_back)
+    ).order_by('run_time').all()[:100]
     for Q in QC:
         if Q.is_expired:
             # Drop them like they are hot!
             logging.warning('Dropping table %s' % (Q.table_name))
             drop_table(Q.table_name)
             Q.delete()
+
 
 def drop_table(table_name):
     """
@@ -131,7 +145,7 @@ def drop_table(table_name):
     engine = get_db_engine()
     c = engine.connect()
     query_text = """drop table %s""" % (table_name)
-    result = c.execute(query_text)
+    c.execute(query_text)
     c.close()
 
 

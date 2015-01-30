@@ -2,7 +2,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 import factory
 
-from website.models import Db, Query, QueryDefault
+import website.models  # import Db, Query, QueryDefault
+import cron.models  # import Job, EmailUser
 
 
 class TagsFactory(factory.DjangoModelFactory):
@@ -26,7 +27,7 @@ class UserFactory(factory.DjangoModelFactory):
 
 class DbFactory(TagsFactory):
     class Meta:
-        model = Db
+        model = website.models.Db
         exclude = ('DB',)
 
     DB = settings.DATABASES['default']
@@ -42,7 +43,7 @@ class DbFactory(TagsFactory):
 
 class QueryFactory(TagsFactory):
     class Meta:
-        model = Query
+        model = website.models.Query
 
     title = "title"
     description = "description"
@@ -53,10 +54,42 @@ class QueryFactory(TagsFactory):
     pivot_data = False
 
 
+class DashboardFactory(TagsFactory):
+    class Meta:
+        model = website.models.Dashboard
+
+    title = 'title'
+    description = ''
+    description_long = ''
+    owner = factory.SubFactory(User)
+
+
+class DashboardQueryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = website.models.DashboardQuery
+    query = factory.SubFactory(QueryFactory)
+    dashboard = factory.SubFactory(DashboardFactory)
+
+
 class QueryDefaultFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = QueryDefault
+        model = website.models.QueryDefault
     query = factory.SubFactory(QueryFactory)
     search_for = "<DEFAULT>"
     replace_with = ""
     data_type = 'String'
+
+
+class JobFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = cron.models.Job
+    owner = factory.SubFactory(UserFactory)
+    dashboard = factory.SubFactory(DashboardFactory)
+    type = 'daily'
+
+
+class EmailUserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = cron.models.EmailUser
+    job = factory.SubFactory(JobFactory)
+    user = factory.SubFactory(UserFactory)
