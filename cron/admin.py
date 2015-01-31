@@ -1,17 +1,14 @@
 from django.contrib import admin
-
-# Register your models here.
-from models import *
+import models
 
 
 class EmailUserAdmin(admin.TabularInline):
-    model = EmailUser
+    model = models.EmailUser
     extra = 3
 
 
 class JobAdmin(admin.ModelAdmin):
-    model = Job
+    model = models.Job
     inlines = [EmailUserAdmin]
 
-admin.site.register(Job, JobAdmin)
-# admin.site.register(EmailUser, EmailUserAdmin)
+admin.site.register(models.Job, JobAdmin)
