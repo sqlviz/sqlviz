@@ -101,3 +101,6 @@ target/
 
 # SFTP File
 sftp-config.json
+
+# Password File
+chartly/passwords.json
