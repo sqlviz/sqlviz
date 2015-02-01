@@ -2,6 +2,7 @@ machine:
   environment:
     DATABASE_URL: mysql://ubuntu:@localhost:3306/circle_test
     CUSTOM_DATABASE_URL: mysql://ubuntu:@localhost:3306/circle_test
+    PWD_DATA: 
 
 dependencies:
   override:
@@ -9,7 +10,8 @@ dependencies:
 
 test:
   pre:
-    - echo '{"SCRATCH": {"DB_TYPE": "mysql", "DB": "scratch", "HOST": "localhost", "PWD": "django", "USER": "django", "PORT": 3306}, "SECRET_KEY": "j_-af1@u(h7j%nklasdfkjahsdkhaslghas;", "EMAIL": {"EMAIL_HOST_PASSWORD": "asdgasgasdfa", "EMAIL_PORT": 587, "EMAIL_USE_TLS": true, "EMAIL_HOST_USER": "test@gmail.com", "EMAIL_HOST": "smtp.gmail.com"}, "DJANO": {"DB_TYPE": "mysql", "DB": "scratch", "HOST": "localhost", "PWD": "django", "USER": "django", "PORT": 3306}}' > chartly/passwords.json
+    - >
+      echo '{"SCRATCH": {"DB_TYPE": "mysql", "DB": "scratch", "HOST": "localhost", "PWD": "django", "USER": "django", "PORT": 3306}, "SECRET_KEY": "j_-af1@u(h7j%nkkdweuq6n$i=dyi2b+o7n8$u4szdb9^-6-j2", "EMAIL": {"EMAIL_HOST_PASSWORD": "test", "EMAIL_PORT": 587, "EMAIL_USE_TLS": true, "EMAIL_HOST_USER": "example@gmail.com", "EMAIL_HOST": "smtp.gmail.com"}, "DJANO": {"DB_TYPE": "mysql", "DB": "scratch", "HOST": "localhost", "PWD": "django", "USER": "django", "PORT": 3306}}' > chartly/passwords.json
   override:
     - flake8 tests/
     - coverage run manage.py test
