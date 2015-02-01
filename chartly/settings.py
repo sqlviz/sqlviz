@@ -21,8 +21,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
 # Import PWDs from separate JSON file outside of VC
-pwd_file = 'passwords.json'
-pwd_data = json.loads(open(pwd_file, 'r'))
+pwd_file = BASE_DIR + '/chartly/passwords.json'
+with open(pwd_file) as json_file:
+    pwd_data = json.load(json_file)
+
+# pwd_data = json.loads(open(pwd_file, 'r'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = pwd_data['SECRET_KEY']
