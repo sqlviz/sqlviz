@@ -35,11 +35,13 @@ class QueryInteractiveAPITest(TransactionTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        correct_response = {u'data': {u'data': [[u'information_schema'], [u'django'], [u'scratch'], [u'test'], [u'test_django']], u'columns': [u'Database']}, u'error': False}
-        self.assertEqual(data, correct_response)
+        db_list = ['scratch', 'test', 'test_django']
+        for db in db_list:
+            self.assertIn([db], data['data']['data'])
 
     def test_db_data_db(self):
-        url = '/app/api/database_explorer/?con_id=%s&db_id=%s' % (self.db.id, self.db.db)
+        url = '/app/api/database_explorer/?con_id=%s&db_id=%s' \
+            % (self.db.id, self.db.db)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -54,10 +56,8 @@ class QueryInteractiveAPITest(TransactionTestCase):
         )
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        correct_response  = [[u'id', u'int(11)', u'NO', u'PRI', None, u'auto_increment']]
-        # , [u'password', u'varchar(128)', u'NO', u'', None, u''], [u'last_login', u'datetime', u'NO', u'', None, u''], [u'is_superuser', u'tinyint(1)', u'NO', u'', None, u''], [u'username', u'varchar(30)', u'NO', u'UNI', None, u''], [u'first_name', u'varchar(30)', u'NO', u'', None, u''], [u'last_name', u'varchar(30)', u'NO', u'', None, u''], [u'email', u'varchar(75)', u'NO', u'', None, u''], [u'is_staff', u'tinyint(1)', u'NO', u'', None, u''], [u'is_active', u'tinyint(1)', u'NO', u'', None, u''], [u'date_joined', u'datetime', u'NO', u'', None, u'']]
-        for row in correct_response:
-            self.assertIn(row, data['data']['data'])
+        row = [['id', 'int(11)', 'NO', 'PRI', None, 'auto_increment']]
+        self.assertIn(row, data['data']['data'])
 
     def test_simple_query_interactive(self):
         query_text = 'select * from auth_user'
@@ -73,4 +73,3 @@ class QueryInteractiveAPITest(TransactionTestCase):
         self.assertIn(self.username, user_data)
         self.assertIn(self.user.email, user_data)
         self.assertIn(self.user.id, user_data)
-
