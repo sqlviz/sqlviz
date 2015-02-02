@@ -10,8 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 #
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import logging
-
+import json
 import dj_database_url
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
@@ -21,8 +20,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
+# Import PWDs from separate JSON file outside of VC
+pwd_file = BASE_DIR + '/chartly/passwords.json'
+with open(pwd_file) as json_file:
+    pwd_data = json.load(json_file)
+
+# pwd_data = json.loads(open(pwd_file, 'r'))
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'j_-af1@u(h7j%nkkdweuq6n$i=dyi2b+o7n8$u4szdb9^-6-j2'
+SECRET_KEY = pwd_data['SECRET_KEY']
+# 'j_-af1@u(h7j%nkkdweuq6n$i=dyi2b+o7n8$u4szdb9^-6-j2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -72,7 +79,8 @@ TEMPLATE_LOADERS = (
 )
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates"
+    # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, 'templates'),
@@ -82,7 +90,7 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
 )
 
-# logging
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -124,13 +132,11 @@ LOGGING = {
     }
 }
 
-if DEBUG:
+if DEBUG is True:
     # make all loggers use the console.
     for logger in LOGGING['loggers']:
         LOGGING['loggers'][logger]['handlers'] = ['console']
 
-# Database
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -163,7 +169,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-#Encryption
+# Encryption
 ENCRYPTED_FIELDS_KEYDIR = BASE_DIR + '/fieldkeys'
 
 # Login URL for @log_in decorator
@@ -181,11 +187,11 @@ CRONJOBS = [
 ]
 
 # Add minutely scheduele for testing
-if DEBUG == True:
+if DEBUG is True:
     CRONJOBS.append(('0 * * * *', 'cron.cron.scheduled_job', ['hourly']))
 
 # EMAIL MODE FOR TEST
-if DEBUG == True:
+if DEBUG is True:
     EMAIL_HOST = 'smtp.gmail.com'
     EMAIL_HOST_USER = 'matthew.feldman@gmail.com'
     EMAIL_HOST_PASSWORD = 'uydzgtfqwxcghzxl'
