@@ -176,6 +176,8 @@ $( "#append_list" ).on("click",'#close',function() {
 
 <div id='db_explorer'>
   <form id='chart_data'>
+    <div id='db_explorer_error' class = 'alert alert-error alert-block'>
+    </div>
     {% csrf_token %}
     <div class='row'>
       <div class="col-md-3"><h3>DB Selector</h3><div id="db_selector"></div></div>
@@ -193,23 +195,31 @@ function selectDB () {
   var data = {'con_id': con_id}
   //console.log(data);
   $.get('{% url "website:database_explorer_api" %}',data, function( json_data ) {
-    html = '';
-    //console.log(json_data);
-    $.each(json_data.data.data, function(key, val) {
-      html += "<ul class='db list-group-item' con_id='"+con_id +"' db_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
-    });
-    $('#db_selector').html(html);
-    $('#table_selector').empty();
-    $('#div_table_columns').empty();    
+    if (json_data.error == true) {
+      console.log(json_data);
+      $("#db_explorer_error").text(json_data.data);
+      $("#db_explorer_error").show();
+    } else {
+      $("#db_explorer_error").hide();
+      html = '';
+      //console.log(json_data);
+      $.each(json_data.data.data, function(key, val) {
+        html += "<ul class='db list-group-item' con_id='"+con_id +"' db_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+      });
+      $('#db_selector').html(html);
+      $('#table_selector').empty();
+      $('#div_table_columns').empty();
+    }
+  }).fail(function() {
+    $("#db_explorer_error").text('Unknown Error Occured');
+    $("#db_explorer_error").show()
   });
 }
-
 $( "select" ).change(function () {
   event.preventDefault(); // prevents scrolling up
   selectDB();
 });
 selectDB(); // Trigger DB select on page load
-
 // run if the db is hit
 $( "#db_explorer" ).on("click",'.db',function() {
   //alert($( this ).attr('db_id'));
@@ -219,13 +229,23 @@ $( "#db_explorer" ).on("click",'.db',function() {
   var data = {'db_id': db_id, 'con_id' : con_id}
   //console.log(data);
   $.get('{% url "website:database_explorer_api" %}',data, function( json_data ) {
-    html = '';
-    //console.log(json_data.data.data);
-    $.each(json_data.data.data, function(key, val) {
-      html += "<ul class='table list-group-item' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
-    });
-    $('#table_selector').html(html);
-    $('#div_table_columns').empty();
+    console.log(json_data)
+    if (json_data.error == true) {
+      $("#db_explorer_error").text(json_data.data);
+      $("#db_explorer_error").show();
+    } else {
+      $("#db_explorer_error").hide();
+      html = '';
+      //console.log(json_data.data.data);
+      $.each(json_data.data.data, function(key, val) {
+        html += "<ul class='table list-group-item' db_id='" + db_id + "' con_id='" + con_id + "' table_id='" + val + "'><a href='#' onClick='return false;'>" + val + "</a></ul>\n";
+      });
+      $('#table_selector').html(html);
+      $('#div_table_columns').empty();      
+    }
+  }).fail(function() {
+    $("#db_explorer_error").text('Unknown Error Occured');
+    $("#db_explorer_error").show()
   });
 });
 

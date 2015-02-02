@@ -36,6 +36,11 @@ class Query:
         if depth > MAX_DEPTH_RECURSION:
             raise IOError("Recursion Limit Reached")
 
+    def __str__(self):
+        return "QT : %s \n DB %s \n U : %s \n CA : %s" % (
+            self.query_text, self.db, self.user, self.cacheable
+        )
+
     def check_safety(self):
         """
         Check for dangerous database things
@@ -202,8 +207,10 @@ class Run_Query(Query):
         """
         Saves query browsing for ACL purposes
         """
-        if self.user is None or self.query_id is None:
-            logging.error("Running query without a user or query")
+        if self.query_id is None:
+            logging.info("Running query without a query id")
+        elif self.user is None:
+            logging.error("Running query without a user")
         else:
             QV = models.QueryView(user=self.user, query=self.query_model)
             QV.save()
@@ -216,6 +223,8 @@ class Run_Query(Query):
         Writes output to MySQL table
         Pandas is depricating this function.  TODO rewrite
         """
+        if self.cacheable is False:
+            raise Exception("Tryin to run Save on a non-cacheable query")
         if table_name is None:
             table_name = 'table_%s' % self.query_id
         engine = get_db_engine.get_db_engine()
@@ -283,7 +292,8 @@ class Run_Query(Query):
 
         if len(self.data) == 0:
             raise Exception("No Data Returned")
-        self.save_to_mysql('table_%s_%s' % (self.query_id, self.query_hash))
+        if self.cacheable is True:
+            self.save_to_mysql('table_%s_%s' % (self.query_id, self.query_hash))
         return self.data
 
     def run_SQL_query(self):

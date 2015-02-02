@@ -166,6 +166,7 @@ def query_interactive(request):
         {'db_list': db_list},
         RequestContext(request))
 
+
 @login_required
 def query_interactive_api(request):
     # Take Query, Database, and Pivot
@@ -173,13 +174,14 @@ def query_interactive_api(request):
     try:
         query_text = request.POST['query_text']
         db = models.Db.objects.filter(id=request.POST['db']).first()
-        pivot = True if request.POST['pivot'].lower() == 'true' else False
-        cumulative = True if request.POST['cumulative'].lower() == 'true' else False
+        pivot = True if request.POST.get('pivot', '').lower() == 'true' else False
+        cumulative = True if request.POST.get('cumulative', '').lower() == 'true' else False
         start_time = time.time()
         MD = query.Manipulate_Data(
             query_text=query_text,
             db=db,
-            user=request.user
+            user=request.user,
+            cacheable=False,
         )
         MD.prepare_safety()
         MD.run_query()
@@ -229,27 +231,26 @@ def database_explorer_api(request):
 
         # Switch in database Type
         if con.type == 'MySQL':
-            DMM = sql_manager.MySQLManager(con, request)
+            dmm = sql_manager.MySQLManager(con, request)
         elif con.type == 'Postgres':
-            DMM = sql_manager.PSQLManager(con, request)
+            dmm = sql_manager.PSQLManager(con, request)
         else:
-            raise ValueError("""Database cannot be explorered yet.
-Only supported types are 'MySQL','Postgres'""")
+            raise ValueError("""Database cannot be explorered yet. Only supported types are 'MySQL','Postgres'""")
 
         # Get proper response data
         if db_id is None:
-            DMM.findDatabase()
+            dmm.find_database()
         elif table_id is None:  # Show tables if table is none
-            DMM.showTables(db_id)
+            dmm.show_tables(db_id)
         elif table_id is not None:
-            DMM.describeTable(db_id, table_id)
+            dmm.describe_table(db_id, table_id)
         else:
             raise ValueError("""ERROR: con_id is needed,
                     db_id needed for to produce table list,
                     table_id needed to procude column list""")
 
-        DMM.run_query()
-        response_data = DMM.RQ.numericalize_data_array()
+        dmm.run_query()
+        response_data = dmm.RQ.numericalize_data_array()
         # logging.warning(""" BINGO %s """ % response_data)
         return_data = {
             "data":
