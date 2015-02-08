@@ -138,15 +138,33 @@ if DEBUG is True:
         LOGGING['loggers'][logger]['handlers'] = ['console']
 
 
+django_pwd_data = pwd_data['DJANJO']
 DATABASES = {
     'default': dj_database_url.config(
-        default='mysql://django:django@localhost/django'),
+        default='%s://%s:%s@%s:%s/%s' % (
+            django_pwd_data['DB_TYPE'],
+            django_pwd_data['USER'],
+            django_pwd_data['PWD'],
+            django_pwd_data['HOST'],
+            django_pwd_data['PORT'],
+            django_pwd_data['DB']
+        )
+    )
 }
 
 
+django_pwd_data = pwd_data['SCRATCH']
 CUSTOM_DATABASES = {
     'write_to': dj_database_url.config(
-        default='mysql://django:django@localhost:3306/scratch'),
+        default='%s://%s:%s@%s:%s/%s' % (
+            django_pwd_data['DB_TYPE'],
+            django_pwd_data['USER'],
+            django_pwd_data['PWD'],
+            django_pwd_data['HOST'],
+            django_pwd_data['PORT'],
+            django_pwd_data['DB'],
+        )
+    )
 }
 
 
@@ -192,11 +210,12 @@ if DEBUG is True:
 
 # EMAIL MODE FOR TEST
 if DEBUG is True:
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_HOST_USER = 'matthew.feldman@gmail.com'
-    EMAIL_HOST_PASSWORD = 'uydzgtfqwxcghzxl'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
+    email_password_data = pwd_data['EMAIL']
+    EMAIL_HOST = email_password_data['EMAIL_HOST']
+    EMAIL_HOST_USER = email_password_data['EMAIL_HOST_USER']
+    EMAIL_HOST_PASSWORD = email_password_data['EMAIL_HOST_PASSWORD']
+    EMAIL_PORT = email_password_data['EMAIL_PORT']
+    EMAIL_USE_TLS = email_password_data['EMAIL_USE_TLS']
 
 MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'

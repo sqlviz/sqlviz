@@ -15,9 +15,10 @@ from website.get_db_engine import get_db_engine
 
 
 class Job:
-    def __init__(self, id):
+    def __init__(self, id, job=None):
         self.id = id
-        job = models.Job.objects.filter(id=id).first()
+        if job is None:
+            job = models.Job.objects.filter(id=id).first()
         self.dashboard_id = job.dashboard_id
         self.title = website.models.Dashboard.objects.filter(
             id=self.dashboard_id
@@ -48,7 +49,7 @@ class Job:
         self.return_dict = {}
         for dq in website.models.DashboardQuery.objects.filter(
                 dashboard_id=self.dashboard_id):
-            LQ = website.query.Load_Query(query_id=dq.query_id, user=None)
+            LQ = website.query.Load_Query(query_id=dq.query_id, user=self.owner)
             Q = LQ.prepare_query()
             Q.run_query()
             Q.run_manipulations()
@@ -82,10 +83,10 @@ class Job:
 
         context = {'query_list': [v for k, v in self.return_dict.iteritems()]}
         html_content = render_to_string(
-            os.path.join('email_report.html'), context
+            os.path.join('email/email_report.html'), context
         )
         text_content = render_to_string(
-            os.path.join('email_report.txt'), context
+            os.path.join('email/email_report.txt'), context
         )
 
         msg = EmailMultiAlternatives(subject, text_content,
@@ -157,10 +158,10 @@ def scheduled_job(frequency):
     jobs = models.Job.objects.filter(type=frequency)  # Get current jos
     for job in jobs:  # Iterate through all jobs
         # 1 job = 1 dashboard
-        j = Job(job.id, job.dashboard_id, job.owner)
-        try:
+        j = Job(job.id, job)
+        if True: #try:
             j.run()
             job.save()
-        except Exception, e:
-            print str(sys.exc_info()) + str(e)
-            j.failure(str(sys.exc_info()) + str(e))
+        #except Exception, e:
+        #    print str(sys.exc_info()) + str(e)
+        #    j.failure(str(sys.exc_info()) + str(e))

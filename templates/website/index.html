@@ -68,7 +68,7 @@
         {% for dash in dashboard_list %}
           <tr>
           <td> D{{dash.id}} </td> 
-          <td> <a id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='star {% if dash.fav %}favorite{% endif %}'>{{dash.fav}}</a> </td>
+          <td> <a object_id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='star {% if dash.fav %}favorite{% endif %}'>{{dash.fav}}</a> </td>
           <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
           <td> </td>
 
