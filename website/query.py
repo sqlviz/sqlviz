@@ -434,7 +434,7 @@ class Manipulate_Data(Run_Query):
             output_image = '%sthumbnails/%s.png' % (settings.MEDIA_ROOT, self.query_id)
         else:
             output_image = file_output
-        cli = """phantomjs %s/Highcharts-4.0.3/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (static_path, json_data_file, output_image, width, height)
+        cli = """phantomjs %s/Highcharts-4.0.4/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (static_path, json_data_file, output_image, width, height)
         # print cli
         subprocess.call([cli], shell=True)
         return output_image
