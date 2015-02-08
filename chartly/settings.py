@@ -138,7 +138,7 @@ if DEBUG is True:
         LOGGING['loggers'][logger]['handlers'] = ['console']
 
 
-django_pwd_data = pwd_data['DJANJO']
+django_pwd_data = pwd_data['DJANGO']
 DATABASES = {
     'default': dj_database_url.config(
         default='%s://%s:%s@%s:%s/%s' % (
