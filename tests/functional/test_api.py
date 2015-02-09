@@ -18,10 +18,21 @@ def create_users(user_count=100):
 
 class QueryAPITestCase(APITestCase):
 
-    def get_query(self, query_id):
-        response = self.client.get('/api/query/{}'.format(query_id))
+    def get_query(self, query_id, query_params=None):
+        url = '/api/query/{}'.format(query_id)
+        if query_params:
+            query_string = "&".join("=".join(i) for i in query_params.items())
+            url = "{}?{}".format(url, query_string)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
+
+    def assertQueryData(self, query_data, **kwargs):
+        kwargs.setdefault('cached', False)
+        kwargs.setdefault('error', False)
+        self.assertLess(query_data['time_elapsed'], 1)
+        query_data.pop('time_elapsed')
+        self.assertEqual(query_data, kwargs)
 
 
 class QueryAPITest(QueryAPITestCase):
@@ -41,12 +52,8 @@ class QueryAPITest(QueryAPITestCase):
         self.create_user()
         self.login()
         data = self.get_query(1)
-        self.assertEqual(data, {
-            'cached': False,
-            'time_elapsed': 0,
-            'data': "No Query matches the given query.",
-            'error': True,
-        })
+        self.assertQueryData(data, error=True,
+                             data="No Query matches the given query.")
 
     def test_unsafe_query(self):
         user = self.create_user()
@@ -63,13 +70,8 @@ class QueryAPITest(QueryAPITestCase):
             owner=user,
         )
         data = self.get_query(query.id)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': True,
-            'data': 'Query contained delete -- Can not be run',
-        })
+        self.assertQueryData(data, error=True,
+                         data='Query contained delete -- Can not be run')
 
     def test_valid_query(self):
         user = self.create_user()
@@ -79,15 +81,9 @@ class QueryAPITest(QueryAPITestCase):
         )
         self.login()
         data = self.get_query(query.id)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['id', 'username'],
-                'data': [[user.id, user.username]],
-            },
+        self.assertQueryData(data, data={
+            'columns': ['id', 'username'],
+            'data': [[user.id, user.username]],
         })
 
     def test_pivot(self):
@@ -112,18 +108,13 @@ class QueryAPITest(QueryAPITestCase):
             pivot_data=True
         )
         data = self.get_query(query.id)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['first_name', 'Brown', 'Green', 'Smith', 'Yu'],
-                'data': [
-                    [u'Bob', 9.0, 8.0, 8.0, 8.0],
-                    [u'Dilbert', 8.0, 8.0, 8.0, 9.0],
-                    [u'John', 8.0, 9.0, 9.0, 8.0]
-                ]
-            },
+        self.assertQueryData(data, data={
+            'columns': ['first_name', 'Brown', 'Green', 'Smith', 'Yu'],
+            'data': [
+                [u'Bob', 9.0, 8.0, 8.0, 8.0],
+                [u'Dilbert', 8.0, 8.0, 8.0, 9.0],
+                [u'John', 8.0, 9.0, 9.0, 8.0]
+            ],
         })
 
 
@@ -164,34 +155,18 @@ class QueryParameterTest(QueryAPITestCase):
     def test_parameters_default(self):
         (user, query, defaults) = self.mock_valid_user_and_parameter_query()
         data = self.get_query(query.id)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['first_name'],
-                'data': [['John']],
-            },
+        self.assertQueryData(data, data={
+            'columns': ['first_name'],
+            'data': [['John']],
         })
 
     def test_parameters_request(self):
         (user, query, defaults) = self.mock_valid_user_and_parameter_query()
         name = 'Bob'
-        response = self.client.get(
-            '/api/query/%s?<NAME>=%s' % (query.id, name)
-        )
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['first_name'],
-                'data': [[name]],
-            }
+        data = self.get_query(query.id, {'<NAME>': name})
+        self.assertQueryData(data, data={
+            'columns': ['first_name'],
+            'data': [[name]],
         })
 
 
@@ -208,27 +183,15 @@ class QueryCacheTest(QueryAPITestCase):
         )
         self.login()
         data = self.get_query(query.id)
-        self.assertLess(data['time_elapsed'], 1)
         # TODO make this run a longer query and validate the cache is faster
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['id', 'username'],
-                'data': [[user.id, user.username]],
-            },
+        self.assertQueryData(data, data={
+            'columns': ['id', 'username'],
+            'data': [[user.id, user.username]],
         })
         data = self.get_query(query.id)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': True,
-            'error': False,
-            'data': {
-                'columns': ['id', 'username'],
-                'data': [[user.id, user.username]],
-            },
+        self.assertQueryData(data, cached=True, data={
+            'columns': ['id', 'username'],
+            'data': [[user.id, user.username]],
         })
         return (user, query)
 
@@ -237,20 +200,10 @@ class QueryCacheTest(QueryAPITestCase):
         (user, query) = self.test_used_cache()
         # Now run with caching turned off
         # TODO use a url parameter in get here
-        response = self.client.get(
-            '/api/query/%s?%s' % (query.id, 'cacheable=false')
-        )
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertLess(data['time_elapsed'], 1)
-        del data['time_elapsed']
-        self.assertEqual(data, {
-            'cached': False,
-            'error': False,
-            'data': {
-                'columns': ['id', 'username'],
-                'data': [[user.id, user.username]],
-            },
+        data = self.get_query(query.id, {'cacheable': "False"})
+        self.assertQueryData(data, data={
+            'columns': ['id', 'username'],
+            'data': [[user.id, user.username]],
         })
 
 
