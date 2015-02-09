@@ -1,24 +1,15 @@
 import json
 
-from django.test import TransactionTestCase
-from ..factories import DbFactory, UserFactory
+from .testcases import APITestCase
+from ..factories import DbFactory
 
 
-class QueryInteractiveAPITest(TransactionTestCase):
-
-    username = "username"
-    password = "password"
+class QueryInteractiveAPITest(APITestCase):
 
     def setUp(self):
-        self.user = UserFactory()
+        self.user = self.create_user()
         self.login()
-        self.db = self.mock_database()
-
-    def login(self):
-        self.client.login(username=self.username, password=self.password)
-
-    def mock_database(self):
-        return DbFactory()
+        self.db = DbFactory()
 
     def test_db_data_con(self):
         url = '/api/database_explorer/?con_id=%s' % (self.db.id)
