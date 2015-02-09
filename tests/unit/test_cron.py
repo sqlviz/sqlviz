@@ -38,7 +38,7 @@ class EmailTest(TransactionTestCase):
         self.assertEqual(mail.outbox[0].subject, self.dashboard.title)
 
     def mock_dashboard_cron(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory()
         self.query = QueryFactory(
             query_text="""
                 select
