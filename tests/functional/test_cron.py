@@ -5,8 +5,8 @@ from django.core import mail
 # import cron.cron
 # import website.models
 from test_api import QueryAPITest
-from ..factories import QueryFactory, DashboardFactory, \
-    DashboardQueryFactory, JobFactory, EmailUserFactory
+from ..factories import (QueryFactory, DashboardFactory,
+                         DashboardQueryFactory, JobFactory, EmailUserFactory)
 import cron.cron
 
 
