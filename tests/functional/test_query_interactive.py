@@ -1,8 +1,7 @@
 import json
 
-from django.contrib.auth.models import User
 from django.test import TransactionTestCase
-from ..factories import DbFactory
+from ..factories import DbFactory, UserFactory
 
 
 class QueryInteractiveAPITest(TransactionTestCase):
@@ -11,18 +10,9 @@ class QueryInteractiveAPITest(TransactionTestCase):
     password = "password"
 
     def setUp(self):
-        self.user = self.create_user()
+        self.user = UserFactory()
         self.login()
         self.db = self.mock_database()
-
-    def create_user(self, **defaults):
-        kwargs = {
-            'username': self.username,
-            'password': self.password,
-            'email': "u@example.com",
-        }
-        kwargs.update(defaults)
-        return User.objects.create_user(**kwargs)
 
     def login(self):
         self.client.login(username=self.username, password=self.password)
