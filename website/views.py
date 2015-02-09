@@ -26,8 +26,12 @@ def index(request):
         dashboard_list = models.Dashboard.objects.filter(hide_index=0)
     else:
         filter = request.GET.get('q', None)
-        query_list = models.Query.objects.filter(hide_index=0).filter(Q(title__contains=filter) | Q(description__contains=filter)).distinct()
-        dashboard_list = models.Dashboard.objects.filter(hide_index = 0).filter(Q(title__contains=filter) | Q(description__contains=filter)).distinct()
+        query_list = models.Query.objects.filter(hide_index=0).filter(
+            Q(title__contains=filter) | Q(description__contains=filter)
+        ).distinct()
+        dashboard_list = models.Dashboard.objects.filter(hide_index=0).filter(
+            Q(title__contains=filter) | Q(description__contains=filter)
+        ).distinct()
 
     # Get Favorites
     user = User.objects.get(username=request.user)
@@ -65,13 +69,13 @@ def index(request):
 def query_api(request, query_id):
     try:
         start_time = time.time()
-        LQ = query.Load_Query(
+        lq = query.Load_Query(
             query_id=query_id,
             user=request.user,
             parameters=request.GET.dict(),
             cacheable=request.GET.get('cacheable', None)
         )
-        q = LQ.prepare_query()
+        q = lq.prepare_query()
         q.run_query()
         q.run_manipulations()
         response_data = q.data_array
@@ -100,11 +104,13 @@ def query_api(request, query_id):
 def query_view(request, query_ids):
     query_id_array = query_ids.split(',')
     # TODO filter to make sure only this applies to queries which exist
-    query_list = [m for m in models.Query.objects.filter(id__in = query_id_array)]
+    query_list = [m for m in models.Query.objects.filter(
+        id__in=query_id_array)]
     # Get Favorites
     # TODO get rid of copy paste job here with queries
     user = User.objects.get(username=request.user)
-    query_favorites = favit.models.Favorite.objects.for_user(user, model=models.Query)
+    query_favorites = favit.models.Favorite.objects.for_user(
+        user, model=models.Query)
     query_fav_dict = dict([(i.target_object_id, i) for i in query_favorites])
 
     replacement_dict = {}
@@ -115,13 +121,13 @@ def query_view(request, query_ids):
         else:
             setattr(q, 'fav', False)
 
-        LQ = query.Load_Query(
+        lq = query.Load_Query(
             query_id=q.id,
             user=request.user,
             parameters=request.GET.dict())
-        LQ.prepare_query()
-        q.query_text = LQ.query.query_text
-        for k, v in LQ.target_parameters.iteritems():
+        lq.prepare_query()
+        q.query_text = lq.query.query_text
+        for k, v in lq.target_parameters.iteritems():
             # This dict has target, replacement, and data_type
             replacement_dict[k] = v
             json_get[v['search_for']] = v['replace_with']
@@ -139,17 +145,20 @@ def query_view(request, query_ids):
         },
         context_instance=RequestContext(request))
 
+
 @login_required
 def query_name(request, query_names):
     query_name_array = query_names.split(',')
-    query_list_string = ','.join([str(m.id) for m in models.Query.objects.filter(title__in = query_name_array)])
+    queries = models.Query.objects.filter(title__in=query_name_array)
+    query_list_string = ','.join([str(q.id) for q in queries])
     return query_view(request, query_list_string)
 
 
 @login_required
 def dashboard(request, dashboard_id):
     # First find all the queries, then run it as a list of queries
-    dashboard_query_list = models.DashboardQuery.objects.filter(dashboard_id = dashboard_id).order_by('order')
+    dashboard_query_list = models.DashboardQuery.objects.filter(
+        dashboard_id=dashboard_id).order_by('order')
     query_id_array = []
     for q in dashboard_query_list:
         query_id_array.append(str(q.query_id))
@@ -174,23 +183,23 @@ def query_interactive_api(request):
     try:
         query_text = request.POST['query_text']
         db = models.Db.objects.filter(id=request.POST['db']).first()
-        pivot = True if request.POST.get('pivot', '').lower() == 'true' else False
-        cumulative = True if request.POST.get('cumulative', '').lower() == 'true' else False
+        pivot = request.POST.get('pivot', '').lower() == 'true'
+        cumulative = request.POST.get('cumulative', '').lower() == 'true'
         start_time = time.time()
-        MD = query.Manipulate_Data(
+        md = query.Manipulate_Data(
             query_text=query_text,
             db=db,
             user=request.user,
             cacheable=False,
         )
-        MD.prepare_safety()
-        MD.run_query()
+        md.prepare_safety()
+        md.run_query()
         if pivot:
-            MD.pivot()
+            md.pivot()
         if cumulative:
-            MD.cumulative()
-        MD.pandas_to_array()
-        response_data = MD.numericalize_data_array()
+            md.cumulative()
+        md.pandas_to_array()
+        response_data = md.numericalize_data_array()
         time_elapsed = time.time() - start_time  # TODO get rid of this
         return_data = {
             "data": {
@@ -235,7 +244,8 @@ def database_explorer_api(request):
         elif con.type == 'Postgres':
             dmm = sql_manager.PSQLManager(con, request)
         else:
-            raise ValueError("""Database cannot be explorered yet. Only supported types are 'MySQL','Postgres'""")
+            raise ValueError("""Database cannot be explorered yet.
+                    Only supported types are MySQL &Postgres""")
 
         # Get proper response data
         if db_id is None:
