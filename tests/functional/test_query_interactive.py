@@ -31,7 +31,7 @@ class QueryInteractiveAPITest(TransactionTestCase):
         return DbFactory()
 
     def test_db_data_con(self):
-        url = '/app/api/database_explorer/?con_id=%s' % (self.db.id)
+        url = '/api/database_explorer/?con_id=%s' % (self.db.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -41,7 +41,7 @@ class QueryInteractiveAPITest(TransactionTestCase):
         self.assertGreater(len(data['data']['data']), 3)
 
     def test_db_data_db(self):
-        url = '/app/api/database_explorer/?con_id=%s&db_id=%s' \
+        url = '/api/database_explorer/?con_id=%s&db_id=%s' \
             % (self.db.id, self.db.db)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -52,7 +52,7 @@ class QueryInteractiveAPITest(TransactionTestCase):
 
     def test_db_data_table(self):
         response = self.client.get(
-            '/app/api/database_explorer/?con_id=%s' % (self.db.id) +
+            '/api/database_explorer/?con_id=%s' % (self.db.id) +
             '&db_id=%s&table_id=auth_user' % (self.db.db)
         )
         self.assertEqual(response.status_code, 200)
@@ -63,7 +63,7 @@ class QueryInteractiveAPITest(TransactionTestCase):
     def test_simple_query_interactive(self):
         query_text = 'select * from auth_user'
         response = self.client.post(
-            '/app/api/query_interactive/',
+            '/api/query_interactive/',
             {'query_text': query_text, 'db': self.db.id},
         )
         self.assertEqual(response.status_code, 200)

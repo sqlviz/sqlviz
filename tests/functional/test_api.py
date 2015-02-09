@@ -51,11 +51,11 @@ class QueryAPITest(TransactionTestCase):
         return (user, query)
 
     def test_not_logged_in(self):
-        response = self.client.get('/app/api/query/1')
+        response = self.client.get('/api/query/1')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             response['location'],
-            "http://testserver/accounts/login?next=/app/api/query/1",
+            "http://testserver/accounts/login?next=/api/query/1",
         )
 
     def test_invalid_query_id(self):
@@ -64,7 +64,7 @@ class QueryAPITest(TransactionTestCase):
         """
         self.create_user()
         self.login()
-        response = self.client.get('/app/api/query/1')
+        response = self.client.get('/api/query/1')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual(data, {
@@ -88,7 +88,7 @@ class QueryAPITest(TransactionTestCase):
                 """,
             owner=user,
         )
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertLess(data['time_elapsed'], 1)
@@ -101,7 +101,7 @@ class QueryAPITest(TransactionTestCase):
 
     def test_valid_query(self):
         (user, query) = self.mock_valid_user_and_query()
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertLess(data['time_elapsed'], 1)
@@ -136,7 +136,7 @@ class QueryAPITest(TransactionTestCase):
             owner=user,
             pivot_data=True
         )
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         del data['time_elapsed']
@@ -190,7 +190,7 @@ class QueryParameterTest(QueryAPITest):
 
     def test_parameters_default(self):
         (user, query, defaults) = self.mock_valid_user_and_parameter_query()
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertLess(data['time_elapsed'], 1)
@@ -208,7 +208,7 @@ class QueryParameterTest(QueryAPITest):
         (user, query, defaults) = self.mock_valid_user_and_parameter_query()
         name = 'Bob'
         response = self.client.get(
-            '/app/api/query/%s?<NAME>=%s' % (query.id, name)
+            '/api/query/%s?<NAME>=%s' % (query.id, name)
         )
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -230,7 +230,7 @@ class QueryCacheTest(QueryAPITest):
         Runs query twice to see if caching goes from False to True
         """
         (user, query) = self.mock_valid_user_and_query()
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertLess(data['time_elapsed'], 1)
@@ -244,7 +244,7 @@ class QueryCacheTest(QueryAPITest):
                 'data': [[user.id, user.username]],
             },
         })
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertLess(data['time_elapsed'], 1)
@@ -265,7 +265,7 @@ class QueryCacheTest(QueryAPITest):
         # Now run with caching turned off
         # TODO use a url parameter in get here
         response = self.client.get(
-            '/app/api/query/%s?%s' % (query.id, 'cacheable=false')
+            '/api/query/%s?%s' % (query.id, 'cacheable=false')
         )
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -313,7 +313,7 @@ class QueryAPIPermissionTest(TransactionTestCase):
         return QueryFactory(owner=self.user, **kwargs)
 
     def get_query(self, query):
-        response = self.client.get('/app/api/query/{}'.format(query.id))
+        response = self.client.get('/api/query/{}'.format(query.id))
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         return data
