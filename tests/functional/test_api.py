@@ -71,7 +71,7 @@ class QueryAPITest(QueryAPITestCase):
         )
         data = self.get_query(query.id)
         self.assertQueryData(data, error=True,
-                         data='Query contained delete -- Can not be run')
+                             data='Query contained delete -- Can not be run')
 
     def test_valid_query(self):
         user = self.create_user()
