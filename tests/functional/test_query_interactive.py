@@ -11,33 +11,29 @@ class QueryInteractiveAPITest(APITestCase):
         self.login()
         self.db = DbFactory()
 
-    def test_db_data_con(self):
-        url = '/api/database_explorer/?con_id=%s' % (self.db.id)
+    def get_query(self, params):
+        params.setdefault('con_id', self.db.id)
+        query_string = "&".join("{}={}".format(*i) for i in params.items())
+        url = '/api/database_explorer/?{}'.format(query_string)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        return json.loads(response.content)
+
+    def test_db_data_con(self):
         db_list = []  # TODO find something approps for this check
+        data = self.get_query({})
         for db in db_list:
             self.assertIn([db], data['data']['data'])
         self.assertGreater(len(data['data']['data']), 3)
 
     def test_db_data_db(self):
-        url = '/api/database_explorer/?con_id=%s&db_id=%s' \
-            % (self.db.id, self.db.db)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = self.get_query({'db_id': self.db.db})
         known_good_tables = ['auth_group', 'website_query', 'django_admin_log']
         for table in known_good_tables:
             self.assertIn([table], data['data']['data'])
 
     def test_db_data_table(self):
-        response = self.client.get(
-            '/api/database_explorer/?con_id=%s' % (self.db.id) +
-            '&db_id=%s&table_id=auth_user' % (self.db.db)
-        )
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = self.get_query({'db_id': self.db.db, 'table_id': "auth_user"})
         row = ['id', 'int(11)', 'NO', 'PRI', None, 'auto_increment']
         self.assertIn(row, data['data']['data'])
 

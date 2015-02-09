@@ -1,31 +1,46 @@
-from django.test import LiveServerTestCase, TransactionTestCase
+from django.test import (LiveServerTestCase as BaseLiveServerTestCase,
+                         TransactionTestCase)
 from splinter import Browser
 
 from ..factories import UserFactory
 
 
-class APITestCase(TransactionTestCase):
+class TestCaseMixin(object):
 
     username = "username"
     password = "password"
 
-    def login(self):
-        self.client.login(username=self.username, password=self.password)
-
-    def create_user(self, **defaults):
-        kwargs = {
+    def create_user(self, **kwargs):
+        attrs = {
             'username': self.username,
             'password': self.password,
         }
-        kwargs.update(defaults)
-        return UserFactory(**kwargs)
+        attrs.update(kwargs)
+        return UserFactory(**attrs)
 
 
-class TestCase(LiveServerTestCase):
+class APITestCase(TestCaseMixin, TransactionTestCase):
+
+    def login(self):
+        self.client.login(username=self.username, password=self.password)
+
+
+class LiveServerTestCase(TestCaseMixin, BaseLiveServerTestCase):
 
     """Base test case for in-browser functional tests."""
 
     initial_url = None
+    login_button_value = 'Log in'
+
+    def login(self):
+        self.browser.fill('username', self.username)
+        self.browser.fill('password', self.password)
+        self.browser.find_by_value(self.login_button_value).click()
+
+    def create_staff_user(self, **kwargs):
+        kwargs.setdefault('is_staff', True)
+        kwargs.setdefault('is_superuser', True)
+        return super(LiveServerTestCase, self).create_user(**kwargs)
 
     def setUp(self):
         self.browser = Browser('django')
