@@ -1,13 +1,9 @@
-from django.contrib.auth.models import User
-
 from ..factories import DbFactory
-from .testcases import TestCase
+from .testcases import LiveServerTestCase
 
 
-class AdminQueryPageTest(TestCase):
+class AdminQueryPageTest(LiveServerTestCase):
 
-    username = "username"
-    password = "password"
     initial_url = "/admin/"
 
     def setUp(self):
@@ -15,20 +11,12 @@ class AdminQueryPageTest(TestCase):
         self.user = self.create_user()
         self.login()
 
-    def create_user(self):
-        return User.objects.create_superuser(
-            username=self.username,
-            password=self.password,
-            email="u@example.com",
-        )
-
-    def login(self):
-        self.browser.fill('username', self.username)
-        self.browser.fill('password', self.password)
-        self.browser.find_by_value('Log in').click()
+    def create_user(self, **kwargs):
+        return super(LiveServerTestCase, self).create_user(
+            is_staff=True, is_superuser=True)
 
     def test_invalid_query_id(self):
-        db = DbFactory.create()
+        db = DbFactory()
         self.browser.find_link_by_href("/admin/website/query/add/").click()
         self.browser.fill_form({
             'title': "GDP",

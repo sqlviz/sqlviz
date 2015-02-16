@@ -1,18 +1,9 @@
-from django.contrib.auth.models import User
-
-from .testcases import TestCase
+from .testcases import LiveServerTestCase
 
 
-class AdminLoginTest(TestCase):
+class AdminLoginTest(LiveServerTestCase):
 
-    username = "username"
-    password = "password"
     initial_url = "/admin/"
-
-    def login(self):
-        self.browser.fill('username', self.username)
-        self.browser.fill('password', self.password)
-        self.browser.find_by_value('Log in').click()
 
     def test_invalid_username(self):
         """Ensure error shown when logging in with an invalid username."""
@@ -22,37 +13,23 @@ class AdminLoginTest(TestCase):
 
     def test_incorrect_password(self):
         """Ensure error shown when logging in with an incorrect password."""
-        User.objects.create_superuser(
-            username=self.username,
-            email="u@example.com",
-            password="other password",
-        )
         assert not self.browser.find_by_css('.errornote')
+        self.create_user(is_staff=True, password="other password")
         self.login()
         assert "case-sensitive" in self.browser.find_by_css('.errornote').text
 
     def test_valid_credentials(self):
         """Ensure logging in with valid credentials redirects to admin."""
-        User.objects.create_superuser(
-            username=self.username,
-            email="u@example.com",
-            password=self.password,
-        )
         assert "Log out" not in self.browser.find_by_css('body').text
+        self.create_user(is_staff=True)
         self.login()
         assert "Log out" in self.browser.find_by_css('body').text
 
 
-class LoginPageTest(TestCase):
+class LoginPageTest(LiveServerTestCase):
 
-    username = "username"
-    password = "password"
     initial_url = "/accounts/login"
-
-    def login(self):
-        self.browser.fill('username', self.username)
-        self.browser.fill('password', self.password)
-        self.browser.find_by_value('login').click()
+    login_button_value = 'login'
 
     def test_invalid_username(self):
         """Ensure error shown when logging in with an invalid username."""
@@ -62,23 +39,15 @@ class LoginPageTest(TestCase):
 
     def test_incorrect_password(self):
         """Ensure error shown when logging in with an incorrect password."""
-        User.objects.create_user(
-            username=self.username,
-            email="u@example.com",
-            password="other password",
-        )
         assert not self.browser.find_by_css('.errorlist')
+        self.create_user(password="other password")
         self.login()
         assert "case-sensitive" in self.browser.find_by_css('.errorlist').text
 
     def test_valid_credentials(self):
         """Ensure logging in with valid credentials redirects to admin."""
-        User.objects.create_user(
-            username=self.username,
-            email="u@example.com",
-            password=self.password
-        )
         assert "Interactive Mode" not in self.browser.find_by_css('body').text
+        self.create_user()
         self.login()
         assert "Interactive Mode" not in self.browser.find_by_css('body').text
         assert ("No Queries or Dashboards are available" in
@@ -87,12 +56,8 @@ class LoginPageTest(TestCase):
 
     def test_valid_credentials_not_staff(self):
         """Ensure logging in with valid credentials redirects to admin."""
-        User.objects.create_superuser(
-            username=self.username,
-            email="u@example.com",
-            password=self.password
-        )
         assert "Interactive Mode" not in self.browser.find_by_css('body').text
+        self.create_user(is_staff=True)
         self.login()
         assert "Interactive Mode" in self.browser.find_by_css('body').text
         assert "Admin" in self.browser.find_by_css('body').text

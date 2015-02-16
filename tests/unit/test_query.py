@@ -1,10 +1,10 @@
-import unittest
+from unittest import TestCase
 import website.query
 import pandas as pd
 import json
 
 
-class TestLimits(unittest.TestCase):
+class TestLimits(TestCase):
     def test_adding_simple_limits(self):
         query = website.query.Query(
             query_text="select * from some_table",
@@ -42,7 +42,7 @@ class TestLimits(unittest.TestCase):
             "select * from some_table limit 10;")
 
 
-class TestSafety(unittest.TestCase):
+class TestSafety(TestCase):
     def stop_words(self):
         base_query = "select * from some_table"
         stop_words = ['insert', 'delete', 'drop',
@@ -54,7 +54,7 @@ class TestSafety(unittest.TestCase):
             self.assertRaises(TypeError, query.check_safety)
 
 
-class TestManipulateData(unittest.TestCase):
+class TestManipulateData(TestCase):
     def test_numericalize_data_array(self):
         md = website.query.Manipulate_Data(
             query_text='',
@@ -80,6 +80,3 @@ class TestManipulateData(unittest.TestCase):
                 "summer": {"0": 0.0, "1": 1.0, "2": 2.0},
                 "winter": {"0": 4.0, "1": 3.0, "2": 0.0}
             })
-
-if __name__ == '__main__':
-    unittest.main()
