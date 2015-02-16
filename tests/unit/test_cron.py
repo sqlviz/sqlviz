@@ -1,16 +1,13 @@
-# from django.contrib.auth.models import User
-# from django.test import TransactionTestCase
+from django.test import TransactionTestCase
 from django.core import mail
-# from django.test import TestCase
-# import cron.cron
-# import website.models
-from test_api import QueryAPITest
-from ..factories import QueryFactory, DashboardFactory, \
-    DashboardQueryFactory, JobFactory, EmailUserFactory
-import cron.cron
+
+from cron import cron
+
+from ..factories import (QueryFactory, DashboardFactory, UserFactory,
+                         DashboardQueryFactory, JobFactory, EmailUserFactory)
 
 
-class EmailTest(QueryAPITest):
+class EmailTest(TransactionTestCase):
     number_users_create = 5
 
     def test_send_email(self):
@@ -29,7 +26,7 @@ class EmailTest(QueryAPITest):
 
     def test_cron_email(self):
         self.mock_dashboard_cron()
-        job_instance = cron.cron.Job(self.job.id)
+        job_instance = cron.Job(self.job.id)
         return_data = job_instance.run()[0][self.query.id]
         del return_data['table']
         valid_data = {'description': u'description',
@@ -41,8 +38,7 @@ class EmailTest(QueryAPITest):
         self.assertEqual(mail.outbox[0].subject, self.dashboard.title)
 
     def mock_dashboard_cron(self):
-        self.user = self.create_user()
-        self.login()
+        self.user = UserFactory()
         self.query = QueryFactory(
             query_text="""
                 select
