@@ -1,4 +1,4 @@
-Chartly
+SQLviz
 =======
 
 .. image:: https://circleci.com/gh/sqlviz/sqlviz/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
