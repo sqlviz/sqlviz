@@ -1,13 +1,13 @@
 Chartly
 =======
 
-.. image:: https://circleci.com/gh/dataglu/chartly/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
-    :target: https://circleci.com/gh/dataglu/chartly/tree/master
+.. image:: https://circleci.com/gh/sqlviz/sqlviz/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
+    :target: https://circleci.com/gh/sqlviz/sqlviz/tree/master
 
-.. image:: https://codecov.io/github/dataglu/chartly/coverage.svg?token=LQPKDYzyKr&branch=master
-    :target: https://codecov.io/github/dataglu/chartly?branch=master
+.. image:: https://codecov.io/github/sqlviz/sqlviz/coverage.svg?token=LQPKDYzyKr&branch=master
+    :target: https://codecov.io/github/sqlviz/sqlviz?branch=master
 
-Chartly is a data visualization platform built on Django
+SQLviz is a data visualization platform built on Django
 
 Requirements
 ------------
