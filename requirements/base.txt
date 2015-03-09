@@ -12,7 +12,7 @@ django-taggit==0.12.2
 logutils==0.3.3
 mock==1.0.1
 nose==1.3.4
-pandas==0.15.3
+pandas==0.15.2
 patsy==0.3.0
 psycopg2==2.5.4
 pyasn1==0.1.7
