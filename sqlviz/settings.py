@@ -1,5 +1,5 @@
 """
-Django settings for chartly project.
+Django settings for sqlviz project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/dev/topics/settings/
@@ -57,7 +57,7 @@ pwd_data = {
 }
 
 # Import PWDs from separate JSON file outside of VC
-pwd_file = BASE_DIR + '/chartly/passwords.json'
+pwd_file = BASE_DIR + '/sqlviz/passwords.json'
 try:
     with open(pwd_file) as json_file:
         pwd_data = json.load(json_file)
@@ -106,9 +106,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'chartly.urls'
+ROOT_URLCONF = 'sqlviz.urls'
 
-WSGI_APPLICATION = 'chartly.wsgi.application'
+WSGI_APPLICATION = 'sqlviz.wsgi.application'
 # Templates
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -258,4 +258,4 @@ if DEBUG is True:
 MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = '/var/www/chartly/static/'
+STATIC_ROOT = '/var/www/sqlviz/static/'

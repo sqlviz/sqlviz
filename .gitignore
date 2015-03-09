@@ -103,4 +103,4 @@ target/
 sftp-config.json
 
 # Password File
-chartly/passwords.json
+sqlviz/passwords.json

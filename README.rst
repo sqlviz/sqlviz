@@ -1,4 +1,4 @@
-SQLviz
+SQLVIZ
 =======
 
 .. image:: https://circleci.com/gh/sqlviz/sqlviz/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
@@ -7,7 +7,7 @@ SQLviz
 .. image:: https://codecov.io/github/sqlviz/sqlviz/coverage.svg?token=LQPKDYzyKr&branch=master
     :target: https://codecov.io/github/sqlviz/sqlviz?branch=master
 
-SQLviz is a data visualization platform built on Django
+SQLVIZ is a data visualization platform built on Django
 
 Requirements
 ------------
@@ -105,7 +105,7 @@ Grant Apache write access to media folder
     $ chmod  -R 777 media
 
 
-Using Chartly
+Using sqlviz
 -------------
 
 Setting up a database
