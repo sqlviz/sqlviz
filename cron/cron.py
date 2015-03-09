@@ -111,7 +111,7 @@ class Job:
         """
         send a stack trace to the owner of the mailing list
         """
-        # subject = 'Email Failure Chartly!'
+        # subject = 'Email Failure SQLVIZ!'
         # sender = self.owner.email
         # to_mail = self.owner.email
         send_mail(

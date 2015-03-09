@@ -1,4 +1,4 @@
-import chartly.settings as settings
+import sqlviz.settings as settings
 import sqlalchemy
 from urllib import quote_plus as urlquote
 

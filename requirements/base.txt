@@ -10,11 +10,9 @@ django-encrypted-fields==1.1.1
 django-favit==0.2.4
 django-taggit==0.12.2
 logutils==0.3.3
-matplotlib==1.4.2
 mock==1.0.1
 nose==1.3.4
-numpy==1.9.1
-pandas==0.15.1
+pandas==0.15.2
 patsy==0.3.0
 psycopg2==2.5.4
 pyasn1==0.1.7

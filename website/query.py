@@ -73,7 +73,7 @@ class Query:
         Adds comments before query for the DBAs to blame
         """
         comment_char = {'MySQL': '#', 'Postgres': '--', 'Hive': '--'}
-        self.query_text = "%s Chartly Running Query Id: %s \n %s" % (
+        self.query_text = "%s sqlviz Running Query Id: %s \n %s" % (
             comment_char[self.db.type],
             self.query_id,
             self.query_text)
