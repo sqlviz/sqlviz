@@ -104,3 +104,7 @@ sftp-config.json
 
 # Password File
 sqlviz/passwords.json
+
+# Highcharts Repo
+website/static/Highcharts/*
+website/statsic/Highmaps/*
