@@ -1,7 +1,7 @@
-sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran
+sudo yum install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran
 
-pip install -r requirements/local.txt
 pip install -r requirements/base.txt
+pip install -r requirements/local.txt
 
 mysql -u root
 
