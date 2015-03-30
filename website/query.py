@@ -232,7 +232,9 @@ class Run_Query(Query):
         self.data.to_sql(table_name, con=engine, if_exists='replace',
                          index=False, chunksize=batch_size)
         # logging.warning('Save to MySQL')
-        QC = models.QueryCache.objects.filter(query=self.query_model).filter(table_name=table_name).first()
+        QC = models.QueryCache.objects.filter(
+            query=self.query_model
+        ).filter(table_name=table_name).first()
         # logging.warning(QC)
         if QC is None:
             # logging.warning('CREATE SOMETHING')
@@ -293,7 +295,9 @@ class Run_Query(Query):
         if len(self.data) == 0:
             raise Exception("No Data Returned")
         if self.cacheable is True:
-            self.save_to_mysql('table_%s_%s' % (self.query_id, self.query_hash))
+            self.save_to_mysql(
+                'table_%s_%s' % (self.query_id, self.query_hash)
+            )
         return self.data
 
     def run_SQL_query(self):
@@ -301,12 +305,13 @@ class Run_Query(Query):
         Runs SQL query in DB
         """
         engine_string = '%s://%s:%s@%s:%s/%s' % (
-                self.db.type.lower(),
-                self.db.username,
-                urlquote(self.db.password_encrypted),
-                self.db.host,
-                self.db.port,
-                self.db.db)
+            self.db.type.lower(),
+            self.db.username,
+            urlquote(self.db.password_encrypted),
+            self.db.host,
+            self.db.port,
+            self.db.db
+        )
         engine = sqlalchemy.create_engine(engine_string,)
         c = engine.connect()
         query_text = self.query_text.replace('%', '%%')  # SQLAlchemy Esc
@@ -418,7 +423,9 @@ class Manipulate_Data(Run_Query):
             'yAxis': '',
             'graph_extra': self.query_model.graph_extra,
             'title': self.query_model.title}
-        static_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'website/static'))
+        static_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '..', 'website/static')
+        )
         # logging.warning(static_path)
         guid = str(uuid.uuid1())
         json_data_file = '//tmp/%s.json' % (guid)
@@ -431,10 +438,11 @@ class Manipulate_Data(Run_Query):
         subprocess.call([cli], shell=True)
         # Transform JSON file into image using CLI and Phantom JS
         if file_output is None:
-            output_image = '%sthumbnails/%s.png' % (settings.MEDIA_ROOT, self.query_id)
+            output_image = '%sthumbnails/%s.png' % \
+                (settings.MEDIA_ROOT, self.query_id)
         else:
             output_image = file_output
-        cli = """phantomjs %s/Highcharts-4.0.4/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (static_path, json_data_file, output_image, width, height)
+        cli = """phantomjs %s/Highcharts/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (static_path, json_data_file, output_image, width, height)
         # print cli
         subprocess.call([cli], shell=True)
         return output_image
@@ -445,7 +453,7 @@ class Manipulate_Data(Run_Query):
         """
         query = models.Query.objects.filter(id=self.query_id).first()
 
-        if query.pivot_data is True:  # if exists_and_equals(d, 'pivot','True'):
+        if query.pivot_data is True:
             self.pivot()
         if query.cumulative is True:
             self.cumulative()
@@ -459,6 +467,7 @@ class Manipulate_Data(Run_Query):
             self.query_model.image = fileout
             self.query_model.save()
         """
+
 
 def string_to_boolean(string='', default=False):
     """
