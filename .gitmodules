@@ -1,6 +1,9 @@
 [submodule "website/static/Highmaps_rep"]
-	path = website/static/Highmaps_rep
+	path = website/static/Highmaps/Highmaps_rep
 	url = https://github.com/highslide-software/highmaps-release
-[submodule "website/static/Highcharts_rep"]
-	path = website/static/Highcharts_rep
-	url = https://github.com/highslide-software/highcharts-release
+[submodule "website/static/DataTables"]
+	path = website/static/DataTables
+	url = https://github.com/DataTables/DataTables
+[submodule "website/static/ace-builds"]
+	path = website/static/ace-builds
+	url = https://github.com/ajaxorg/ace-builds/
