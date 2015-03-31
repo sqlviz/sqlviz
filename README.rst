@@ -1,4 +1,4 @@
-SQLVIZ
+SQLviz
 =======
 
 .. image:: https://circleci.com/gh/sqlviz/sqlviz/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
@@ -7,7 +7,7 @@ SQLVIZ
 .. image:: https://codecov.io/github/sqlviz/sqlviz/coverage.svg?token=LQPKDYzyKr&branch=master
     :target: https://codecov.io/github/sqlviz/sqlviz?branch=master
 
-SQLVIZ is a data visualization platform built on Django
+SQLviz is a data visualization platform built on Django
 
 Requirements
 ------------
@@ -96,16 +96,27 @@ Create Django encrypted keys:
     $ keyczart addkey --location=fieldkeys --status=primary --size=256
 
 Enable Uploads
-----------------------------
+--------------
 
-Grant Apache write access to media folder
+If running with Apache, you may need to grant access to media folder
 
 .. code-block:: bash
 
     $ chmod  -R 777 media
 
+Licensing
+---------
+* Highcharts licensing is required.
+    * http://shop.highsoft.com/highcharts.html
+* Once license has been acquired, place highcharts into the necassary folder.
+.. code-block:: bash
+    
+    $ git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
+    $ git clone https://github.com/highslide-software/highmaps-release.git website/static/Highmaps
 
-Using sqlviz
+* First repo is fairly large.  You can checkout the alternative highcharts release branch into the js folder and also checking out the export branch separately.
+
+Using SQLviz
 -------------
 
 Setting up a database
@@ -182,10 +193,6 @@ CSV Upload
 * You can upload a csv to the scratch DB from the admin panel
 * Header should be provided in the first row and formatting is auto-detected as best as possible.
 
-Licensing
-~~~~~~~~~
-* Highcharts licensing is required.
-    * http://shop.highsoft.com/highcharts.html
 
 Thanks
 ~~~~~~
