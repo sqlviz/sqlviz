@@ -408,8 +408,12 @@ class Manipulate_Data(Run_Query):
 
     def generate_image(self, file_output=None, width=400, height=300):
         """
-        create a picture!
+        create a picture, and save to file_output
         """
+        if self.query_model.chart_type is None:
+            raise ValueError('Can not chart Null graph type')
+        elif self.query_model.chart_type == 'country':
+            raise ValueError('Can not chart Country graph type')
         data = copy.deepcopy(self.data_array)
         columns = data.pop(0)
         graph_data = {
@@ -433,7 +437,6 @@ class Manipulate_Data(Run_Query):
             static_path,
             json.dumps(graph_data, cls=DateTimeEncoder),
             json_data_file)
-        # print cli
         # logging.warning(cli)
         subprocess.call([cli], shell=True)
         # Transform JSON file into image using CLI and Phantom JS
@@ -461,12 +464,6 @@ class Manipulate_Data(Run_Query):
         self.pandas_to_array()
         self.numericalize_data_array()
 
-        """if self.query_model.chart_type != 'None':
-            # Run the graph in phantom JS
-            self.generate_image(fileout)
-            self.query_model.image = fileout
-            self.query_model.save()
-        """
 
 
 def string_to_boolean(string='', default=False):
