@@ -1,4 +1,4 @@
-SQLviz
+SQLViz
 =======
 
 .. image:: https://circleci.com/gh/sqlviz/sqlviz/tree/master.svg?style=svg&circle-token=c5003ccfe0b8fbf630da12aeef19e81eb39efcca
@@ -7,7 +7,7 @@ SQLviz
 .. image:: https://codecov.io/github/sqlviz/sqlviz/coverage.svg?token=LQPKDYzyKr&branch=master
     :target: https://codecov.io/github/sqlviz/sqlviz?branch=master
 
-SQLviz is a data visualization platform built on Django
+SQLViz is a data visualization platform built on Django
 
 Requirements
 ------------
@@ -39,12 +39,6 @@ Create the databases and user permissions::
     GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
     CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
-
-Create a test database also::
-
-    CREATE DATABASE IF NOT EXISTS test CHARACTER SET utf8 COLLATE utf8_general_ci;
-    GRANT ALL PRIVILEGES ON test.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
-
 
 Database Migrations
 -------------------
@@ -106,16 +100,16 @@ If running with Apache, you may need to grant access to media folder
 
 Licensing
 ---------
-* Highcharts licensing is required.
+* Highcharts licensing is required for Highcharts and Highmaps (each are separate).
     * http://shop.highsoft.com/highcharts.html
-* Once license has been acquired, place highcharts into the necassary folder.
+* Once license has been acquired, place Hghcharts into the necassary folder.
 .. code-block:: bash
     
     $ git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
     $ git clone https://github.com/highslide-software/highmaps-release.git website/static/Highmaps
 
 * First repo is fairly large.  You can checkout the alternative highcharts release branch into the js folder and also checking out the export branch separately.
-
+* SQLViz does NOT include any warranty for the licenses of used software.  
 Passwords
 ---------
 
@@ -150,7 +144,7 @@ Passwords
     }
 
 
-Using SQLviz
+Using SQLViz
 -------------
 
 Setting up a database
@@ -221,12 +215,10 @@ Groups and Permissions
     * The query and database are untagged
     * They are in a group that shares a name with the database or the query
 
-
 CSV Upload
 ~~~~~~~~~~
 * You can upload a csv to the scratch DB from the admin panel
 * Header should be provided in the first row and formatting is auto-detected as best as possible.
-
 
 Thanks
 ~~~~~~
