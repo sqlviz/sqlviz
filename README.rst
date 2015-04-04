@@ -17,6 +17,7 @@ This project requires Python 2.7 and MySQL:
 .. code-block:: bash
 
     $ sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran
+    $ sudo apt-get build-dep python-numpy python-scipy
 
 
 Installation
@@ -27,7 +28,6 @@ Install Python dependencies (in a virtualenv preferably):
 .. code-block:: bash
 
     $ pip install -r requirements/local.txt
-    $ pip install -r requirements/base.txt
 
 
 Setup the Database
