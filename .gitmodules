@@ -10,3 +10,6 @@
 [submodule "website/static/Highcharts"]
 	path = website/static/Highcharts
 	url = https://github.com/highslide-software/highcharts.com
+[submodule "website/static/Highmaps"]
+	path = website/static/Highmaps
+	url = https://github.com/highslide-software/highmaps-release
