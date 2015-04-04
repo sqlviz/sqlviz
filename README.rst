@@ -116,6 +116,39 @@ Licensing
 
 * First repo is fairly large.  You can checkout the alternative highcharts release branch into the js folder and also checking out the export branch separately.
 
+Passwords
+---------
+
+* You can set up a passwords.json file in the sqlviz folder.
+.. code-block:: json
+    {
+        "SECRET_KEY" : "",
+        "EMAIL": {
+            "EMAIL_HOST" : "smtp.gmail.com",
+            "EMAIL_HOST_PASSWORD" : "",
+            "EMAIL_HOST_USER" : "",
+            "EMAIL_PORT" : 587,
+            "EMAIL_USE_TLS" : true
+        },
+        "DJANGO" : {
+            "DB_TYPE" : "",
+            "USER" : "",
+            "PWD" : "",
+            "HOST" : "",
+            "PORT" : "",
+            "DB" : ""
+        },
+        "SCRATCH" : {
+            "DB_TYPE" : "",
+            "USER" : "",
+            "PWD" : "",
+            "HOST" : "",
+            "PORT" : "",
+            "DB" : ""
+        }
+    }
+
+
 Using SQLviz
 -------------
 
