@@ -120,7 +120,7 @@ Passwords
 ---------
 
 * You can set up a passwords.json file in the sqlviz folder.
-.. code-block:: json
+.. code-block:: javascript
     {
         "SECRET_KEY" : "",
         "EMAIL": {
