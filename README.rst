@@ -27,7 +27,6 @@ Install Python dependencies (in a virtualenv preferably):
 .. code-block:: bash
 
     $ pip install -r requirements/local.txt
-    $ pip install -r requirements/base.txt
 
 
 Setup the Database
