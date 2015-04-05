@@ -50,7 +50,7 @@ To initialize or update the database:
 
     ./manage.py migrate
 
-To create a new super user:
+To create a new super user and enter credentials for that user:
 
 .. code-block:: bash
 
@@ -68,6 +68,26 @@ To start the Django server on port 7878:
 
 Now visit http://localhost:7878/ in your browser, or the IP the server is running from.
 
+Licensing
+---------
+* Highcharts licensing is required for Highcharts and Highmaps (each are separate).
+    * http://shop.highsoft.com/highcharts.html
+* Once license has been acquired, place Highcharts into the necassary folder.
+.. code-block:: bash
+    
+    $ git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
+    $ git clone https://github.com/highslide-software/highmaps-release.git website/static/Highmaps
+
+Loading Initial Data
+--------------------
+
+Load data into to SQLViz so there is out of gate functionality
+
+.. code-block:: bash
+
+    $ python manage.py loaddata initial_data/djia_data.json 
+    $ python manage.py loaddata initial_data/initial_data.json 
+    
 
 Enabling Cron
 -------------
@@ -86,6 +106,7 @@ Create Django encrypted keys:
 
 .. code-block:: bash
 
+    $ rm -rf fieldkeys
     $ mkdir fieldkeys
     $ keyczart create --location=fieldkeys --purpose=crypt
     $ keyczart addkey --location=fieldkeys --status=primary --size=256
@@ -93,28 +114,21 @@ Create Django encrypted keys:
 Enable Uploads
 --------------
 
-If running with Apache, you may need to grant access to media folder
+If running with Apache, you may need to grant access to media folder and the debug.log file
 
 .. code-block:: bash
 
     $ chmod  -R 777 media
+    $ chmod 777 debug.log
 
-Licensing
----------
-* Highcharts licensing is required for Highcharts and Highmaps (each are separate).
-    * http://shop.highsoft.com/highcharts.html
-* Once license has been acquired, place Highcharts into the necassary folder.
-.. code-block:: bash
-    
-    $ git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
-    $ git clone https://github.com/highslide-software/highmaps-release.git website/static/Highmaps
 
 * First repo is fairly large.  You can checkout the alternative highcharts release branch into the js folder and also checking out the export branch separately.
-* SQLViz does NOT include any warranty for the licenses of used software.  
+* SQLViz does NOT include any warranty for the licenses of used software. 
+
 Passwords
 ---------
 
-* You can set up a passwords.json file in the sqlviz folder.
+* You can set up a passwords.json file in the sqlviz folder.  It is in the gitignore to avoid copy-ing passwords into a repo.  Email is used for automated reporting.
 .. code-block:: javascript
 
     {
@@ -146,16 +160,16 @@ Passwords
 
 
 Using SQLViz
--------------
+------------
 
 Setting up a database
 ~~~~~~~~~~~~~~~~~~~~~
 * In Admin Panel add Database
     * Currently supported Databases: MYSQL, Postgres
-* TODO: Oracle, MSSQL, Hive 2, GBQ
 * Add port, username and password
 * Password is encrypyed in database
 * Make sure account is readonly only (http://www.symantec.com/business/support/index?page=content&id=HOWTO30408)
+* Tags affect the security and visibility of a query
 
 Creating a Query
 ~~~~~~~~~~~~~~~~

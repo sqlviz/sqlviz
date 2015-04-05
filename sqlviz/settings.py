@@ -94,7 +94,8 @@ INSTALLED_APPS = (
     'cron',
     'favit',
     'favs',
-    'csv_upload'
+    'csv_upload',
+    'scratch'
 )
 
 MIDDLEWARE_CLASSES = (
