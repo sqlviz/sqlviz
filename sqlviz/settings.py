@@ -146,20 +146,20 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
-            },
+        },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR + '/debug.log',
             'formatter': 'simple'
-            },
         },
+    },
     'loggers': {
         'django': {
             'handlers': ['file'],
             'level': 'WARNING',
             'propagate': True,
-            },
+        },
         'django_crontab': {
             'handlers': ['console'],
             'level': 'INFO',
