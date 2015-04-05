@@ -12,14 +12,16 @@ SQLViz is a data visualization platform built on Django
 Requirements
 ------------
 
-This project requires Python 2.7 and MySQL:
+This project requires Python 2.7, MySQL, and Postgres.  Instructions below are for Ubuntu.  These instructions have been tested on an EC2 "Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - ami-29ebb519" server.
+
+Installation
+------------
+
+Install required Linux packages.  
 
 .. code-block:: bash
 
     $ sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran postgresql-devel lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev
-
-Installation
-------------
 
 Install Python dependencies (in a virtualenv preferably):
 
@@ -61,9 +63,9 @@ To start the Django server on port 7878:
 
 .. code-block:: bash
 
-    $ ./manage.py runserver 7878
+    $ ./manage.py runserver 0.0.0.0:7878
 
-Now visit http://localhost:7878/ in your browser.
+Now visit http://localhost:7878/ in your browser, or the IP the server is running from.
 
 
 Enabling Cron
