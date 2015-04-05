@@ -91,7 +91,7 @@ class Query:
         self.add_comment()
 
 
-class Load_Query:
+class LoadQuery:
     def __init__(self, query_id, user, cacheable=None,
                  parameters={}):
         self.query_id = query_id
@@ -111,7 +111,7 @@ class Load_Query:
             self.cacheable = query.cacheable
         else:  # Convert to boolean
             self.cacheable = string_to_boolean(self.cacheable)
-        self.query = Manipulate_Data(
+        self.query = ManipulateData(
             query_text=query.query_text, db=query.db, user=self.user,
             query_id=self.query_id, query_model=query,
             parameters=self.parameters, cacheable=self.cacheable)
@@ -162,7 +162,7 @@ class Load_Query:
         return self.query
 
 
-class Run_Query(Query):
+class RunQuery(Query):
     def run_query_hash(self):
         m = hashlib.md5()
         m.update(self.query_text)
@@ -212,8 +212,8 @@ class Run_Query(Query):
         elif self.user is None:
             logging.error("Running query without a user")
         else:
-            QV = models.QueryView(user=self.user, query=self.query_model)
-            QV.save()
+            qv = models.QueryView(user=self.user, query=self.query_model)
+            qv.save()
 
     def return_data_array(self):
         return self.data
@@ -232,35 +232,34 @@ class Run_Query(Query):
         self.data.to_sql(table_name, con=engine, if_exists='replace',
                          index=False, chunksize=batch_size)
         # logging.warning('Save to MySQL')
-        QC = models.QueryCache.objects.filter(
+        qc = models.QueryCache.objects.filter(
             query=self.query_model
         ).filter(table_name=table_name).first()
         # logging.warning(QC)
-        if QC is None:
+        if qc is None:
             # logging.warning('CREATE SOMETHING')
             models.QueryCache.objects.create(query=self.query_model,
                                              table_name=table_name,
                                              hash=self.query_hash)
         else:
-            # logging.warning('modify something')
-            QC.hash = self.query_hash
-            QC.save()
+            qc.hash = self.query_hash
+            qc.save()
         return table_name
 
     def run_precedents(self):
-        QP = models.QueryPrecedent.objects.filter(final_query_id=self.query_id)
+        qp = models.QueryPrecedent.objects.filter(final_query_id=self.query_id)
         run_guid = uuid.uuid1()
 
-        for i in QP:  # TODO could be parralelized???
-            LQ = Load_Query(
-                query_id=QP.preceding_query_id,
+        for i in qp:  # TODO could be parralelized???
+            lq = LoadQuery(
+                query_id=qp.preceding_query_id,
                 user=self.user,
                 parameters=self.parameters,
                 cacheable=True)
-            Q = LQ.run()
-            Q.run_query()
-            table_name = '%s_%s' % (run_guid, LQ.query_id)
-            Q.save_to_mysql(table_name)  # TODO run this after pivot?
+            q = lq.run()
+            q.run_query()
+            table_name = '%s_%s' % (run_guid, lq.query_id)
+            q.save_to_mysql(table_name)  # TODO run this after pivot?
 
     def run_query(self):
         """
@@ -286,7 +285,7 @@ class Run_Query(Query):
         # Get DB Type
         if self.db.type in ['MySQL', 'Postgres']:
             self.cached = False
-            self.data = self.run_SQL_query()
+            self.data = self.run_sql_query()
         elif self.db.type == 'Hive':
             raise ValueError("HIVE NOT YET IMPLMENTED TODO")
         else:
@@ -300,7 +299,7 @@ class Run_Query(Query):
             )
         return self.data
 
-    def run_SQL_query(self):
+    def run_sql_query(self):
         """
         Runs SQL query in DB
         """
@@ -336,15 +335,15 @@ class Run_Query(Query):
         another previous and fresh query_tags
         returns table name / False
         """
-        QC = models.QueryCache.objects.filter(
+        qc = models.QueryCache.objects.filter(
             query_id=self.query_id,
             hash=self.query_hash).order_by('run_time').first()
-        if QC is None:
+        if qc is None:
             return False
-        elif QC.is_expired():
+        elif qc.is_expired():
             return False
         else:
-            return QC.table_name
+            return qc.table_name
 
     def retrieve_cache(self, table_name):
         """
@@ -355,7 +354,7 @@ class Run_Query(Query):
         return self.data
 
 
-class Manipulate_Data(Run_Query):
+class ManipulateData(RunQuery):
     def numericalize_data_array(self):
         """
         Checks for numbers encoded as strings due to bad database encoding
@@ -463,7 +462,6 @@ class Manipulate_Data(Run_Query):
 
         self.pandas_to_array()
         self.numericalize_data_array()
-
 
 
 def string_to_boolean(string='', default=False):

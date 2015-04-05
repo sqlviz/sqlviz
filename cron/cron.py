@@ -7,7 +7,6 @@ import os
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from email.MIMEImage import MIMEImage
-import sys
 import logging
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
@@ -49,21 +48,21 @@ class Job:
         self.return_dict = {}
         for dq in website.models.DashboardQuery.objects.filter(
                 dashboard_id=self.dashboard_id):
-            LQ = website.query.Load_Query(query_id=dq.query_id, user=self.owner)
-            Q = LQ.prepare_query()
-            Q.run_query()
-            Q.run_manipulations()
-            table = Q.html_table()
-            if Q.query_model.chart_type != 'None':
-                image = Q.generate_image('//tmp/%s.png' % uuid.uuid1())
+            lq = website.query.LoadQuery(query_id=dq.query_id, user=self.owner)
+            q = lq.prepare_query()
+            q.run_query()
+            q.run_manipulations()
+            table = q.html_table()
+            if q.query_model.chart_type != 'None':
+                image = q.generate_image('//tmp/%s.png' % uuid.uuid1())
             else:
                 image = None
             # TODO fix this it is ugly!
             self.return_dict[dq.query_id] = {
                 'id': dq.query_id,
                 'table': table,
-                'title': Q.query_model.title,
-                'description': Q.query_model.description,
+                'title': q.query_model.title,
+                'description': q.query_model.description,
                 'img': image}
         return self.return_dict
 
@@ -128,15 +127,15 @@ def cache_buster(days_back=2):
     When run will remove all tables that are for old cache
     """
     # Get all dead tables
-    QC = website.models.QueryCache.objects.filter(
+    qc = website.models.QueryCache.objects.filter(
         run_time__lt=timezone.now() - relativedelta(days=days_back)
     ).order_by('run_time').all()[:100]
-    for Q in QC:
-        if Q.is_expired:
+    for q in qc:
+        if q.is_expired:
             # Drop them like they are hot!
-            logging.warning('Dropping table %s' % (Q.table_name))
-            drop_table(Q.table_name)
-            Q.delete()
+            logging.warning('Dropping table %s' % (q.table_name))
+            drop_table(q.table_name)
+            q.delete()
 
 
 def drop_table(table_name):
@@ -159,9 +158,9 @@ def scheduled_job(frequency):
     for job in jobs:  # Iterate through all jobs
         # 1 job = 1 dashboard
         j = Job(job.id, job)
-        if True: #try:
+        if True:  # try:
             j.run()
             job.save()
-        #except Exception, e:
+        # except Exception, e:
         #    print str(sys.exc_info()) + str(e)
         #    j.failure(str(sys.exc_info()) + str(e))

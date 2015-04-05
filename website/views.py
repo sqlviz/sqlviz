@@ -69,7 +69,7 @@ def index(request):
 def query_api(request, query_id):
     try:
         start_time = time.time()
-        lq = query.Load_Query(
+        lq = query.LoadQuery(
             query_id=query_id,
             user=request.user,
             parameters=request.GET.dict(),
@@ -121,7 +121,7 @@ def query_view(request, query_ids):
         else:
             setattr(q, 'fav', False)
 
-        lq = query.Load_Query(
+        lq = query.LoadQuery(
             query_id=q.id,
             user=request.user,
             parameters=request.GET.dict())
@@ -186,7 +186,7 @@ def query_interactive_api(request):
         pivot = request.POST.get('pivot', '').lower() == 'true'
         cumulative = request.POST.get('cumulative', '').lower() == 'true'
         start_time = time.time()
-        md = query.Manipulate_Data(
+        md = query.ManipulateData(
             query_text=query_text,
             db=db,
             user=request.user,
@@ -261,7 +261,6 @@ def database_explorer_api(request):
 
         dmm.run_query()
         response_data = dmm.RQ.numericalize_data_array()
-        # logging.warning(""" BINGO %s """ % response_data)
         return_data = {
             "data":
             {

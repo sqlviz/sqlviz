@@ -56,7 +56,7 @@ class TestSafety(TestCase):
 
 class TestManipulateData(TestCase):
     def test_numericalize_data_array(self):
-        md = website.query.Manipulate_Data(
+        md = website.query.ManipulateData(
             query_text='',
             db='')
         md.data_array = [['a', '3', '4.0', '2014-01-02']]
@@ -64,7 +64,7 @@ class TestManipulateData(TestCase):
         self.assertListEqual(return_array, [['a', 3, 4.0, '2014-01-02']])
 
     def test_pivot(self):
-        md = website.query.Manipulate_Data(
+        md = website.query.ManipulateData(
             query_text='',
             db='')
         test_data = {
