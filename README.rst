@@ -102,7 +102,7 @@ Licensing
 ---------
 * Highcharts licensing is required for Highcharts and Highmaps (each are separate).
     * http://shop.highsoft.com/highcharts.html
-* Once license has been acquired, place Hghcharts into the necassary folder.
+* Once license has been acquired, place Highcharts into the necassary folder.
 .. code-block:: bash
     
     $ git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
