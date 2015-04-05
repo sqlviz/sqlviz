@@ -1,0 +1,66 @@
+elds": {
+    "username": "django",
+    "password_encrypted": "django",
+    "db": "django",
+    "modified_time": "2015-04-05T05:13:33Z",
+    "name_short": "local",
+    "host": "127.0.0.1",
+    "create_time": "2015-04-05T05:05:27Z",
+    "type": "MySQL",
+    "port": 3306,
+    "name_long": "localhost"
+  },
+  "model": "website.db",
+  "pk": 1
+},
+{
+  "fields": {
+    "cumulative": false,
+    "stacked": false,
+    "description": "Shows daily prices for the DJIA",
+    "title": "Daily DJIA prices",
+    "query_text": "select date(DATE) as date,\r\nprice\r\nfrom scratch.dim_djia\r\nwhere price > 0;",
+    "image": "",
+    "hide_index": false,
+    "db": 1,
+    "modified_time": "2015-04-05T05:36:56Z",
+    "pivot_data": false,
+    "insert_limit": false,
+    "create_time": "2015-04-05T05:36:56Z",
+    "chart_type": "line",
+    "hide_table": false,
+    "owner": 1,
+    "graph_extra": "{}",
+    "log_scale_y": false,
+    "description_long": "Data is taken at daily close for the DJIA.  ",
+    "cacheable": true
+  },
+  "model": "website.query",
+  "pk": 2
+},
+{
+  "fields": {
+    "cumulative": false,
+    "stacked": false,
+    "description": "Shows GDP data by each country",
+    "title": "Country GDP",
+    "query_text": "select\r\n  code, gdp\r\nfrom\r\n  scratch.dim_country_gdp",
+    "image": "",
+    "hide_index": false,
+    "db": 1,
+    "modified_time": "2015-04-05T06:12:39Z",
+    "pivot_data": false,
+    "insert_limit": true,
+    "create_time": "2015-04-05T06:12:39Z",
+    "chart_type": "country",
+    "hide_table": false,
+    "owner": 1,
+    "graph_extra": "{}",
+    "log_scale_y": false,
+    "description_long": "Data is collected from a public data set; estimates maybe applied where appropriate.",
+    "cacheable": true
+  },
+  "model": "website.query",
+  "pk": 3
+}
+]
