@@ -16,9 +16,7 @@ This project requires Python 2.7 and MySQL:
 
 .. code-block:: bash
 
-    $ sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^
-    $ sudo apt-get install python-pip python-numpy 
-
+    $ sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran postgresql-devel lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev
 
 Installation
 ------------
