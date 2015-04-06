@@ -1,9 +1,9 @@
 import query
-import logging
+
 
 class Manager:
     def __init__(self, db, request):
-        self.RQ = query.Manipulate_Data(
+        self.RQ = query.ManipulateData(
             query_text='',
             db=db,
             user=request.user,
