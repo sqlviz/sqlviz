@@ -1,8 +1,8 @@
 #!/bin/bash
 
-sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev phantomjs libxml2-dev libxslt1-dev
+sudo apt-get install libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev phantomjs libxml2-dev libxslt1-dev
 
-pip install -r requirements/local.txt
+sudo pip install -r requirements/local.txt
 
 mysql -u root
 
