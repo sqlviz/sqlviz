@@ -4,14 +4,51 @@ sudo apt-get install mysql-server libmysqlclient-dev python-dev libblas-dev libl
 
 pip install -r requirements/local.txt
 
-mysql -u root
 
-CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
-GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
-CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
-GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY 'django';
+## Create passwords randomly
 
-quit;
+MYSQLPWD=$(openssl rand -base64 32)
+DJANGOPWD=$(openssl rand -base64 32)
+PWD_JSON='{
+    "SECRET_KEY" : "DJANGOPWD",
+    "EMAIL": {
+        "EMAIL_HOST" : "smtp.gmail.com",
+        "EMAIL_HOST_PASSWORD" : "",
+        "EMAIL_HOST_USER" : "test@example.com",
+        "EMAIL_PORT" : 587,
+        "EMAIL_USE_TLS" : true
+    },
+    "DJANGO" : {
+        "DB_TYPE" : "mysql",
+        "USER" : "django",
+        "PWD" : "MYSQLPWD",
+        "HOST" : "localhost",
+        "PORT" : 3306,
+        "DB" : "django"
+    },
+    "SCRATCH" : {
+        "DB_TYPE" : "mysql",
+        "USER" : "django",
+        "PWD" : "MYSQLPWD",
+        "HOST" : "localhost",
+        "PORT" : 3306,
+        "DB" : "scratch"
+    }
+}'
+
+PWD_JSON="${PWD_JSON//DJANGOPWD/$DJANGOPWD}"
+PWD_JSON="${PWD_JSON//MYSQLPWD/$MYSQLPWD}"
+
+# Place passwords in necassary files
+echo "$PWD_JSON" > sqlviz/passwords.json
+
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
+	GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';
+	CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
+	GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';"
+
+# Modify  Initial Data to include MySQL Password
+sed -i "s@MYSQLPWD@$MYSQLPWD@" initial_data/initial_data.json
 
 ./manage.py migrate
 
