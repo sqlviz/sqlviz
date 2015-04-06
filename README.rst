@@ -14,8 +14,10 @@ Requirements
 
 This project requires Python 2.7, MySQL, and Postgres.  Instructions below are for Ubuntu.  These instructions have been tested on an EC2 "Ubuntu Server 14.04 LTS (HVM), SSD Volume Type - ami-29ebb519" server.
 
+
 Installation
 ------------
+
 
 .. code-block:: bash
     $ git clone https://github.com/sqlviz/sqlviz.git
