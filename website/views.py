@@ -209,11 +209,11 @@ def query_interactive_api(request):
             "time_elapsed": time_elapsed,
             "error": False}
     except Exception, e:
-            logging.warning(traceback.format_exc())
-            return_data = {
-                "data": str(e),
-                "time_elapsed": 0,
-                "error": True}
+        logging.warning(traceback.format_exc())
+        return_data = {
+            "data": str(e),
+            "time_elapsed": 0,
+            "error": True}
     return HttpResponse(json.dumps(return_data, cls=DateTimeEncoder),
                         content_type="application/json")
 
@@ -272,11 +272,11 @@ def database_explorer_api(request):
             json.dumps(return_data, cls=DateTimeEncoder),
             content_type="application/json")
     except Exception:
-            logging.warning(traceback.format_exc())
-            return_data = {
-                "data": str(traceback.format_exc()),
-                "time_elapsed": 0,
-                "error": True}
+        logging.warning(traceback.format_exc())
+        return_data = {
+            "data": str(traceback.format_exc()),
+            "time_elapsed": 0,
+            "error": True}
     return HttpResponse(
         json.dumps(return_data, cls=DateTimeEncoder),
         content_type="application/json")

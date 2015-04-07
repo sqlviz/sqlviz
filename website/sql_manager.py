@@ -2,6 +2,7 @@ import query
 
 
 class Manager:
+
     def __init__(self, db, request):
         self.RQ = query.ManipulateData(
             query_text='',
@@ -16,6 +17,7 @@ class Manager:
 
 
 class MySQLManager(Manager):
+
     def find_database(self):
         self.RQ.query_text = "show databases"
 
@@ -30,6 +32,7 @@ class MySQLManager(Manager):
 
 
 class PSQLManager(Manager):
+
     def find_database(self):
         self.RQ.query_text = """SELECT datname FROM pg_database
             WHERE datistemplate = false;"""
