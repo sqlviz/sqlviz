@@ -13,6 +13,7 @@ import os
 import json
 import dj_database_url
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+from urllib import quote_plus as urlquote
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -183,7 +184,7 @@ DATABASES = {
         default='%s://%s:%s@%s:%s/%s' % (
             django_pwd_data['DB_TYPE'],
             django_pwd_data['USER'],
-            django_pwd_data['PWD'],
+            urlquote(django_pwd_data['PWD']),
             django_pwd_data['HOST'],
             django_pwd_data['PORT'],
             django_pwd_data['DB']
