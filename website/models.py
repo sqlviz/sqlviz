@@ -54,11 +54,10 @@ class Query(models.Model):
         default=False, help_text='Hide from Main Search')
     hide_table = models.BooleanField(
         default=False, help_text='Supress Data output in display')
-    chart_type = models.CharField(max_length=10,
-                                  choices=(('None', 'None'),
-                                    ('line', 'line'), ('bar', 'bar'),
-                                    ('column', 'column'), ('area', 'area'),
-                                    ('country', 'country')),
+    chart_type = models.CharField(max_length=10, choices=(
+                                    ('None', 'None'), ('line', 'line'),
+                                    ('bar', 'bar'), ('column', 'column'),
+                                    ('area', 'area'), ('country', 'country')),
                                   default='None')
     pivot_data = models.BooleanField(
         default=False,
@@ -140,10 +139,13 @@ class QueryDefault(models.Model):
     query = models.ForeignKey(Query)
     search_for = models.CharField(max_length=128)
     replace_with = models.CharField(
-        max_length=1024, help_text='For todays date set replace with = today and data_type = Date')
+        max_length=1024,
+        help_text='For todayreplace with = today and data_type = Date')
     data_type = models.CharField(max_length=10,
                                  choices=(
-                                     ('Numeric', 'Numeric'), ('String', 'String'), ('Date', 'Date')),
+                                     ('Numeric', 'Numeric'),
+                                     ('String', 'String'),
+                                     ('Date', 'Date')),
                                  default='String')
 
     def __str__(self):
@@ -236,7 +238,7 @@ def post_save_handler_query(sender, instance, **kwargs):
     # POST SAVE TO CREATE IMAGE FOR QUERY
     post_save.disconnect(post_save_handler_query, sender=Query)
     if instance.chart_type not in ['None', 'country']:
-        lq = query.load_query(query_id=instance.id, user=instance.owner)
+        lq = query.LoadQuery(query_id=instance.id, user=instance.owner)
         q = lq.prepare_query()
         q.run_query()
         q.run_manipulations()
