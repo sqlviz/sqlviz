@@ -199,7 +199,7 @@ CUSTOM_DATABASES = {
         default='%s://%s:%s@%s:%s/%s' % (
             django_pwd_data['DB_TYPE'],
             django_pwd_data['USER'],
-            django_pwd_data['PWD'],
+            urlquote(django_pwd_data['PWD']),
             django_pwd_data['HOST'],
             django_pwd_data['PORT'],
             django_pwd_data['DB'],
