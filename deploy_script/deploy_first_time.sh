@@ -42,7 +42,7 @@ PWD_JSON="${PWD_JSON//MYSQLPWD/$MYSQLPWD}"
 # Place passwords in necassary files
 echo "$PWD_JSON" > sqlviz/passwords.json
 
-mysql -u root -e "CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
 	GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';
 	CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
 	GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';"

@@ -11,9 +11,6 @@ from dateutil.relativedelta import relativedelta
 import re
 import time
 import json
-import datetime
-import logging
-
 import query
 
 
@@ -22,7 +19,8 @@ class Db(models.Model):
     name_long = models.CharField(unique=True, max_length=128)
     type = models.CharField(max_length=10,
                             choices=(
-                                ('MySQL', 'MySQL'), ('Postgres', 'Postgres'), ('Hive2', 'Hive2')),
+                                ('MySQL', 'MySQL'), ('Postgres', 'Postgres'),
+                                ('Hive2', 'Hive2')),
                             default='None')
     host = models.CharField(max_length=1024)
     db = models.CharField(max_length=1024)
@@ -43,7 +41,8 @@ class Db(models.Model):
 
 class Query(models.Model):
     title = models.CharField(
-        unique=True, max_length=124, help_text='Primary Short Name Used for URL mappings')
+        unique=True, max_length=124,
+        help_text='Primary Short Name Used for URL mappings')
     description = models.TextField(max_length=200)
     description_long = models.TextField(max_length=1024, blank=True)
     query_text = models.TextField(max_length=2048, help_text='Query to Run')
@@ -56,15 +55,18 @@ class Query(models.Model):
     hide_table = models.BooleanField(
         default=False, help_text='Supress Data output in display')
     chart_type = models.CharField(max_length=10,
-                                  choices=(('None', 'None'), ('line', 'line'), ('bar', 'bar'), (
-                                      'column', 'column'), ('area', 'area'), ('country', 'country')),
+                                  choices=(('None', 'None'),
+                                    ('line', 'line'), ('bar', 'bar'),
+                                    ('column', 'column'), ('area', 'area'),
+                                    ('country', 'country')),
                                   default='None')
     pivot_data = models.BooleanField(
-        default=False,  help_text='Pivot data around first/second columns.  Nulls filled with 0')
+        default=False,
+        help_text='Pivot data around 1rst&2nd columns. Nulls filled with 0')
     cumulative = models.BooleanField(
-        default=False,  help_text='Run cumulatie sum')
+        default=False, help_text='Run cumulatie sum')
     log_scale_y = models.BooleanField(
-        default=False,  help_text='Log scale Y axis')
+        default=False, help_text='Log scale Y axis')
     stacked = models.BooleanField(default=False, help_text='Stack graph Type')
     create_time = models.DateTimeField(auto_now_add=True, editable=False)
     modified_time = models.DateTimeField(auto_now=True, editable=False)
@@ -72,7 +74,8 @@ class Query(models.Model):
     graph_extra = models.TextField(
         blank=True, help_text='JSON form of highcharts formatting')
     image = models.ImageField(
-        upload_to=settings.MEDIA_ROOT + '/thumbnails', max_length=2048, blank=True)
+        upload_to=settings.MEDIA_ROOT + '/thumbnails',
+        max_length=2048, blank=True)
     cacheable = models.BooleanField(
         default=True, help_text='allows this query result to be cached')
     tags = TaggableManager(blank=True)
@@ -90,10 +93,10 @@ class Query(models.Model):
         # dont allow queries to contain blacklist words
         blacklist = ['delete', 'insert', 'update', 'alter', 'drop']
 
-        def findWholeWord(w):
+        def find_whole_word(w):
             return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
         for word in blacklist:
-            if findWholeWord(word)(self.query_text) != None:
+            if find_whole_word(word)(self.query_text) is not None:
                 raise ValidationError('Queries can not contain %s' % word)
         if self.chart_type == 'None' and self.stacked == 1:
             raise ValidationError("Can't stack an invisible chart")
@@ -109,11 +112,13 @@ class Query(models.Model):
         """
         try:
             try:
-                Q = query.Manipulate_Data(query_text = 'explain ' + self.query_text, db = self.db, user = self.owner)
+                Q = query.Manipulate_Data(query_text = 'explain '
+                    + self.query_text, db = self.db, user = self.owner)
                 Q.run_query()
             except Exception, e:
                 # Somethings are un-explainable
-                Q = query.Manipulate_Data(query_text = self.query_text, db = self.db, user = self.owner)
+                Q = query.Manipulate_Data(query_text = self.query_text,
+                        db = self.db, user = self.owner)
                 Q.run_query()
         except Exception, e:
             raise ValidationError("Query must run: %s" % (e))"""
@@ -226,17 +231,16 @@ class QueryView(models.Model):
     def __str__(self):
         return "%s : %s : %s" % (self.user, self.query, self.view_time)
 
-# POST SAVE TO CREATE IMAGE FOR QUERY
-
 
 def post_save_handler_query(sender, instance, **kwargs):
+    # POST SAVE TO CREATE IMAGE FOR QUERY
     post_save.disconnect(post_save_handler_query, sender=Query)
     if instance.chart_type not in ['None', 'country']:
-        LQ = query.Load_Query(query_id=instance.id, user=instance.owner)
-        Q = LQ.prepare_query()
-        Q.run_query()
-        Q.run_manipulations()
-        image = Q.generate_image()
+        lq = query.load_query(query_id=instance.id, user=instance.owner)
+        q = lq.prepare_query()
+        q.run_query()
+        q.run_manipulations()
+        image = q.generate_image()
         instance.image = image
         instance.save()
     post_save.connect(post_save_handler_query, sender=Query)
