@@ -7,8 +7,8 @@ sudo pip install -r requirements/local.txt
 
 ## Create passwords randomly
 
-MYSQLPWD=$(openssl rand -base64 32)
-DJANGOPWD=$(openssl rand -base64 32)
+MYSQLPWD=$(openssl rand -hex 32)
+DJANGOPWD=$(openssl rand -hex 32)
 PWD_JSON='{
     "SECRET_KEY" : "DJANGOPWD",
     "EMAIL": {
