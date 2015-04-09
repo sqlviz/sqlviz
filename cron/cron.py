@@ -14,6 +14,7 @@ from website.get_db_engine import get_db_engine
 
 
 class Job:
+
     def __init__(self, id, job=None):
         self.id = id
         if job is None:

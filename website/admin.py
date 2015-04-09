@@ -15,6 +15,7 @@ class QueryPrecedentAdmin(admin.TabularInline):
 
 
 class QueryAdminForm(forms.ModelForm):
+
     class Meta:
         model = Query
         widgets = {'query_text': AceWidget(mode='sql')}
@@ -24,11 +25,13 @@ class QueryAdminForm(forms.ModelForm):
 class QueryAdmin(admin.ModelAdmin):
     form = QueryAdminForm
     inlines = [QueryDefaultAdmin, QueryPrecedentAdmin]
-    list_display = ('id', 'title', 'db', 'owner', 'chart_type', 'modified_time')
+    list_display = (
+        'id', 'title', 'db', 'owner', 'chart_type', 'modified_time')
     save_as = True
 
 
 class DbAdminForm(forms.ModelForm):
+
     class Meta:
         model = Db
         widgets = {'password_encrypted': PasswordInput()}
@@ -44,7 +47,8 @@ class DashboardQueryAdmin(admin.TabularInline):
     model = DashboardQuery
 
     def get_form(self, request, obj=None, **kwargs):
-        form = super(DashboardQueryAdmin, self).get_form(request, obj, **kwargs)
+        form = super(DashboardQueryAdmin, self).get_form(
+            request, obj, **kwargs)
         form.base_fields['order'].initial = 1
         return form
 

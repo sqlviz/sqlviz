@@ -22,6 +22,7 @@ MAX_DEPTH_RECURSION = 10
 
 
 class Query:
+
     def __init__(self, query_text, db, depth=0, user=None,
                  query_id=None, query_model=None, parameters=None,
                  cacheable=True):
@@ -92,6 +93,7 @@ class Query:
 
 
 class LoadQuery:
+
     def __init__(self, query_id, user, cacheable=None,
                  parameters={}):
         self.query_id = query_id
@@ -163,6 +165,7 @@ class LoadQuery:
 
 
 class RunQuery(Query):
+
     def run_query_hash(self):
         m = hashlib.md5()
         m.update(self.query_text)
@@ -355,6 +358,7 @@ class RunQuery(Query):
 
 
 class ManipulateData(RunQuery):
+
     def numericalize_data_array(self):
         """
         Checks for numbers encoded as strings due to bad database encoding
@@ -444,7 +448,8 @@ class ManipulateData(RunQuery):
                 (settings.MEDIA_ROOT, self.query_id)
         else:
             output_image = file_output
-        cli = """phantomjs %s/Highcharts/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (static_path, json_data_file, output_image, width, height)
+        cli = """phantomjs %s/Highcharts/exporting-server/phantomjs/highcharts-convert.js -infile %s -outfile %s -scale 2.5 -width %s - height %s""" % (
+            static_path, json_data_file, output_image, width, height)
         # print cli
         subprocess.call([cli], shell=True)
         return output_image
