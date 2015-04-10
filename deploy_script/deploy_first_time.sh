@@ -54,8 +54,7 @@ sed -i "s@MYSQLPWD@$MYSQLPWD@" initial_data/initial_data.json
 
 ./manage.py createsuperuser
 
-git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
-git clone https://github.com/highslide-software/highmaps-release.git website/static/Highmaps
+./manage.py crontab add
 
 rm -rf fieldkeys
 mkdir fieldkeys
@@ -67,6 +66,9 @@ python manage.py loaddata initial_data/initial_data.json
 
 chmod  -R 777 media
 
-./manage.py runserver 7878    
+git clone https://github.com/highslide-software/highcharts.com.git website/static/Highcharts
+git clone https://github.com/highslide-software/highmaps-release.git website/static/Highmaps
+
+./manage.py runserver 0.0.0.0:8000
 
 
