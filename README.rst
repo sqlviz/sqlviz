@@ -17,9 +17,10 @@ This project requires Python 2.7, MySQL, and Postgres.  Instructions below are f
 
 Installation
 ------------
-
+ Clone the project and run the deploy script.
 
 .. code-block:: bash
+
     $ git clone https://github.com/sqlviz/sqlviz.git
     $ cd sqlviz
     $ sudo bash deploy_script/deploy_script_initial.sh
@@ -31,7 +32,6 @@ Using SQLViz
 Setting up a database
 ~~~~~~~~~~~~~~~~~~~~~
 * In Admin Panel add Database
-    * Currently supported Databases: MYSQL, Postgres
 * Add port, username and password
 * Password is encrypyed in database
 * Make sure account is readonly only (http://www.symantec.com/business/support/index?page=content&id=HOWTO30408)
