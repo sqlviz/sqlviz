@@ -278,5 +278,4 @@ Passwords
         }
     }
     
-[![Analytics](https://ga-beacon.appspot.com/UA-55739949-2/sqlviz/sqlviz)](https://github.com/igrigorik/ga-beacon)
-
+[![Analytics](https://ga-beacon.appspot.com/UA-55739949-2/sqlviz/sqlviz)](https://github.com/igrigorik/ga-beacon)]
