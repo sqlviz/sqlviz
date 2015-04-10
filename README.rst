@@ -17,6 +17,7 @@ This project requires Python 2.7, MySQL, and Postgres.  Instructions below are f
 
 Installation
 ------------
+
  Clone the project and run the deploy script.
 
 .. code-block:: bash
