@@ -7,7 +7,7 @@
 
 {% endblock %}
 {% block main %}
-  <div align='center' padding='3px'><button align='right' type="submit" id="toggle_table" class="btn btn-info">Show Images</button>
+  <div padding=3 align='left' padding='3px'><button align='right' type="submit" id="toggle_table" class="btn btn-info">Show Images</button>
   </div>
 
 <script>
@@ -34,11 +34,10 @@
           <td> Title </td>
           <td> Description </td>
           <td> Thumbnail </td>
-          <td> Owner </td>
-          <td> Target DB </td>
           <td> Tags </td>
+          <td> Owner </td>
           {% if user.is_staff %}
-            <td> Edit </td>
+          <td> Edit </td>
           {% endif %}
         </tr>
       </thead>
@@ -48,18 +47,16 @@
           <td> Q{{query.id}} </td>
           <td> <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a></td>
           <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
+          <td> {{query.description}} {{query.description_long}} </td>
           <td> 
             {% if query.image %}
               <a href="{% url 'website:query' query.id %}">
-                <img src='{{query.image}}' width = '80px' height = '132px' alt='image for query {{query.id}}'>
+                <img src='{{query.image}}' width = '132px' height = '80px' alt='image for query {{query.id}}'>
               </a>
             {% endif %}
           </td>
-          <td> {{query.description}}  {{query.description_long}}</td>
           <td> {{query.tags.names|join:", " }} </td>
           <td> {{query.owner}} </td>
-          <td> {{query.db}} </td>
-
           {% if user.is_staff %}
             <td> <a href="{% url 'admin:website_query_change' query.id %}">Edit</a> </td>
           {% endif %}
@@ -70,15 +67,13 @@
           <td> D{{dash.id}} </td> 
           <td> <a object_id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='star {% if dash.fav %}favorite{% endif %}'>{{dash.fav}}</a> </td>
           <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
+          <td> {{dash.description}} {{dash.description_long}} </td>
           <td><!-- image --> </td>
-          <td> {{dash.create_time}} </td>
-          <td> {{dash.description}}  {{dash.description_long}}</td>
-          <td><!-- database --></td>
-          <td>  {{ dash.tags.names|join:", " |truncatechars_html:4 }} </td>
+          <td> {{ dash.tags.names|join:", " |truncatechars_html:4 }} </td>
+          <td> {{dash.owner}} </td>
           {% if user.is_staff %}
             <td> <a href="{% url 'admin:website_dashboard_change' dash.id %}">Edit</a> </td>
           {% endif %}
-        </tr>  
         </tr>      
         {% endfor %}        
       </tbody>
@@ -92,12 +87,6 @@
         "tableTools": {
           "sSwfPath": "{% static 'DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls_pdf.swf' %}"
         },
-        "columnDefs": [
-          {
-            "visible": false,
-            "targets": 10
-          }
-        ] 
       });
     } );
     </script>
@@ -105,25 +94,33 @@
     <p>No Queries or Dashboards are available.</p>
 {% endif %}
 </div>
-{% if 1 == 1 %}
 <div id='img_group' class='hide'>
-  {% if query_list or dashboard_list %}
-    {% for query in query_list %}
-      {% if query.image %}
-        <div class='col-lg-3'>
-          <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}}</a>
-          <a href="{% url 'website:query' query.id %}">
-           Q{{query.id}} - {{query.title}} 
-          <img src='{{query.image}}' width = '200px' height = '200px' alt='{{query.description}}  {{query.description_long}}'>
-          </a>
+  {% if query_list_images %}
+    {% for query in query_list_images %}
+      {% if forloop.counter|divisibleby:3 %}
+        <div class="row">
+      {% endif %}
+      <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+          <div class="caption">
+            <h3>{{query.title}}</h3>
+            <p>
+              <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a>
+              <a href="{% url 'website:query' query.id %}">
+                <img src='{{query.image}}' width = '260px' height = '160px'>
+              </a>
+            </p>
+          </div>
         </div>
+      </div>
+      {% if forloop.counter|divisibleby:3 %}
+        </div class="row">
       {% endif %}
     {% endfor %}
   {% else %}
       <p>No Queries Images available.</p>
   {% endif %}
 </div>
-{% endif %}
 <script>
   make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
 </script>
