@@ -218,7 +218,7 @@ class RunQuery(Query):
             qv = models.QueryView(user=self.user, query=self.query_model)
             qv.save()
 
-    def return_data_array(self):
+    def return_data(self):
         return self.data
 
     def save_to_mysql(self, table_name=None, batch_size=1000):

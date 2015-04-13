@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from django.views.generic.base import RedirectView
+# from django.views.generic.base import RedirectView
 from django.conf import settings
 
 urlpatterns = patterns('',
@@ -8,7 +8,8 @@ urlpatterns = patterns('',
                        url(r'^accounts/',
                            include('accounts.urls', namespace='accounts')),
                        url(r'^admin/', include(admin.site.urls), name='admin'),
-                       url(r'^favs/', include('favs.urls', namespace='favs'))
+                       url(r'^favs/', include('favs.urls', namespace='favs')),
+                       url(r'^', include('ml.urls', namespace='ml'))
                        )
 
 
