@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 # from django.shortcuts import render
-from sklearn import (metrics, linear_model, cross_validation)
+# from sklearn import (metrics, linear_model, cross_validation)
+import statsmodels.formula.api as smf
+import statsmodels as sm
 import models
 import website.query as query
 # from sklearn.metrics import roc_auc_scor
@@ -61,28 +63,37 @@ class MachineLearning:
         q = lq.prepare_query()
         q.run_query()
         q.run_manipulations()
-        df = q.return_data()
+        self.data = q.return_data()
+        return self.data
 
-        col_pred = [ml_data.target_column]
-        cols = [col for col in df.columns if col not in col_pred]
-        x = df[cols]
-        y = df[col_pred]
-        return x, y
+    def build_model_string(self):
+        ml_string = []
+        for col_name, col_type in (zip(self.data.columns, self.data.dtypes)):
+            if col_name != self.ml_model.target_column:
+                if col_type == 'object':
+                    ml_string.append('C(%s)' % col_name)
+                else:
+                    ml_string.append(col_name)
+        ml_string = ' + '.join(ml_string)
+        ml_string = '%s ~ %s' % (self.ml_model.target_column, ml_string)
+        return ml_string.encode("ascii")
 
     def linear_regression(self):
-        X, y = self.prepare_data()
-        clf = linear_model.LinearRegression()
-        clf.fit(X, y)
-        coeff = clf.coef_.tolist()
-        intercept = clf.intercept_.tolist()
-
+        self.prepare_data()
+        ml_string = self.build_model_string()
+        self.model = smf.ols(formula=ml_string, data=self.data).fit()
+        self.model_to_db()
+        params = self.model.params
+        summary = str(self.model.summary())
+        print summary
         return_data = {
             "data":
-                {"coeff": coeff, "intercept": intercept},
+                {
+                    "params": params.tolist(),
+                    "summary": summary
+                },
             "error": False}
-        # logging.warning(return_data)
 
-        self.model = clf
         return HttpResponse(json.dumps(return_data),
                             content_type="application/json")
 
@@ -90,6 +101,7 @@ class MachineLearning:
         return self.model.predict(x)
 
     def logistic_regression(self, test_size=.3, penalty='l2'):
+
         X, y = self.prepare_data()
         X_train, X_cv, y_train, y_cv = cross_validation.train_test_split(
                 X, y, test_size=test_size)
