@@ -61,22 +61,6 @@
   data-spy="scroll" data-target="#myScrollspy"
 {% endblock %}
 
-{% block links %}
-  <li>
-    <a href="{% url 'website:home' %}">Home</a>
-  </li>
-  {% if user.is_staff %}
-    <li>
-      <a href="{% url 'admin:index' %}">Admin</a>
-    </li>
-    <li class='active'>
-      <a href=" {% url 'admin:website_query_change' query_list.0.id %}">Edit</a>
-    </li>
-    <li>
-      <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
-    </li>
-  {% endif %}
-{% endblock %}
 
 {% block main %}
   <script>
@@ -120,6 +104,36 @@
           <li>Query Last Modified: {{query.modified_time}}</li>
           <li>Database: {{query.db}}</li>
           <li id='execution_info_{{query.id}}'></li>
+          {% if query.ml %}
+            </br>
+            <div id='ml_section' class='hide'>
+            <h3>ML Models to inspect </h3>
+            {% for ml_i in query.ml %}
+              <li>
+                  <button type="submit" id="ml_{{ml_i.id}}" class="btn btn-info">
+                    {{ml_i}}
+                  </button>
+                  <pre id='ml_output_{{ml_i.id}}' class='hide'></pre>
+              </li>
+            </div>
+              <script>
+                $(document).ready(function() {
+                  $('#ml_{{ml_i.id}}').click(function() {
+                    $.getJSON('{% url "ml:build_model" ml_i.id  %}', {{json_get|safe}}, function( json_data ) {
+                        return_str = ''
+                        $.each( json_data.data, function( key, value ) {
+                          return_str = return_str + '\n' +  key + ' \n' + value;
+                        });
+                        $("#ml_output_{{ml_i.id}}").text(return_str);
+                        $("#ml_output_{{ml_i.id}}").removeClass("hide");
+                    }).fail(function() {
+                      alert('oops');
+                    })
+                  })
+                })
+              </script>
+            {% endfor %}
+          {% endif %}
         </ul>
         <br />
         <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">
@@ -155,6 +169,7 @@
                 var chart = new Highcharts.Chart(options);
             };
             $( "#execution_info_{{query.id}}").text("Cache Status : " + json_data.cached + " Run Time : " + json_data.time_elapsed + ' seconds');
+            $('#ml_section').removeClass('hide');
           } else {
             $( "#error_{{query.id}}" ).show();
             $( "#error_{{query.id}} pre" ).text(json_data.data);

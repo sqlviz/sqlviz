@@ -353,7 +353,8 @@ class RunQuery(Query):
         sets self.data from the query's cache
         """
         engine = get_db_engine.get_db_engine()
-        self.data = pd.read_sql_table(table_name, con=engine)
+        self.data = pd.read_sql_table(table_name, con=engine, coerce_float=True)
+        self.data = self.data.convert_objects(convert_numeric=True)
         return self.data
 
 
