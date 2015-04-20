@@ -1,0 +1,104 @@
+{% extends 'website/base.html' %}
+
+{% load staticfiles %}
+
+{% block title %} 
+  {% if title %}
+    {{title}}
+  {% else %}
+      No Matched Model
+  {% endif %}  
+{% endblock %}
+{% block style %}
+<script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
+<link type="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<!-- For country charts -->
+<script type="text/javascript" src="{% static 'Highcharts/js/highcharts.src.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highmaps/modules/map.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highmaps/modules/exporting.js' %}"></script>
+<script src="{% static 'js/world-highres.js' %}"></script>
+<style type="text/css" media="screen">
+    ul.nav-tabs {
+      width: 140px;
+      margin-top: 20px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+    }
+    ul.nav-tabs li {
+      margin: 0;
+      border-top: 1px solid #ddd;
+    }
+    ul.nav-tabs li:first-child {
+      border-top: none;
+    }
+    ul.nav-tabs li a {
+      margin: 0;
+      padding: 8px 16px;
+      border-radius: 0;
+    }
+    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
+      color: #fff;
+      background: #0088cc;
+      border: 1px solid #0088cc;
+    }
+    ul.nav-tabs li:first-child a {
+      border-radius: 4px 4px 0 0;
+    }
+    ul.nav-tabs li:last-child a {
+      border-radius: 0 0 4px 4px;
+    }
+    ul.nav-tabs.affix {
+      top: 30px; /* Set the top position of pinned element */
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+  data-spy="scroll" data-target="#myScrollspy"
+{% endblock %}
+
+{% block links %}
+  <li>
+    <a href="{% url 'website:home' %}">Home</a>
+  </li>
+  {% if user.is_staff %}
+    <li>
+      <a href="{% url 'admin:index' %}">Admin</a>
+    </li>
+    <li>
+      <a href=" {% url 'admin:website_query_change' query_list.0.id %}">Edit</a>
+    </li>
+    <li>
+      <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
+    </li>
+  {% endif %}
+{% endblock %}
+
+{% block main %}
+  <div class='col-xs-9 content' role='main'>
+  {% if query_list %}
+      <section class='well' id='div_{{query.id}}'>
+        <h2>
+          <div class='inline'>
+            {{ml.name_long}}
+          </div>
+        </h2>
+          <div id='div_table_{{ml.id}}'></div>
+          <div id="waiting_{{ml.id}}"><img src='{% static 'ajax-loader.gif' %}'>
+          </div>
+          <div id="error_{{ml.id}}" class = "alert alert-error alert-block">
+            <pre></pre>
+          </div>
+        </div>
+        <ul class='hide_{{query.id}}'>
+          <li>{{ml}}</li>
+        </ul>
+        <br />
+      </section>
+      
+  {% else %}
+      <h3 class='label-danger'>No Data found</h3>
+  {% endif %}
+{% endblock %}
