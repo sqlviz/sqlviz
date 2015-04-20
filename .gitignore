@@ -107,4 +107,4 @@ sqlviz/passwords.json
 
 # Highcharts Repo
 website/static/Highcharts/*
-website/statsic/Highmaps/*
+website/static/Highmaps/*

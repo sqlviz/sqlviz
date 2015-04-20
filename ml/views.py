@@ -36,34 +36,61 @@ def view_model(request, ml_id):
 
 @login_required
 def build_model(request, ml_id):
-    ml = MachineLearning(request, ml_id)
+    ml = MachineLearning(request, ml_id=ml_id)
+    return ml.build_model()
+
+
+@login_required
+def build_model_adhoc(request):
+    ml = MachineLearning(request,
+                         query_id=request.GET.get('query_id'),
+                         model_type=request.GET.get('model_type'),
+                         target_column=request.GET.get('target_column'))
     return ml.build_model()
 
 
 @login_required
 def use_model(request, ml_id):
-    ml = MachineLearning(request, ml_id)
+    ml = MachineLearning(request, ml_id=ml_id)
     x = pd.DataFrame(json.loads(request.GET.get('data', None)))
-    #x = sm.api.add_constant(x)
+    # x = sm.api.add_constant(x)
     return ml.use_model(x)
 
 
 class MachineLearning:
-    def __init__(self, request, ml_id):
+    """
+    Two modes of running
+    1)  Load parameters from db
+    2)  Load parameters from args
+    Data always comes from a query_id.
+    """
+    def __init__(self, request, **kwargs):
         self.request = request
-        self.ml_id = ml_id
-        self.ml_model = models.machine_learning_model.objects.filter(
-                id=ml_id).first()
-        self.model = None
+        if 'ml_id' in kwargs:
+            self.load_type = 'db'
+            self.ml_id = kwargs['ml_id']
+            ml_model = models.machine_learning_model.objects.filter(
+                    id=self.ml_id).first()
+            self.model_type = ml_model.type
+            self.query_id = ml_model.query_id
+            self.target_column = ml_model.target_column
+        elif all(k in kwargs for k in ('query_id',
+                                       'target_column',
+                                       'model_type')):
+            self.load_type = 'args'
+            self.query_id = kwargs['query_id']
+            self.target_column = kwargs['target_column']
+            self.model_type = kwargs['model_type']
+        self.cache_only = True  # TODO modify query.py to accept this
 
     def build_model(self):
         # Build model and return results as API
-        if self.ml_model.type == 'logistic':
+        if self.model_type == 'logistic':
             return_data = self.logistic_regression()
-        elif self.ml_model.type == 'linear':
+        elif self.model_type == 'linear':
             return_data = self.linear_regression()
-        # save results if requested
-        if True:
+        # TODO save results if needed only
+        if False:
             self.model_to_db()
         # Return to API
         return return_data
@@ -75,8 +102,8 @@ class MachineLearning:
                             content_type="application/json")
 
     def prepare_data(self):
-        ml_data = self.ml_model
-        query_id = ml_data.query_id
+        #ml_data = self.ml_model
+        query_id = self.query_id
         lq = query.LoadQuery(
             query_id=query_id,
             user=self.request.user,
@@ -91,33 +118,37 @@ class MachineLearning:
 
     def build_model_string(self):
         ml_string = []
-        print self.data.columns
-        print self.data.dtypes
-        print self.data.head()
+        # print self.data.columns
+        # print self.data.dtypes
+        # print self.data.head()
         self.data = self.data.convert_objects(convert_numeric=True)
         print self.data.describe()
         for col_name, col_type in (zip(self.data.columns, self.data.dtypes)):
-            if col_name != self.ml_model.target_column:
+            if col_name != self.target_column:
                 if col_type == 'object':
                     ml_string.append('C(%s)' % col_name)
                 else:
                     ml_string.append(col_name)
         ml_string = ' + '.join(ml_string)
-        ml_string = '%s ~ %s' % (self.ml_model.target_column, ml_string)
+        ml_string = '%s ~ %s' % (self.target_column, ml_string)
         return ml_string.encode("ascii")
+
+    def apply_model(self, x):
+        return self.model.predict(x)
 
     def linear_regression(self):
         self.prepare_data()
         ml_string = self.build_model_string()
-        print ml_string
+        # print ml_string
         self.model = smf.ols(formula=ml_string, data=self.data).fit()
-        print self.model
+        # print self.model
         # params = self.model.params.tolist()  # .tolist()
         summary = str(self.model.summary())
         return_data = {
             "data":
                 {
                     # "params": params,
+                    "model_form": ml_string,
                     "summary": summary
                 },
             "error": False}
@@ -126,18 +157,16 @@ class MachineLearning:
         return HttpResponse(json.dumps(return_data),
                             content_type="application/json")
 
-    def apply_model(self, x):
-        return self.model.predict(x)
-
     def logistic_regression(self, test_size=.3):
         self.data = self.prepare_data()
-        col_pred = [self.ml_model.target_column]
+        col_pred = [self.target_column]
         cols = [col for col in self.data.columns if col not in col_pred]
         x = self.data[cols]
+        x['intercept'] = 1
         y = self.data[col_pred]
 
         for col_name, col_type in (zip(x.columns, x.dtypes)):
-            if col_name != self.ml_model.target_column:
+            if col_name != self.target_column:
                 if col_type == 'object':
                     dummy_ranks = pd.get_dummies(
                             self.data[col_name], prefix=col_name)
@@ -148,7 +177,7 @@ class MachineLearning:
 
         self.model = sm.discrete.discrete_model.Logit(y_train, x_train).fit()
         summary = str(self.model.summary())
-        params = self.model.params.tolist()
+        # params = self.model.params.tolist()
 
         # calculate AUC
         preds = self.model.predict(x_cv)
@@ -159,7 +188,6 @@ class MachineLearning:
             "data":
                 {
                     "summary": summary,
-                    "params": params,
                     "auc": auc
                 },
             "error": False}

@@ -227,7 +227,7 @@ class RunQuery(Query):
         Pandas is depricating this function.  TODO rewrite
         """
         if self.cacheable is False:
-            raise Exception("Tryin to run Save on a non-cacheable query")
+            raise Exception("Trying to run Save on a non-cacheable query")
         if table_name is None:
             table_name = 'table_%s' % self.query_id
         engine = get_db_engine.get_db_engine()
@@ -363,6 +363,7 @@ class ManipulateData(RunQuery):
     def numericalize_data_array(self):
         """
         Checks for numbers encoded as strings due to bad database encoding
+        TODO replace with pandas method that does this
         """
         def num(foo):
             try:

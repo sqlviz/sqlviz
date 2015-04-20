@@ -115,6 +115,13 @@
                   </button>
                   <pre id='ml_output_{{ml_i.id}}' class='hide'></pre>
               </li>
+              <li> ad hoc model</li>
+              <form>
+                  <input type="text" id="model" placeholder="linear">
+                  <input type="text" id="target_column" placeholder="target">
+                  <input type="hidden" id="query_id" value="{{query.id}}">
+              </form>
+
             </div>
               <script>
                 $(document).ready(function() {
