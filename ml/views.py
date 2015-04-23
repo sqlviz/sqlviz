@@ -37,7 +37,10 @@ def view_model(request, ml_id):
 @login_required
 def build_model(request, ml_id):
     ml = MachineLearning(request, ml_id=ml_id)
-    return ml.build_model()
+    return HttpResponse(
+        json.dumps(ml.build_model()),
+        content_type="application/json"
+    )
 
 
 @login_required
@@ -46,7 +49,10 @@ def build_model_adhoc(request):
                          query_id=request.GET.get('query_id'),
                          model_type=request.GET.get('model_type'),
                          target_column=request.GET.get('target_column'))
-    return ml.build_model()
+    return HttpResponse(
+        json.dumps(ml.build_model()),
+        content_type="application/json"
+    )
 
 
 @login_required
@@ -54,7 +60,10 @@ def use_model(request, ml_id):
     ml = MachineLearning(request, ml_id=ml_id)
     x = pd.DataFrame(json.loads(request.GET.get('data', None)))
     # x = sm.api.add_constant(x)
-    return ml.use_model(x)
+    return HttpResponse(
+        json.dumps(ml.use_model(x)),
+        content_type="application/json"
+    )
 
 
 class MachineLearning:
@@ -88,7 +97,9 @@ class MachineLearning:
         if self.model_type == 'logistic':
             return_data = self.logistic_regression()
         elif self.model_type == 'linear':
-            return_data = self.linear_regression()
+            self.data = self.prepare_data()
+            self.ml_string = self.build_model_string()
+            return_data = self.linear_regression(self.data, self.ml_string)
         # TODO save results if needed only
         if False:
             self.model_to_db()
@@ -98,11 +109,11 @@ class MachineLearning:
     def use_model(self, x):
         # Find latest model
         self.db_to_model()
-        return HttpResponse(json.dumps(self.apply_model(x)),
-                            content_type="application/json")
+        return self.apply_model(x)
+        # HttpResponse(json.dumps),
+        #                    content_type="application/json")
 
     def prepare_data(self):
-        #ml_data = self.ml_model
         query_id = self.query_id
         lq = query.LoadQuery(
             query_id=query_id,
@@ -118,11 +129,7 @@ class MachineLearning:
 
     def build_model_string(self):
         ml_string = []
-        # print self.data.columns
-        # print self.data.dtypes
-        # print self.data.head()
         self.data = self.data.convert_objects(convert_numeric=True)
-        print self.data.describe()
         for col_name, col_type in (zip(self.data.columns, self.data.dtypes)):
             if col_name != self.target_column:
                 if col_type == 'object':
@@ -136,13 +143,8 @@ class MachineLearning:
     def apply_model(self, x):
         return self.model.predict(x)
 
-    def linear_regression(self):
-        self.prepare_data()
-        ml_string = self.build_model_string()
-        # print ml_string
-        self.model = smf.ols(formula=ml_string, data=self.data).fit()
-        # print self.model
-        # params = self.model.params.tolist()  # .tolist()
+    def linear_regression(self, data, ml_string):
+        self.model = smf.ols(formula=ml_string, data=data).fit()
         summary = str(self.model.summary())
         return_data = {
             "data":
@@ -153,9 +155,9 @@ class MachineLearning:
                 },
             "error": False}
         # print "predicted", self.model.predict(self.data.iloc[0])
-
-        return HttpResponse(json.dumps(return_data),
-                            content_type="application/json")
+        return return_data
+        # HttpResponse(json.dumps(return_data),
+        #                    content_type="application/json")
 
     def logistic_regression(self, test_size=.3):
         self.data = self.prepare_data()
@@ -169,11 +171,13 @@ class MachineLearning:
             if col_name != self.target_column:
                 if col_type == 'object':
                     dummy_ranks = pd.get_dummies(
-                            self.data[col_name], prefix=col_name)
+                        self.data[col_name], prefix=col_name
+                    )
                     x = x.join(dummy_ranks)
                     x = x.drop(col_name, 1)
         x_train, x_cv, y_train, y_cv = cross_validation.train_test_split(
-                x, y, test_size=test_size)
+            x, y, test_size=test_size
+        )
 
         self.model = sm.discrete.discrete_model.Logit(y_train, x_train).fit()
         summary = str(self.model.summary())
@@ -191,8 +195,9 @@ class MachineLearning:
                     "auc": auc
                 },
             "error": False}
-        return HttpResponse(json.dumps(return_data),
-                            content_type="application/json")
+        return return_data
+        # HttpResponse(json.dumps(return_data),
+        #                    content_type="application/json")
 
     def model_to_db(self):
 
@@ -201,7 +206,7 @@ class MachineLearning:
         print "SAVE TO {}".format(blob)
         model = copy.deepcopy(self.model)
         # model.remove_data()
-        model.save(blob) # , remove_data=True)
+        model.save(blob)  # , remove_data=True)
         try:
             obj = models.model_blob.objects.get(model_id=self.ml_model)
             obj.blob = blob

@@ -38,12 +38,16 @@ class QueryAPITestCase(APITestCase):
 class QueryAPITest(QueryAPITestCase):
 
     def test_not_logged_in(self):
-        response = self.client.get('/api/query/1')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response['location'],
-            "http://testserver/accounts/login?next=/api/query/1",
-        )
+        # TODO add more endpoints here
+        endpoints = ['/api/query/1',
+                     '/api/query_interactive/', '/api/database_explorer/']
+        for resp in endpoints:
+            response = self.client.get(resp)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(
+                response['location'],
+                "http://testserver/accounts/login?next=%s" % (resp),
+            )
 
     def test_invalid_query_id(self):
         """
