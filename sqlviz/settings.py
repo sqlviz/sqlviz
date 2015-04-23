@@ -96,7 +96,8 @@ INSTALLED_APPS = (
     'favit',
     'favs',
     'csv_upload',
-    'scratch'
+    'scratch',
+    'ml'
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,0 +1,70 @@
+{% extends 'website/base.html' %}
+
+
+{% block title %} SQLVIZ Model Homepage {% endblock %}
+{% load staticfiles %}
+{% block style %}
+
+{% endblock %}
+{% block main %}
+<div id='table_group'>
+{% if ml_models %}
+    <table id='ml_list_table' class="table table-striped dataTable">
+      <thead>
+        <tr>
+          <td> Id </td>
+          <td> Title </td>
+          <td> type </td>
+          <td> query </td>
+          <td> build model </td>
+          <td> use model </td>
+          {% if user.is_staff %}
+            <td> Edit </td>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for model in ml_models %}
+        <tr>
+          <td> {{model.id}} </td>
+          <td> {{model.title}} </td>
+          <td> {{model.type}} </td>
+          <td> <a href='{% url 'website:query' model.query.id %}'>{{model.query.id}} {{model.query.title}} </a></td>
+          <td>
+            <form action="{% url 'ml:build_model' model.id %}">
+              <button type="submit" class="btn btn-info">Build</button>
+            </form>
+          </td>
+          <td>
+            <form action="{% url 'ml:use_model' model.id %}">
+              <button type="submit" class="btn btn-info">Use</button>
+            </form>
+          </td>
+          {% if user.is_staff %}
+            <td> 
+              <form action="{% url 'admin:ml_machine_learning_model_change' model.id %}">
+              <button type="submit" class="btn btn-info">Edit</button>
+            </form>
+            </td>
+          {% endif %}
+        </tr>   
+        {% endfor %}
+      </tbody>
+    </table>
+    <script>
+    $(document).ready(function() {
+      $('#ml_list_table').dataTable({
+        "bAutoWidth": false,
+        "bScrollCollapse": true,
+        "iDisplayLength": 100,
+        "tableTools": {
+          "sSwfPath": "{% static 'DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls_pdf.swf' %}"
+        },
+      });
+    } );
+    </script>
+{% else %}
+    <p>No Models available.</p>
+{% endif %}
+</div>
+{% endblock %}

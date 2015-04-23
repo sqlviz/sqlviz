@@ -61,22 +61,6 @@
   data-spy="scroll" data-target="#myScrollspy"
 {% endblock %}
 
-{% block links %}
-  <li>
-    <a href="{% url 'website:home' %}">Home</a>
-  </li>
-  {% if user.is_staff %}
-    <li>
-      <a href="{% url 'admin:index' %}">Admin</a>
-    </li>
-    <li class='active'>
-      <a href=" {% url 'admin:website_query_change' query_list.0.id %}">Edit</a>
-    </li>
-    <li>
-      <a href="{% url 'website:query_interactive' %}">Interactive Mode</a>
-    </li>
-  {% endif %}
-{% endblock %}
 
 {% block main %}
   <script>
@@ -121,22 +105,72 @@
           <li>Database: {{query.db}}</li>
           <li id='execution_info_{{query.id}}'></li>
         </ul>
+
+          <div id='ml_section' class='hide'>
+            <h3>Machine Learning Models</h3>
+            {% if query.ml %}
+              {% for ml_i in query.ml %}
+              <h4> Static Models</h4>
+                  <button type="submit" id="ml_{{ml_i.id}}" class="btn btn-info">
+                    {{ml_i}}
+                  </button>
+              <script>
+                $(document).ready(function() {
+                  $('#ml_{{ml_i.id}}').click(function() {
+                    $.getJSON('{% url "ml:build_model" ml_i.id  %}', {{json_get|safe}}, function( json_data ) {
+                        return_str = ''
+                        $.each( json_data.data, function( key, value ) {
+                          return_str = return_str + '\n' +  key + ' \n' + value;
+                        });
+                        $("#ml_output_{{query.id}}").text(return_str);
+                        $("#ml_output_{{query.id}}").removeClass("hide");
+                    }).fail(function() {
+                      alert('oops');
+                    })
+                  })
+                })
+              </script>
+            {% endfor %}
+          {% endif %}
+          <h4> ad hoc model</h4>
+          <form id='ml_adhoc_{{query.id}}' class="input-group">
+              <select class="form-control" id="column_names_{{query.id}}">
+              </select>
+              <select class="form-control" id="model_type_{{query.id}}">
+                <option value="linear">Linear Regression</option>
+                <option value="logistic">Logistic Regression</option>
+                <option value="tree">Decision Tree</option>
+                <option value="kmeans">K-Means</option>
+              </select>
+              <button type="submit" class="btn btn-info">Run ML Model</button>
+              <script>
+                $(document).ready(function() {
+                  $('#toggle_{{query.id}}').click(function() {
+                    $(".hide_{{query.id}}").toggleClass("hide");
+                    if ($.trim($(this).text()) === 'Hide') {
+                      $(this).text('Show');
+                    } else {
+                      $(this).text('Hide');
+                    }
+                  });
+                });
+              </script>
+          </form>
+          <pre id='ml_output_{{query.id}}' class='hide'></pre>
+        </div>          
         <br />
         <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">
           Hide
         </button>
       </section>
       <script>
-        $(document).ready(function() {
-          $('#toggle_{{query.id}}').click(function() {
-            $(".hide_{{query.id}}").toggleClass("hide");
-            if ($.trim($(this).text()) === 'Hide') {
-              $(this).text('Show');
-            } else {
-              $(this).text('Hide');
-            }
-          });
-        });
+$(document).ready(function(){      
+  $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
+    //alert('test!');
+    event.preventDefault();
+    send_data_ml_adhoc('{{query.id}}','ml_output_{{ml_i.id}}');
+  });
+});
       </script>
       <script>
         $( "#error_{{query.id}}" ).hide();
@@ -155,6 +189,15 @@
                 var chart = new Highcharts.Chart(options);
             };
             $( "#execution_info_{{query.id}}").text("Cache Status : " + json_data.cached + " Run Time : " + json_data.time_elapsed + ' seconds');
+            $('#ml_section').removeClass('hide');
+            // Make drop downs in ML based on Columns
+            console.log(json_data.data.columns);
+            var mySelect = $("#column_names_{{query.id}}");
+            $.each(json_data.data.columns, function(idx, colname) {
+                mySelect.append(
+                  $('<option></option>').val(colname).html(colname)
+                );
+            });
           } else {
             $( "#error_{{query.id}}" ).show();
             $( "#error_{{query.id}} pre" ).text(json_data.data);
@@ -225,4 +268,30 @@
       </ul>
     </div>
   {% endif %}
+<script>
+  function send_data_ml_adhoc(query_id, destination_div){
+    // TODO make sure that get parameters are used here!
+    var model_type = $("#model_type_" + query_id + " option:selected").val();
+    var target_column = $("#column_names_" + query_id + " option:selected").val();
+    // TODO use http://api.jquery.com/serialize/
+    var str = $( "#ml_adhoc_"+query_id ).serialize();
+    data = {'query_id': query_id,
+      'model_type' : model_type,
+      'target_column' : target_column,
+    };
+    console.log(data)
+    console.log(str)
+    $.get('{% url "ml:build_model_adhoc" %}',data, function( json_data ) {
+      return_str = ''
+      $.each( json_data.data, function( key, value ) {
+        return_str = return_str + '\n' +  key + ' \n' + value;
+      });
+      $("#ml_output_" + query_id).text(return_str);
+      $("#ml_output_" + query_id).removeClass("hide");
+    }).fail(function() {
+        alert('oops');
+    });
+    ;
+  };
+</script>  
 {% endblock %}

@@ -14,6 +14,8 @@ import favit.models
 import query
 import models
 import sql_manager
+
+from ml.models import machine_learning_model
 from date_time_encoder import DateTimeEncoder
 
 logger = logging.getLogger(__name__)
@@ -131,6 +133,9 @@ def query_view(request, query_ids):
             query_id=q.id,
             user=request.user,
             parameters=request.GET.dict())
+        ml = machine_learning_model.objects.filter(query=q.id)
+        if ml is not None:
+            setattr(q, 'ml', ml)
         lq.prepare_query()
         q.query_text = lq.query.query_text
         for k, v in lq.target_parameters.iteritems():

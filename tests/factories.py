@@ -2,7 +2,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 import factory
 
-import website.models  # import Db, Query, QueryDefault
+import website.models
+import ml.models  # import Db, Query, QueryDefault
 import cron.models  # import Job, EmailUser
 
 
@@ -52,6 +53,15 @@ class QueryFactory(TagsFactory):
     graph_extra = "{}"
     query_text = "select username, last_login from auth_user"
     pivot_data = False
+
+
+class MlFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ml.models.machine_learning_model
+    query = factory.SubFactory(QueryFactory)
+    title = 'title'
+    type = 'logistic'
+    target_column = 'username'
 
 
 class DashboardFactory(TagsFactory):

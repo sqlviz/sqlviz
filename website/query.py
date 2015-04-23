@@ -218,7 +218,7 @@ class RunQuery(Query):
             qv = models.QueryView(user=self.user, query=self.query_model)
             qv.save()
 
-    def return_data_array(self):
+    def return_data(self):
         return self.data
 
     def save_to_mysql(self, table_name=None, batch_size=1000):
@@ -227,7 +227,7 @@ class RunQuery(Query):
         Pandas is depricating this function.  TODO rewrite
         """
         if self.cacheable is False:
-            raise Exception("Tryin to run Save on a non-cacheable query")
+            raise Exception("Trying to run Save on a non-cacheable query")
         if table_name is None:
             table_name = 'table_%s' % self.query_id
         engine = get_db_engine.get_db_engine()
@@ -353,7 +353,8 @@ class RunQuery(Query):
         sets self.data from the query's cache
         """
         engine = get_db_engine.get_db_engine()
-        self.data = pd.read_sql_table(table_name, con=engine)
+        self.data = pd.read_sql_table(table_name, con=engine, coerce_float=True)
+        self.data = self.data.convert_objects(convert_numeric=True)
         return self.data
 
 
@@ -362,6 +363,7 @@ class ManipulateData(RunQuery):
     def numericalize_data_array(self):
         """
         Checks for numbers encoded as strings due to bad database encoding
+        TODO replace with pandas method that does this
         """
         def num(foo):
             try:
