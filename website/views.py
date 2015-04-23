@@ -39,16 +39,21 @@ def index(request):
         for_user(user, model=models.Query)
     query_fav_dict = {}
     query_fav_dict = dict([(i.target_object_id, i) for i in query_favorites])
+    query_list_images = []
     for q in query_list:
         if q.id in query_fav_dict:
             setattr(q, 'fav', True)
         else:
             setattr(q, 'fav', False)
+        if q.image is not None and q.image != '':
+            logging.warning(q)
+            logging.warning(q.image)
+            query_list_images.append(q)
 
     dash_favorites = favit.models.Favorite.objects.\
         for_user(user, model=models.Dashboard)
     dash_fav_dict = dict([(i.target_object_id, i) for i in dash_favorites])
-    # logging.warning('%s coco puffs' % (dash_fav_dict))
+
     for d in dashboard_list:
         if d.id in dash_fav_dict:
             setattr(d, 'fav', True)
@@ -59,6 +64,7 @@ def index(request):
         'website/index.html',
         {
             'query_list': query_list,
+            'query_list_images': query_list_images,
             'dashboard_list': dashboard_list,
             'query_favorites': query_fav_dict
         },

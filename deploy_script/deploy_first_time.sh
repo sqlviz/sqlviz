@@ -72,7 +72,7 @@ python manage.py loaddata initial_data/initial_data.json
 
 chmod  -R 777 media
 
-echo 'startind dev server'
+echo 'starting dev server'
 ./manage.py runserver 0.0.0.0:8000
 
 
