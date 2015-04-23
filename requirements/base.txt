@@ -24,3 +24,4 @@ simplejson==3.6.5
 six==1.8.0
 wsgiref==0.1.2
 scikit-learn==0.15.2
+statsmodel==0.6.1
