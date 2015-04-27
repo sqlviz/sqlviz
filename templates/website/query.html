@@ -20,6 +20,7 @@
 <script type="text/javascript" src="{% static 'Highmaps/modules/map.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highmaps/modules/exporting.js' %}"></script>
 <script src="{% static 'js/world-highres.js' %}"></script>
+<script src="{% static 'js/website_query.js' %}"></script>
 <style type="text/css" media="screen">
     ul.nav-tabs {
       width: 140px;
@@ -63,14 +64,9 @@
 
 
 {% block main %}
-  <script>
-    make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
-  </script>  
-  <script>
-  jQuery.escapeSelector = function(str) {
-    return str.replace(/[!"#$%&'()*+,./:;<=>?@\[\\\]^`{|}~]/g, "\\$&");
-  }
-  </script>
+<script>
+  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
+</script>  
   <div class='col-xs-9 content' role='main'>
   {% if query_list %}
     {% for query in query_list %}    
@@ -115,20 +111,9 @@
                     {{ml_i}}
                   </button>
               <script>
-                $(document).ready(function() {
-                  $('#ml_{{ml_i.id}}').click(function() {
-                    $.getJSON('{% url "ml:build_model" ml_i.id  %}', {{json_get|safe}}, function( json_data ) {
-                        return_str = ''
-                        $.each( json_data.data, function( key, value ) {
-                          return_str = return_str + '\n' +  key + ' \n' + value;
-                        });
-                        $("#ml_output_{{query.id}}").text(return_str);
-                        $("#ml_output_{{query.id}}").removeClass("hide");
-                    }).fail(function() {
-                      alert('oops');
-                    })
-                  })
-                })
+                make_adhoc_model({{ml_i.id}},
+                    '{% url "ml:build_model" ml_i.id  %})',
+                    {{json_get|safe}}, {{query.id}});
               </script>
             {% endfor %}
           {% endif %}
@@ -164,50 +149,18 @@
         </button>
       </section>
       <script>
-$(document).ready(function(){      
-  $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
-    //alert('test!');
-    event.preventDefault();
-    send_data_ml_adhoc('{{query.id}}','ml_output_{{ml_i.id}}');
-  });
-});
+      display_data({{query.id}}, '{% url "website:query_api" query.id %}',  {{json_get|safe}}, '{{query.hide_table}}', '{{query.chart_type}}', '{{query.title}}', '{{query.stacked}}', '{{query.log_scale_y}}', '{{query.graph_extra|safe}}')
       </script>
       <script>
-        $( "#error_{{query.id}}" ).hide();
-        $.getJSON('{% url "website:query_api" query.id %}', {{json_get|safe}}, function( json_data ) {
-          $( "#waiting_{{query.id}}" ).empty();
-          if (json_data.error == false){
-            if ('{{query.hide_table}}' ==  'False') {
-              make_table(json_data.data.columns, json_data.data.data, '{{query.id}}');  
-            }
-            if ('{{query.chart_type}}' == 'country'){
-              options = make_chart_country(json_data.data.columns, json_data.data.data, '{{query.title}}','custom/world')
-              $('#chart_' + {{query.id}}).highcharts('Map', options);
-            }
-            else if ('{{query.chart_type}}' != 'None'){
-              options = make_chart(json_data.data.columns, json_data.data.data, 'chart_{{query.id}}', '{{query.stacked}}', '{{query.chart_type}}', '{{query.title}}', 'Xaxis Title', 'yAxis Title' ,'{{query.log_scale_y}}',{{query.graph_extra|safe|default:"{}" }});
-                var chart = new Highcharts.Chart(options);
-            };
-            $( "#execution_info_{{query.id}}").text("Cache Status : " + json_data.cached + " Run Time : " + json_data.time_elapsed + ' seconds');
-            $('#ml_section').removeClass('hide');
-            // Make drop downs in ML based on Columns
-            console.log(json_data.data.columns);
-            var mySelect = $("#column_names_{{query.id}}");
-            $.each(json_data.data.columns, function(idx, colname) {
-                mySelect.append(
-                  $('<option></option>').val(colname).html(colname)
-                );
-            });
-          } else {
-            $( "#error_{{query.id}}" ).show();
-            $( "#error_{{query.id}} pre" ).text(json_data.data);
-          }
-        }).fail(function() {
-          $( "#waiting_{{query.id}}" ).empty();
-          $( "#error_{{query.id}}" ).show();
-          $( "#error_{{query.id}} pre" ).text('Unknown Error Occured');
+        $(document).ready(function(){      
+          $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
+            //alert('test!');
+            event.preventDefault();
+            send_data_ml_adhoc('{{query.id}}','ml_output_{{ml_i.id}}');
+          });
         });
       </script>
+      
     {% endfor %}
   {% else %}
       <h3 class='label-danger'>No Queries found with that namespace or permission denied.  Are you sure it is there?</h3>
@@ -225,9 +178,7 @@ $(document).ready(function(){
             >
             </p>
           <script>
-            $(function(){
-              $('#selector_' +  $.escapeSelector('{{default_dict.search_for}}')).datepicker({ dateFormat: 'yy-mm-dd' });
-            });
+            make_date_picker('{{default_dict.search_for}}');
           </script>
           {% elif default_dict.data_type == 'Numeric' %}
             {# NUMERIC #}
@@ -268,30 +219,4 @@ $(document).ready(function(){
       </ul>
     </div>
   {% endif %}
-<script>
-  function send_data_ml_adhoc(query_id, destination_div){
-    // TODO make sure that get parameters are used here!
-    var model_type = $("#model_type_" + query_id + " option:selected").val();
-    var target_column = $("#column_names_" + query_id + " option:selected").val();
-    // TODO use http://api.jquery.com/serialize/
-    var str = $( "#ml_adhoc_"+query_id ).serialize();
-    data = {'query_id': query_id,
-      'model_type' : model_type,
-      'target_column' : target_column,
-    };
-    console.log(data)
-    console.log(str)
-    $.get('{% url "ml:build_model_adhoc" %}',data, function( json_data ) {
-      return_str = ''
-      $.each( json_data.data, function( key, value ) {
-        return_str = return_str + '\n' +  key + ' \n' + value;
-      });
-      $("#ml_output_" + query_id).text(return_str);
-      $("#ml_output_" + query_id).removeClass("hide");
-    }).fail(function() {
-        alert('oops');
-    });
-    ;
-  };
-</script>  
 {% endblock %}

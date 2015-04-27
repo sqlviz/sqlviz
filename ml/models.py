@@ -11,6 +11,9 @@ class machine_learning_model(models.Model):
     query = models.ForeignKey('website.Query')
     target_column = models.CharField(max_length=100)
 
+    class Meta:
+        unique_together = ['query', 'target_column', 'type']
+
     def __str__(self):
         return '%s %s %s' % (self.title, self.type, self.target_column)
 

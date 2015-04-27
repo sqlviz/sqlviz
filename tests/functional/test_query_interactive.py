@@ -2,6 +2,8 @@ import json
 
 from .testcases import APITestCase
 from ..factories import DbFactory
+from django.core.urlresolvers import reverse
+# from django.test.client import Client
 
 
 class QueryInteractiveAPITest(APITestCase):
@@ -51,3 +53,8 @@ class QueryInteractiveAPITest(APITestCase):
         self.assertIn(self.username, user_data)
         self.assertIn(self.user.email, user_data)
         self.assertIn(self.user.id, user_data)
+
+    def test_url(self):
+        url = reverse('website:query_interactive_api')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

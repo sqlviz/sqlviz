@@ -360,19 +360,13 @@ class RunQuery(Query):
 
 class ManipulateData(RunQuery):
 
-    def numericalize_data_array(self):
+    def numericalize_data(self):
         """
         Checks for numbers encoded as strings due to bad database encoding
         TODO replace with pandas method that does this
         """
-        def num(foo):
-            try:
-                return float(foo)
-            except (ValueError, TypeError) as e:
-                return foo
-        new_data = [[num(foo) for foo in row] for row in self.data_array]
-        self.data_array = new_data
-        return self.data_array
+        self.data = self.data.convert_objects(convert_numeric=True)
+        return self.data
 
     def pivot(self, null_fill=0):
         # use pandas TODO to make the pivot
@@ -400,7 +394,7 @@ class ManipulateData(RunQuery):
 
     def pandas_to_array(self):
         # logging.warning(self.data)
-        self.data_array = [self.data.columns]
+        self.data_array = [self.data.columns.tolist()]
         self.data_array += [[v for v in r[1]] for r in self.data.iterrows()]
         # logging.warning(self.data_array)
         return self.data_array
@@ -467,8 +461,8 @@ class ManipulateData(RunQuery):
         if query.cumulative is True:
             self.cumulative()
 
+        self.numericalize_data()
         self.pandas_to_array()
-        self.numericalize_data_array()
 
 
 def string_to_boolean(string='', default=False):

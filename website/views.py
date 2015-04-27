@@ -210,7 +210,7 @@ def query_interactive_api(request):
         if cumulative:
             md.cumulative()
         md.pandas_to_array()
-        response_data = md.numericalize_data_array()
+        response_data = md.data_array  # numericalize_data_array()
         time_elapsed = time.time() - start_time  # TODO get rid of this
         return_data = {
             "data": {
@@ -271,7 +271,7 @@ def database_explorer_api(request):
                     table_id needed to procude column list""")
 
         dmm.run_query()
-        response_data = dmm.RQ.numericalize_data_array()
+        response_data = dmm.RQ.data_array  # numericalize_data_array()
         return_data = {
             "data":
             {

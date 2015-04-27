@@ -54,11 +54,15 @@ class Query(models.Model):
         default=False, help_text='Hide from Main Search')
     hide_table = models.BooleanField(
         default=False, help_text='Supress Data output in display')
-    chart_type = models.CharField(max_length=10, choices=(
-                                    ('None', 'None'), ('line', 'line'),
-                                    ('bar', 'bar'), ('column', 'column'),
-                                    ('area', 'area'), ('country', 'country')),
-                                  default='None')
+    chart_type = models.CharField(
+        max_length=10,
+        choices=(
+            ('None', 'None'), ('line', 'line'),
+            ('bar', 'bar'), ('column', 'column'),
+            ('area', 'area'), ('country', 'country')
+        ),
+        default='None'
+    )
     pivot_data = models.BooleanField(
         default=False,
         help_text='Pivot data around 1rst&2nd columns. Nulls filled with 0')
@@ -170,7 +174,7 @@ class QueryPrecedent(models.Model):
 
     def clean(self):
         def cycle_check(self):
-            # Check to ensure no cycles
+            # TODO Check to ensure no cycles
             pass
         return True
 
