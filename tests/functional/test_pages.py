@@ -1,8 +1,8 @@
+"""
 from django.core.urlresolvers import reverse
 from .testcases import LiveServerTestCase
 
 
-"""
 TODO add test for each major url
 class MLIndexTestCase(LiveServerTestCase):
     def test_url(self):
