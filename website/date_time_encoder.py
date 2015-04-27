@@ -1,11 +1,13 @@
 import json
 import datetime
+import decimal
 
 
 class DateTimeEncoder(json.JSONEncoder):
-
     def default(self, obj):
-        if isinstance(obj, datetime.datetime):
+        if isinstance(obj, decimal.Decimal):
+            return float(obj)
+        elif isinstance(obj, datetime.datetime):
             return obj.isoformat()
         elif isinstance(obj, datetime.date):
             return obj.isoformat()

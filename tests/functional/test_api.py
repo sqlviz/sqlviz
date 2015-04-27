@@ -2,6 +2,8 @@ import json
 
 from ..factories import QueryFactory, QueryDefaultFactory, UserFactory
 from .testcases import APITestCase
+import datetime
+import logging
 
 
 def create_users(user_count=100):
@@ -88,6 +90,50 @@ class QueryAPITest(QueryAPITestCase):
         self.assertQueryData(data, data={
             'columns': ['id', 'username'],
             'data': [[user.id, user.username]],
+        })
+
+    def test_time(self):
+        """
+        Create query that returns a time stamp
+        """
+        user = self.create_user()
+        query = QueryFactory(
+            query_text="select now() as curr_time from auth_user limit 1",
+            owner=user,
+        )
+        self.login()
+        data = self.get_query(query.id)
+        time_object = data['data']['data'][0][0]
+        logging.warning(time_object)
+        t = datetime.datetime.strptime(
+            time_object, "%Y-%m-%dT%H:%M:%S"
+        )
+
+        # Time zone issues may be present
+        delta_t = abs((datetime.datetime.now() - t).seconds) % 3600
+        self.assertLess(delta_t, 2)
+
+    def test_float(self):
+        """
+        Create query that returns a time stamp
+        """
+        user = self.create_user()
+        query = QueryFactory(
+            query_text="""select avg(val) avg_val from
+            (
+            (select 1.0  as val from auth_user limit 1)
+            union
+            (select 0.0  as val from auth_user limit 1)
+            union
+            (select 3.0  as val from auth_user limit 1)
+            ) t1""",
+            owner=user,
+        )
+        self.login()
+        data = self.get_query(query.id)
+        self.assertQueryData(data, data={
+            u'columns': [u'avg_val'],
+            u'data': [[1.33333]]
         })
 
     def test_pivot(self):
