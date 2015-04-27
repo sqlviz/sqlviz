@@ -1,6 +1,7 @@
 from unittest import TestCase
 import ml.views
 import pandas as pd
+from django.core.urlresolvers import reverse
 # import logging
 # import json
 
