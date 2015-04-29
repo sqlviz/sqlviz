@@ -144,7 +144,7 @@ class QueryDefault(models.Model):
     search_for = models.CharField(max_length=128)
     replace_with = models.CharField(
         max_length=1024,
-        help_text='For todayreplace with = today and data_type = Date')
+        help_text='For today replace with = today and data_type = Date')
     data_type = models.CharField(max_length=10,
                                  choices=(
                                      ('Numeric', 'Numeric'),
