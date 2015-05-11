@@ -1,17 +1,48 @@
-function determine_type(colname){
-	/*
-	Check against regex and return string for datatype for
-	Datatables or None
-	*/
-	var re = /^(\w)*_usd$/i;
-	//var found = ;
-	if (re.test(colname)){
-		return 'currency';
-	}
-	var re2 = /^(\w)*_pct$/i;
-	if (re2.test(colname)){
-		return 'percent';
-	}
+function percent_formatter(str) {
+		return str + '%';
+}
+function currency_formatter(str) {
+		return '$' + str ;
+}
+function url_formatter(str) {
+		// Truncate link after 50 characters
+		return '<a href="' + str + '">' + str.substring(0,50) + '</a>';
+}
+function img_formatter(str) {
+		return '<img src="' + str + '"></img>';
+}
+function colname_to_type(colname){
+	//return colname;
+	var d = {
+			'currency': {
+					re: /^(\w)*_usd$/i,
+					type: 'currency',
+					formatter: currency_formatter
+			},
+					'percent': {
+					re: /^(\w)*_pct$/i,
+					type: 'percent',
+					formatter: percent_formatter
+			},
+					'img': {
+					re: /^(\w)*_img$/i,
+					type: 'img',
+					formatter: img_formatter
+			},
+					'url': {
+					re: /^(\w)*_url$/i,
+					type: 'url',
+					formatter: url_formatter
+			},
+	};
+	var return_val = false;
+	$.each(d, function (type, re_info) {
+			re = re_info['re'];
+			if (re.test(colname)) {
+				return_val = re_info;
+			}
+	});
+	return return_val;
 }
 
 function make_table(columns, data, target){
@@ -21,32 +52,29 @@ function make_table(columns, data, target){
 		var cur_array = [];
 		html = "<table class='table table-striped' id='" + table_name + "'>\n";
 		html  +='<thead><tr>';
+		var col_formatter_dict = {};
 		$.each( columns, function( key, val ) {
 			html += "<td>" + val  + "</td>";
-			var type = determine_type(val);
-			console.log(val);
-			console.log(key);
-			console.log(type);
-			if (type){
+			col_data =  colname_to_type(val);
+			if (col_data){
+				col_formatter_dict[key] = col_data['formatter'];
+				type  = col_data['type'];
 				if (type == 'percent'){
-					pct_array.push(key-1);
+					pct_array.push(key - 1);
 				}
 				if (type == 'currency'){
-					cur_array.push(key-1	);
+					cur_array.push(key - 1);
 				}
 			}
 		});
-		//console.log(pct_array);
-		//console.log(cur_array);
 		html += "</tr></thead><tbody>\n";
 		$.each( data, function( key, val ) {
 			html += "<tr>";
 			$.each(val, function(key2, val2) {
-				if (pct_array.indexOf(key2) != -1){
-					val2 = val2.toString() + '%';
-				}
-				if (cur_array.indexOf(key2) != -1){
-					val2 = '$' + val2.toString() ;
+				//console.log(key2);
+				if (key2 in col_formatter_dict) {
+					//console.log('formatted!');
+					val2 = col_formatter_dict[key2](val2);
 				}
 				html += "<td>" + val2 +"</td>";
 			});
