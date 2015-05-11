@@ -1,7 +1,7 @@
 from unittest import TestCase
 import ml.views
 import pandas as pd
-import sklearn
+from sklearn import datasets
 import numpy as np
 
 
@@ -15,19 +15,19 @@ class TestLinearRegression(TestCase):
         )
         n_samples = 1000
 
-        X, y, coef = sklearn.datasets.make_regressioni(
+        x, y, coef = datasets.make_regression(
             n_samples=n_samples, n_features=2,
             n_informative=1, noise=10,
             coef=True, random_state=0
         )
-        X2 = np.random.choice(['yes', 'no'], n_samples)
+        x2 = np.random.choice(['yes', 'no'], n_samples)
 
         y = pd.DataFrame(y)
-        X = pd.DataFrame(X)
-        X2 = pd.DataFrame(X2)
-        df = pd.concat([y, X, X2], axis=1)
-        df.columns=['y', 'a', 'b', 'c']
-        mli.data = dfi
+        x = pd.DataFrame(x)
+        x2 = pd.DataFrame(x2)
+        df = pd.concat([y, x, x2], axis=1)
+        df.columns = ['a', 'b', 'c', 'd']
+        mli.data = df
         self.mli = mli
         return mli
 
