@@ -1,3 +1,15 @@
+function zip_data(columns, data){
+	var return_array = [];
+	$.each(data, function (idx, row){
+		var return_dict = {};
+		$.each(row, function (idx2, val){
+			return_dict[columns[idx2]] = val;
+		});
+		return_array.append(return_dict);
+	});
+	return return_array;
+}
+
 function make_table(columns, data, target){
     var table_name = 'table_' +  target; 
     var div_name  = '#div_table_' + target;
