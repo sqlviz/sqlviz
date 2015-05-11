@@ -1,6 +1,8 @@
 from unittest import TestCase
 import ml.views
 import pandas as pd
+from sklearn import datasets
+import numpy as np
 
 
 class TestLinearRegression(TestCase):
@@ -11,11 +13,21 @@ class TestLinearRegression(TestCase):
             target_column='a',
             model_type='linear'
         )
-        mli.data = pd.DataFrame(
-            [
-                {'a': 10, 'b': '2.0', 'c': 50, 'd': 'yes'},
-                {'a': 0, 'b': '10.0', 'c': 20, 'd': 'no'}
-            ])
+        n_samples = 1000
+
+        x, y, coef = datasets.make_regression(
+            n_samples=n_samples, n_features=2,
+            n_informative=1, noise=10,
+            coef=True, random_state=0
+        )
+        x2 = np.random.choice(['yes', 'no'], n_samples)
+
+        y = pd.DataFrame(y)
+        x = pd.DataFrame(x)
+        x2 = pd.DataFrame(x2)
+        df = pd.concat([y, x, x2], axis=1)
+        df.columns = ['a', 'b', 'c', 'd']
+        mli.data = df
         self.mli = mli
         return mli
 
