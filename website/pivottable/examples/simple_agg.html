@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+
+                var sum = $.pivotUtilities.aggregatorTemplates.sum;
+                var numberFormat = $.pivotUtilities.numberFormat;
+                var intFormat = numberFormat({digitsAfterDecimal: 0}); 
+
+                $("#output").pivot(
+                    [
+                        {color: "blue", shape: "circle", value: 1},
+                        {color: "red", shape: "triangle", value: 2},
+                        {color: "blue", shape: "circle", value: 3},
+                        {color: "red", shape: "triangle", value: 4}
+                    ],
+                    {
+                        rows: ["color"],
+                        cols: ["shape"],
+                        aggregator: sum(intFormat)(["value"])
+                    }
+                );
+             });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <p style="width: 800px">This example shows pivot() with a sum() aggregator.</p>
+
+        
+        <div id="output" style="margin: 10px;"></div>
+
+    </body>
+</html>

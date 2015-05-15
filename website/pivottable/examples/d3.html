@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <script type="text/javascript" src="../dist/d3_renderers.js"></script>
+        <style>
+            body {font-family: Verdana;}
+            .node {
+              border: solid 1px white;
+              font: 10px sans-serif;
+              line-height: 12px;
+              overflow: hidden;
+              position: absolute;
+              text-indent: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                var derivers = $.pivotUtilities.derivers;
+                var renderers = $.extend($.pivotUtilities.renderers, 
+                    $.pivotUtilities.d3_renderers);
+
+                $.getJSON("mps.json", function(mps) {
+                    $("#output").pivotUI(mps, {
+                        renderers: renderers,
+                        derivedAttributes: {
+                            "Age Bin": derivers.bin("Age", 10),
+                            "Gender Imbalance": function(mp) {
+                                return mp["Gender"] == "Male" ? 1 : -1;
+                            }
+                        },
+                        cols: [], rows: ["Province", "Party"],
+                        rendererName: "Treemap"
+                    });
+                });
+             });
+        </script>
+
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <p style="width: 800px">This example of a D3 renderer shows a treemap.</p>
+
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>

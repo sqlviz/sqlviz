@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pivot Demo</title>
+        <!-- external libs from cdnjs -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+
+        <!-- PivotTable.js libs from ../dist -->
+        <link rel="stylesheet" type="text/css" href="../dist/pivot.css">
+        <script type="text/javascript" src="../dist/pivot.js"></script>
+        <style>
+            body {font-family: Verdana;}
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            $(function(){
+                var derivers = $.pivotUtilities.derivers;
+
+                $.get("mps.csv", function(mps) {
+                    $("#output").pivotUI($.csv.toArrays(mps), {
+                        derivedAttributes: {
+                            "Age Bin": derivers.bin("Age", 10),
+                            "Gender Imbalance": function(mp) {
+                                return mp["Gender"] == "Male" ? 1 : -1;
+                            }
+                        }
+                    });
+                });
+             });
+        </script>
+        <p><a href="index.html">&laquo; back to examples</a></p>
+
+        <p style="width: 800px">This example loads the "Canadian Parliament 2012" dataset from a CSV instead of from JSON.</p>
+
+        
+        <div id="output" style="margin: 30px;"></div>
+
+    </body>
+</html>

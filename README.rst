@@ -186,7 +186,7 @@ To start the Django server on port 8000:
 
     $ ./manage.py runserver 0.0.0.0:8000
 
-Now visit http://localhost:7878/ in your browser, or the IP the server is running from.
+Now visit http://localhost:8000/ in your browser, or the IP the server is running from.
 
 Licensing
 ---------
