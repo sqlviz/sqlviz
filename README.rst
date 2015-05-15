@@ -9,6 +9,13 @@ SQLViz
 
 SQLViz is a data visualization platform built on Django
 
+
+
+.. contents::
+    :local:
+    :depth: 2
+    :backlinks: none
+
 Requirements
 ------------
 
@@ -104,19 +111,21 @@ CSV Upload
 
 Thanks
 ~~~~~~
-* Django
-* Jquery
-* Jquery UI
-* Django Taggit
-* Django Favorits
-* Django Encrpyed
-* Highcharts
-* PhantomJS
-* Datatables JS
-* ACE.js
-* Django ACE
-* Bootstrap
-* Django Cron
+* `Django <https://www.djangoproject.com/>`_
+* `Jquery <http://jquery.com/>`_
+* `Jquery UI <http://jqueryui.com/>`_
+* `Django Taggit <https://github.com/alex/django-taggit/>`_
+* `Django Favorites <https://github.com/streema/django-favit/>`_
+* `Django Encrypted <https://github.com/defrex/django-encrypted-fields/>`_
+* `Highcharts <highcharts.com/>`_
+* `PhantomJS <http://phantomjs.org/>`_
+* `Datatables <datatables.net/>`_
+* `ACE.js <http://ace.c9.io/>`_
+* `Django ACE <https://github.com/bradleyayers/django-ace/>`_
+* `Bootstrap <http://getbootstrap.com/>`_
+* `Django Cron <https://github.com/kraiz/django-crontab/>`_
+* `Pivottable <https://github.com/nicolaskruchten/pivottable/>`_
+* `Font Awesome <fortawesome.github.io/Font-Awesome/>`_
 
 RoadMap
 -------
@@ -186,7 +195,7 @@ To start the Django server on port 8000:
 
     $ ./manage.py runserver 0.0.0.0:8000
 
-Now visit http://localhost:8000/ in your browser, or the IP the server is running from.
+Now visit http://localhost:7878/ in your browser, or the IP the server is running from.
 
 Licensing
 ---------
