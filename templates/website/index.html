@@ -44,8 +44,9 @@
       <tbody>
         {% for query in query_list %}
         <tr>
-          <td> Q{{query.id}} </td>
-          <td> <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a></td>
+          <td> <i class="fa fa-bar-chart"></i> {{query.id}} </td>
+          <td> <a object_id='{{query.id}}' target_model='website.Query' href='javascript:'
+            class='fa {% if query.fav %}fa-star{% else %}fa-star-o{% endif %}'></a></td>
           <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
           <td> {{query.description}} {{query.description_long}} </td>
           <td> 
@@ -64,8 +65,8 @@
         {% endfor %}
         {% for dash in dashboard_list %}
           <tr>
-          <td> D{{dash.id}} </td> 
-          <td> <a object_id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='star {% if dash.fav %}favorite{% endif %}'>{{dash.fav}}</a> </td>
+          <td>  <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
+          <td> <a object_id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}'></a> </td>
           <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
           <td> {{dash.description}} {{dash.description_long}} </td>
           <td><!-- image --> </td>
@@ -105,7 +106,8 @@
           <div class="caption">
             <h3>{{query.title}}</h3>
             <p>
-              <a object_id='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>{{query.fav}} </a>
+              <a object_id='{{query.id}}' target_model='website.Query' href='javascript:'
+              class='fa {% if query.fav %}fa-star{% else %}fa-star-o{% endif %}'></a>
               <a href="{% url 'website:query' query.id %}">
                 <img src='{{query.image}}' width = '260px' height = '160px'>
               </a>
