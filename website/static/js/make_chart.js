@@ -1,14 +1,3 @@
-function zip_data(columns, data){
-	var return_array = [];
-	$.each(data, function (idx, row){
-		var return_dict = {};
-		$.each(row, function (idx2, val){
-			return_dict[columns[idx2]] = val;
-		});
-		return_array.append(return_dict);
-	});
-	return return_array;
-
 function percent_formatter(str) {
 		return str + '%';
 }
@@ -232,21 +221,21 @@ function make_chart(columns, data, target, stacked, chart_type, title, xAxis, yA
 					});
 				});
 				if (options.xAxis.categories.length > 14){
-					options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)}
+					options.xAxis.labels = {'step' : Math.max(Math.round(options.xAxis.categories.length / 7),1)};
 				}
 			}
-			options.series = series; 
+			options.series = series;
 			//console.log(options)
 			if (stacked == 'True'){
 				options.plotOptions = {};
 				options.plotOptions[chart_type] = {'stacking' :'normal'};
 			}
 			if (yAxis_log == 'True'){
-				options.yAxis.type = 'logarithmic'
+				options.yAxis.type = 'logarithmic';
 			}
 			$.extend(options, graph_extra); // MUNGE GRAPH SETTINGS
 			//var chart = new Highcharts.Chart(options);
-			return options;    
+			return options;
 	}
 }
 function is_date(data) {

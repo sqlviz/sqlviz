@@ -13,16 +13,18 @@
 {% endblock %}
 {% block style %}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-<link type="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
-<script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<!--<link type="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <!-- For country charts -->
 <script type="text/javascript" src="{% static 'Highcharts/js/highcharts.src.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highmaps/modules/map.js' %}"></script>
 <script type="text/javascript" src="{% static 'Highmaps/modules/exporting.js' %}"></script>
 <script src="{% static 'js/world-highres.js' %}"></script>
 <script src="{% static 'js/website_query.js' %}"></script>
-<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/percent.js"></script>
-<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/currency.js"></script>
+<!--<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/percent.js"></script>
+<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/currency.js"></script>-->
+<link rel="stylesheet" type="text/css" href="{% static 'pivottable/dist/pivot.css' %}"></link>
+<script type="text/javascript" src="{% static 'pivottable/dist/pivot.js' %}"></script>
 
 <style type="text/css" media="screen">
     ul.nav-tabs {
@@ -76,80 +78,98 @@
       <section class='well' id='div_{{query.id}}'>
         <h2>
           <div class='inline'>
-            <a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='star {% if query.fav %}favorite{% endif %}'>
-              {{query.fav}}
+            <a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='fa {% if query.fav %}fa-star{% else %}fa-star-o{% endif %}'>
             </a>
             {{query.title}}
           </div>
         </h2>
+        <div id="waiting_{{query.id}}">
+          <i class="fa fa-circle-o-notch fa-spin"></i>
+        </div>
         <div class='hide_{{query.id}}'>
-          <div id='div_table_{{query.id}}'></div>
-          <div id="waiting_{{query.id}}"><img src='{% static 'ajax-loader.gif' %}'>
-          </div>
           <div id="error_{{query.id}}" class = "alert alert-error alert-block">
             <pre></pre>
           </div>
         </div>
-        <div id ='chart_{{query.id}}'></div>
-        <ul class='hide_{{query.id}}'>
-          <li><a href="{% url 'admin:website_query_change' query.id %}">Edit</a></li>
-          <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
-          <li>Description Short: {{query.description}}</li>
-          {% if query.description_long %}
-          <li>Description Long: {{query.description_long}}</li>
-          {% endif %}
-          <li>Query Text: <div id='sql_{{query.id}}'><pre>{{query.query_text}}</pre>  </div></li>
-          <li>Query Creation: {{query.create_time}}</li>
-          <li>Query Last Modified: {{query.modified_time}}</li>
-          <li>Database: {{query.db}}</li>
-          <li id='execution_info_{{query.id}}'></li>
-        </ul>
+        <div role="tabpanel" id="ready_{{query.id}}">
+          <!-- Nav tabs -->
+          <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active"><a href="#description_{{query.id}}" aria-controls="settings" role="tab" data-toggle="tab">Description</a></li>
+            {% if query.chart_type != "None" %}
+              <li role="presentation" class="hide"><a href="#graph_{{query.id}}" aria-controls="graph_{{query.id}}" role="tab" data-toggle="tab">Graph</a></li>
+            {% endif %}
+            <li role="presentation" class="hide"><a href="#tab_table_{{query.id}}" aria-controls="tab_table_{{query.id}}" role="tab" data-toggle="tab">Table</a></li>
+            <li role="presentation" class="hide"><a href="#pivot_{{query.id}}" aria-controls="pivot_{{query.id}}" role="tab" data-toggle="tab">Pivot</a></li>
+            <li role="presentation" class="hide"><a href="#ml_{{query.id}}" aria-controls="settings" role="tab" data-toggle="tab">Regression</a></li>
+          </ul>
+        </div>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane" id="graph_{{query.id}}">
+              <div id='chart_{{query.id}}'></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="tab_table_{{query.id}}">
+              <div id='div_table_{{query.id}}'></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="pivot_{{query.id}}">
+              <div id='div_pivot_{{query.id}}'></div>
+            </div>
 
-          <div id='ml_section' class='hide'>
-            <h3>Machine Learning Models</h3>
-            {% if query.ml %}
-              {% for ml_i in query.ml %}
-              <h4> Static Models</h4>
-                  <button type="submit" id="ml_{{ml_i.id}}" class="btn btn-info">
-                    {{ml_i}}
-                  </button>
-              <script>
-                make_adhoc_model({{ml_i.id}},
-                    '{% url "ml:build_model" ml_i.id  %})',
-                    {{json_get|safe}}, {{query.id}});
-              </script>
-            {% endfor %}
-          {% endif %}
-          <h4> ad hoc model</h4>
-          <form id='ml_adhoc_{{query.id}}' class="input-group">
-              <select class="form-control" id="column_names_{{query.id}}">
-              </select>
-              <select class="form-control" id="model_type_{{query.id}}">
-                <option value="linear">Linear Regression</option>
-                <option value="logistic">Logistic Regression</option>
-                <option value="tree">Decision Tree</option>
-                <option value="kmeans">K-Means</option>
-              </select>
-              <button type="submit" class="btn btn-info">Run ML Model</button>
-              <script>
-                $(document).ready(function() {
-                  $('#toggle_{{query.id}}').click(function() {
-                    $(".hide_{{query.id}}").toggleClass("hide");
-                    if ($.trim($(this).text()) === 'Hide') {
-                      $(this).text('Show');
-                    } else {
-                      $(this).text('Hide');
-                    }
-                  });
-                });
-              </script>
-          </form>
-          <pre id='ml_output_{{query.id}}' class='hide'></pre>
-        </div>          
-        <br />
-        <button type="submit" id="toggle_{{query.id}}" class="btn btn-info">
-          Hide
-        </button>
+            <div role="tabpanel" class="tab-pane" id="ml_{{query.id}}">
+              <div id='ml_section'>
+                <h3>Machine Learning Models</h3>
+                {% if query.ml %}
+                  {% for ml_i in query.ml %}
+                    <h4> Static Models</h4>
+                    <button type="submit" id="ml_{{ml_i.id}}" class="btn btn-info">
+                      {{ml_i}}
+                    </button>
+                    <script>
+                      make_adhoc_model({{ml_i.id}},
+                          '{% url "ml:build_model" ml_i.id  %}',
+                          {{json_get|safe}}, {{query.id}});
+                    </script>
+                  {% endfor %}
+                {% endif %}
+                <h4> ad hoc model</h4>
+                  <form id='ml_adhoc_{{query.id}}' class="input-group">
+                    <select class="form-control" id="column_names_{{query.id}}">
+                    </select>
+                    <select class="form-control" id="model_type_{{query.id}}">
+                      <option value="linear">Linear Regression</option>
+                      <option value="logistic">Logistic Regression</option>
+                      <option value="tree">Decision Tree</option>
+                      <option value="kmeans">K-Means</option>
+                    </select>
+                    <button type="submit" class="btn btn-info">Run ML Model</button>
+                  </form>
+                  <pre id='ml_output_{{query.id}}' class='hide'></pre>
+                </div> 
+              </div>
+              <div role="tabpanel" class="tab-pane active" id="description_{{query.id}}">
+
+                <ul>
+                  <li>{{query.description}}</li>
+                  <form action="{% url 'admin:website_query_change' query.id %}">
+                    <button class="btn btn-default" type="submit" value="Edit Query">Edit</button>
+                  </form>
+
+                  <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
+                  {% if query.description_long %}
+                    <li>Description Long: {{query.description_long}}</li>
+                  {% endif %}
+                  <li>Query Text:
+                    <div id='sql_{{query.id}}'>
+                      <pre>{{query.query_text}}</pre>
+                    </div>
+                  </li>
+                  <li>Query Creation: {{query.create_time}}</li>
+                  <li>Query Last Modified: {{query.modified_time}}</li>
+                  <li>Database: {{query.db}}</li>
+                  <li id='execution_info_{{query.id}}'></li>
+                </ul>
+              </div>
+            </div>
       </section>
       <script>
       display_data({{query.id}}, '{% url "website:query_api" query.id %}',  {{json_get|safe}}, '{{query.hide_table}}', '{{query.chart_type}}', '{{query.title}}', '{{query.stacked}}', '{{query.log_scale_y}}', '{{query.graph_extra|safe}}')
@@ -159,7 +179,7 @@
           $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
             //alert('test!');
             event.preventDefault();
-            send_data_ml_adhoc('{{query.id}}','ml_output_{{ml_i.id}}');
+            send_data_ml_adhoc('{{query.id}}', '{% url "ml:build_model_adhoc" %}','ml_output_{{ml_i.id}}');
           });
         });
       </script>
