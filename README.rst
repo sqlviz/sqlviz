@@ -24,7 +24,7 @@ Installation
 
     $ git clone https://github.com/sqlviz/sqlviz.git
     $ cd sqlviz
-    $ sudo bash deploy_script/deploy_script_initial.sh
+    $ sudo bash deploy_script/deploy_first_time.sh
 
 
 Using SQLViz
