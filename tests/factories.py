@@ -5,6 +5,7 @@ import factory
 import website.models
 import ml.models  # import Db, Query, QueryDefault
 import cron.models  # import Job, EmailUser
+import uuid
 
 
 class TagsFactory(factory.DjangoModelFactory):
@@ -32,7 +33,7 @@ class DbFactory(TagsFactory):
         exclude = ('DB',)
 
     DB = settings.DATABASES['default']
-    name_short = "default"
+    name_short = "default" # %s" % (str(uuid.uuid1())[0:10])
     name_long = "default"
     type = "MySQL"
     host = factory.LazyAttribute(lambda a: a.DB['HOST'])
@@ -103,3 +104,10 @@ class EmailUserFactory(factory.django.DjangoModelFactory):
         model = cron.models.EmailUser
     job = factory.SubFactory(JobFactory)
     user = factory.SubFactory(UserFactory)
+
+
+class QueryPrecedentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = website.models.QueryPrecedent
+    final_query = factory.SubFactory(QueryFactory)
+    preceding_query = factory.SubFactory(QueryFactory)

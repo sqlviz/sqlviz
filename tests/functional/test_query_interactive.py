@@ -3,7 +3,6 @@ import json
 from .testcases import APITestCase
 from ..factories import DbFactory
 from django.core.urlresolvers import reverse
-# from django.test.client import Client
 
 
 class QueryInteractiveAPITest(APITestCase):
@@ -42,7 +41,7 @@ class QueryInteractiveAPITest(APITestCase):
     def test_simple_query_interactive(self):
         query_text = 'select * from auth_user'
         response = self.client.post(
-            '/api/query_interactive/',
+            reverse('website:query_interactive_api'),
             {'query_text': query_text, 'db': self.db.id},
         )
         self.assertEqual(response.status_code, 200)
@@ -53,8 +52,3 @@ class QueryInteractiveAPITest(APITestCase):
         self.assertIn(self.username, user_data)
         self.assertIn(self.user.email, user_data)
         self.assertIn(self.user.id, user_data)
-
-    def test_url(self):
-        url = reverse('website:query_interactive_api')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
