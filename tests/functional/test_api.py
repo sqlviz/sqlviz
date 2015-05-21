@@ -276,8 +276,7 @@ class QueryPrecedentTest(QueryAPITestCase):
             title='inner'
         )
         query_outer = QueryFactory(
-            query_text="""select *
-                from scratch.<TABLE-%s>""" % (query_inner.id),
+            query_text="""use scratch; show tables;"""
             owner=self.user,
             title='outer',
             db=query_inner.db
