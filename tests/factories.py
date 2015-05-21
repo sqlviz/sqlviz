@@ -5,7 +5,6 @@ import factory
 import website.models
 import ml.models  # import Db, Query, QueryDefault
 import cron.models  # import Job, EmailUser
-import uuid
 
 
 class TagsFactory(factory.DjangoModelFactory):
@@ -33,7 +32,7 @@ class DbFactory(TagsFactory):
         exclude = ('DB',)
 
     DB = settings.DATABASES['default']
-    name_short = "default" # %s" % (str(uuid.uuid1())[0:10])
+    name_short = "default"
     name_long = "default"
     type = "MySQL"
     host = factory.LazyAttribute(lambda a: a.DB['HOST'])
