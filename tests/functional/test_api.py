@@ -277,7 +277,7 @@ class QueryPrecedentTest(QueryAPITestCase):
         )
         query_outer = QueryFactory(
             query_text="""select *
-                from <TABLE-%s>""",
+                from <TABLE-%s>""" % (query_inner.id),
             owner=self.user,
             title='outer',
             db=query_inner.db
