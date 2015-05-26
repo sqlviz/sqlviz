@@ -5,6 +5,7 @@ from ..factories import QueryFactory, QueryDefaultFactory, UserFactory, \
 from .testcases import APITestCase
 import datetime
 import logging
+import os
 
 
 def create_users(user_count=100):
@@ -276,9 +277,13 @@ class QueryPrecedentTest(QueryAPITestCase):
             owner=self.user,
             title='inner'
         )
-        #  "select table_schema, table_name from information_schema.tables  where table_schema not in ('information_schema','performance_schema','mysql')",  #
+        db = 'scratch'
+        if os.environ.get('CIRCLECI'):
+            db = 'circle_test'
+        query_id = query_inner.id
         query_outer = QueryFactory(
-            query_text="""select * from <TABLE-%s>""" % (query_inner.id),
+            query_text="""select *
+                from {db}<TABLE-{query_id}>""".format(**locals()),
             owner=self.user,
             title='outer',
             db=query_inner.db,
