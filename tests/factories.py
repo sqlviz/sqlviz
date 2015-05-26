@@ -53,6 +53,7 @@ class QueryFactory(TagsFactory):
     graph_extra = "{}"
     query_text = "select username, last_login from auth_user"
     pivot_data = False
+    insert_limit = True
 
 
 class MlFactory(factory.django.DjangoModelFactory):

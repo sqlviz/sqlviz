@@ -279,7 +279,8 @@ class QueryPrecedentTest(QueryAPITestCase):
             query_text="show tables",  # """select * from <TABLE-%s>""" % (query_inner.id),
             owner=self.user,
             title='outer',
-            db=query_inner.db
+            db=query_inner.db,
+            insert_limit=False
         )
         QueryPrecedentFactory(
             final_query=query_outer,
