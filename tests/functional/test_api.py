@@ -4,6 +4,7 @@ from ..factories import QueryFactory, QueryDefaultFactory, UserFactory, \
     QueryPrecedentFactory
 from .testcases import APITestCase
 import datetime
+import logging
 
 
 def create_users(user_count=100):
@@ -291,6 +292,7 @@ class QueryPrecedentTest(QueryAPITestCase):
         # Strip volatile data
         inner_data.pop('time_elapsed')
         outer_data.pop('time_elapsed')
+        logging.warning(outer_data)
         self.assertEqual(inner_data, outer_data)
 
 
