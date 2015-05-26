@@ -277,7 +277,7 @@ class QueryPrecedentTest(QueryAPITestCase):
             title='inner'
         )
         query_outer = QueryFactory(
-            query_text="show tables",  # """select * from <TABLE-%s>""" % (query_inner.id),
+            query_text="select table_schema, table_name from information_schema.tables  where table_schema not in ('information_schema','performance_schema','mysql')",  # """select * from <TABLE-%s>""" % (query_inner.id),
             owner=self.user,
             title='outer',
             db=query_inner.db,
