@@ -283,7 +283,7 @@ class QueryPrecedentTest(QueryAPITestCase):
         query_id = query_inner.id
         query_outer = QueryFactory(
             query_text="""select *
-                from {db}<TABLE-{query_id}>""".format(**locals()),
+                from {db}.<TABLE-{query_id}>""".format(**locals()),
             owner=self.user,
             title='outer',
             db=query_inner.db,
