@@ -129,6 +129,13 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
+    'social.apps.django_app.context_processors.backends',
+    'social.apps.django_app.context_processors.login_redirect',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'social.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 # Logging
@@ -262,3 +269,8 @@ MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'
 
 STATIC_ROOT = '/var/www/sqlviz/static/'
+
+# GOOGLE AUTH
+#SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_ID =
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '609386245523-1oe1r4k5oe1ot42vqhol81ejpbc1kgue.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'OS9Fh0kDkzKrwqf76SRzgeWA'

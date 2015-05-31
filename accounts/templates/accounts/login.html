@@ -3,7 +3,7 @@
 	{% if form.errors %}
 		<p>Your username and password didn't match. Please try again.</p>
 	{% endif %}
-
+   <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login with Google</a>
 	<form method="post" action="{% url 'accounts:login' %}">
 		{% csrf_token %}
 		<table>
