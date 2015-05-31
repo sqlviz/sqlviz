@@ -53,6 +53,7 @@ class QueryFactory(TagsFactory):
     graph_extra = "{}"
     query_text = "select username, last_login from auth_user"
     pivot_data = False
+    insert_limit = True
 
 
 class MlFactory(factory.django.DjangoModelFactory):
@@ -103,3 +104,10 @@ class EmailUserFactory(factory.django.DjangoModelFactory):
         model = cron.models.EmailUser
     job = factory.SubFactory(JobFactory)
     user = factory.SubFactory(UserFactory)
+
+
+class QueryPrecedentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = website.models.QueryPrecedent
+    final_query = factory.SubFactory(QueryFactory)
+    preceding_query = factory.SubFactory(QueryFactory)

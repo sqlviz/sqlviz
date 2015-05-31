@@ -14,6 +14,8 @@ import copy
 import hashlib
 import models
 import get_db_engine
+import time
+from macro import Macro, DateMacro, TableMacro
 from urllib import quote_plus as urlquote
 
 from date_time_encoder import DateTimeEncoder
@@ -148,11 +150,19 @@ class LoadQuery:
         """
         For values in the target_parameters dict, update the query_text
         Replace key with target_value
+
+        Macros
+        ## <DATEID> ==> today regardles of what replace with is
+        ## <TABLEID-1> ==> Table_name_guid regardless of replace with
         """
         for key, replacement_dict in self.target_parameters.iteritems():
-            self.query.query_text = self.query.query_text.replace(
-                replacement_dict['search_for'],
-                str(replacement_dict['replace_with']))
+            macro = Macro(
+                key_pattern=replacement_dict['search_for'],
+                replace_value=str(replacement_dict['replace_with'])
+            )
+            self.query.query_text = macro.replace_text(self.query.query_text)
+        date_macro = DateMacro()
+        self.query.query_text = date_macro.replace_text(self.query.query_text)
 
     def get_parameters(self):
         return self.target_parameters
@@ -206,7 +216,7 @@ class RunQuery(Query):
                 """ % (union_set))
             return False
 
-    def record_query_execution(self):
+    def record_query_execution(self, used_cache=False, execution_time=0.0):
         """
         Saves query browsing for ACL purposes
         """
@@ -215,7 +225,12 @@ class RunQuery(Query):
         elif self.user is None:
             logging.error("Running query without a user")
         else:
-            qv = models.QueryView(user=self.user, query=self.query_model)
+            qv = models.QueryView(
+                user=self.user,
+                query=self.query_model,
+                used_cache=used_cache,
+                execution_time=execution_time
+            )
             qv.save()
 
     def return_data(self):
@@ -253,27 +268,50 @@ class RunQuery(Query):
         qp = models.QueryPrecedent.objects.filter(final_query_id=self.query_id)
         run_guid = uuid.uuid1()
 
+        table_output_dict = {}
         for i in qp:  # TODO could be parralelized???
+            logging.warning(i)
             lq = LoadQuery(
-                query_id=qp.preceding_query_id,
+                query_id=i.preceding_query.id,
                 user=self.user,
                 parameters=self.parameters,
                 cacheable=True)
-            q = lq.run()
+            q = lq.prepare_query()
             q.run_query()
-            table_name = '%s_%s' % (run_guid, lq.query_id)
-            q.save_to_mysql(table_name)  # TODO run this after pivot?
+            if q.cached:
+                table_name = q.check_cache()
+                # logging.warning('CACHED TABLE NAME %s' % table_name)
+            else:
+                q.run_manipulations()
+                table_name = 'table_{id}_{guid}'.format(
+                    id=lq.query_id,
+                    guid=run_guid
+                )
+                q.save_to_mysql(table_name)
+            table_output_dict[lq.query_id] = table_name
+        return table_output_dict
 
     def run_query(self):
         """
         Wrapper for Run Query
         """
+        start_time = time.time()
+
         self.prepare_safety()
         self.check_permission()
-        self.record_query_execution()
 
         # Run Precedents
-        self.run_precedents()
+        # TODO fix race conditiosn with precents/ cache
+        precedent_table_names = self.run_precedents()
+        # Run Table Name Macro
+        if precedent_table_names:
+            # TODO run macro
+            table_macro = TableMacro()
+            self.query_text = table_macro.replace_text(
+                text=self.query_text,
+                table_id_dict=precedent_table_names
+            )
+
         # Attempt to use Cache
         table_cache = self.check_cache()
         # logging.warning('Cache Tables %s %s' % (table_cache, self.cacheable))
@@ -300,6 +338,11 @@ class RunQuery(Query):
             self.save_to_mysql(
                 'table_%s_%s' % (self.query_id, self.query_hash)
             )
+        execution_time = time.time() - start_time
+        self.record_query_execution(
+            used_cache=table_cache is None,
+            execution_time=execution_time
+        )
         return self.data
 
     def run_sql_query(self):

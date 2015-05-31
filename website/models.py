@@ -197,6 +197,9 @@ class Dashboard(models.Model):
     def __str__(self):
         return "%s: %s" % (self.id, self.title)
 
+    def get_absolute_url(self):
+        return reverse('website.dashboard', args=[str(self.id)])
+
 
 class DashboardQuery(models.Model):
 
@@ -233,6 +236,8 @@ class QueryView(models.Model):
     user = models.ForeignKey(User)
     query = models.ForeignKey(Query)
     view_time = models.DateTimeField(auto_now_add=True, editable=False)
+    used_cache = models.BooleanField(default=False)
+    execution_time = models.FloatField(default=0.0)
 
     def __str__(self):
         return "%s : %s : %s" % (self.user, self.query, self.view_time)
@@ -250,4 +255,4 @@ def post_save_handler_query(sender, instance, **kwargs):
         instance.image = image
         instance.save()
     post_save.connect(post_save_handler_query, sender=Query)
-post_save.connect(post_save_handler_query, sender=Query)
+# post_save.connect(post_save_handler_query, sender=Query)

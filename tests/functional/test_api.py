@@ -1,9 +1,11 @@
 import json
 
-from ..factories import QueryFactory, QueryDefaultFactory, UserFactory
+from ..factories import QueryFactory, QueryDefaultFactory, UserFactory, \
+    QueryPrecedentFactory
 from .testcases import APITestCase
 import datetime
 import logging
+import os
 
 
 def create_users(user_count=100):
@@ -29,7 +31,7 @@ class QueryAPITestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
-    def assertQueryData(self, query_data, **kwargs):
+    def assert_query_data(self, query_data, **kwargs):
         kwargs.setdefault('cached', False)
         kwargs.setdefault('error', False)
         self.assertLess(query_data['time_elapsed'], 1)
@@ -58,8 +60,11 @@ class QueryAPITest(QueryAPITestCase):
         self.create_user()
         self.login()
         data = self.get_query(1)
-        self.assertQueryData(data, error=True,
-                             data="No Query matches the given query.")
+        self.assert_query_data(
+            data,
+            error=True,
+            data="No Query matches the given query."
+        )
 
     def test_unsafe_query(self):
         user = self.create_user()
@@ -76,8 +81,11 @@ class QueryAPITest(QueryAPITestCase):
             owner=user,
         )
         data = self.get_query(query.id)
-        self.assertQueryData(data, error=True,
-                             data='Query contained delete -- Can not be run')
+        self.assert_query_data(
+            data,
+            error=True,
+            data='Query contained delete -- Can not be run'
+        )
 
     def test_valid_query(self):
         user = self.create_user()
@@ -87,7 +95,7 @@ class QueryAPITest(QueryAPITestCase):
         )
         self.login()
         data = self.get_query(query.id)
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             'columns': ['id', 'username'],
             'data': [[user.id, user.username]],
         })
@@ -104,7 +112,6 @@ class QueryAPITest(QueryAPITestCase):
         self.login()
         data = self.get_query(query.id)
         time_object = data['data']['data'][0][0]
-        logging.warning(time_object)
         t = datetime.datetime.strptime(
             time_object, "%Y-%m-%dT%H:%M:%S"
         )
@@ -131,7 +138,7 @@ class QueryAPITest(QueryAPITestCase):
         )
         self.login()
         data = self.get_query(query.id)
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             u'columns': [u'avg_val'],
             u'data': [[1.33333]]
         })
@@ -158,7 +165,7 @@ class QueryAPITest(QueryAPITestCase):
             pivot_data=True
         )
         data = self.get_query(query.id)
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             'columns': ['first_name', 'Brown', 'Green', 'Smith', 'Yu'],
             'data': [
                 [u'Bob', 9.0, 8.0, 8.0, 8.0],
@@ -180,7 +187,7 @@ class QueryParameterTest(QueryAPITestCase):
                 from
                     auth_user
                 where
-                    date_joined > "<DATE>"
+                    date_joined > "<DT>"
                     and first_name = "<NAME>"
                 limit
                     1
@@ -190,7 +197,7 @@ class QueryParameterTest(QueryAPITestCase):
         defaults = []
         defaults.append(QueryDefaultFactory(
             query=query,
-            search_for="<DATE>",
+            search_for="<DT>",
             replace_with="2014-04-01",
             data_type="Date",
         ))
@@ -205,7 +212,7 @@ class QueryParameterTest(QueryAPITestCase):
     def test_parameters_default(self):
         (user, query, defaults) = self.mock_valid_user_and_parameter_query()
         data = self.get_query(query.id)
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             'columns': ['first_name'],
             'data': [['John']],
         })
@@ -214,47 +221,85 @@ class QueryParameterTest(QueryAPITestCase):
         (user, query, defaults) = self.mock_valid_user_and_parameter_query()
         name = 'Bob'
         data = self.get_query(query.id, {'<NAME>': name})
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             'columns': ['first_name'],
             'data': [[name]],
         })
 
 
 class QueryCacheTest(QueryAPITestCase):
+    def setUp(self):
+        self.user = self.create_user()
+        self.login()
 
     def test_used_cache(self):
         """
         Runs query twice to see if caching goes from False to True
         """
-        user = self.create_user()
         query = QueryFactory(
             query_text="select id, username from auth_user",
-            owner=user,
+            owner=self.user,
         )
-        self.login()
         data = self.get_query(query.id)
         # TODO make this run a longer query and validate the cache is faster
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             'columns': ['id', 'username'],
-            'data': [[user.id, user.username]],
+            'data': [[self.user.id, self.user.username]],
         })
         data = self.get_query(query.id)
-        self.assertQueryData(data, cached=True, data={
+        self.assert_query_data(data, cached=True, data={
             'columns': ['id', 'username'],
-            'data': [[user.id, user.username]],
+            'data': [[self.user.id, self.user.username]],
         })
-        return (user, query)
+        return query
 
     def test_no_cache_request(self):
         # Run Suite from before
-        (user, query) = self.test_used_cache()
+        query = self.test_used_cache()
         # Now run with caching turned off
         # TODO use a url parameter in get here
         data = self.get_query(query.id, {'cacheable': "False"})
-        self.assertQueryData(data, data={
+        self.assert_query_data(data, data={
             'columns': ['id', 'username'],
-            'data': [[user.id, user.username]],
+            'data': [[self.user.id, self.user.username]],
         })
+
+
+class QueryPrecedentTest(QueryAPITestCase):
+    def setUp(self):
+        self.user = self.create_user()
+        self.login()
+
+    def test_precedent_query(self):
+        # Create sub=query
+        query_inner = QueryFactory(
+            query_text="select id, username from auth_user",
+            owner=self.user,
+            title='inner'
+        )
+        db = 'scratch'
+        if os.environ.get('CIRCLECI'):
+            db = 'circle_test'
+        query_id = query_inner.id
+        query_outer = QueryFactory(
+            query_text="""select *
+                from {db}.<TABLE-{query_id}>""".format(**locals()),
+            owner=self.user,
+            title='outer',
+            db=query_inner.db,
+            insert_limit=False
+        )
+        QueryPrecedentFactory(
+            final_query=query_outer,
+            preceding_query=query_inner
+        )
+        inner_data = self.get_query(query_inner.id)
+        outer_data = self.get_query(query_outer.id)
+        # Strip volatile data
+        inner_data.pop('time_elapsed')
+        outer_data.pop('time_elapsed')
+        logging.warning(outer_data)
+        self.assertEqual(inner_data, outer_data)
 
 
 class QueryAPIPermissionTest(QueryAPITestCase):
