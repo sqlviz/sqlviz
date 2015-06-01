@@ -87,6 +87,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'social.apps.django_app.default',
     'django_ace',
     'website',
     'taggit',
@@ -240,6 +241,7 @@ ENCRYPTED_FIELDS_KEYDIR = BASE_DIR + '/fieldkeys'
 
 # Login URL for @log_in decorator
 LOGIN_URL = '/accounts/login'
+# LOGIN_REDIRECT_URL = '/'
 
 # Cronjobs
 CRONJOBS = [
@@ -271,6 +273,7 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = '/var/www/sqlviz/static/'
 
 # GOOGLE AUTH
-#SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_ID =
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '609386245523-1oe1r4k5oe1ot42vqhol81ejpbc1kgue.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'OS9Fh0kDkzKrwqf76SRzgeWA'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = ['gmail.com']

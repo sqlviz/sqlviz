@@ -11,6 +11,7 @@ urlpatterns = patterns(
     url(r'^favs/', include('favs.urls', namespace='favs')),
     url(r'^', include('ml.urls', namespace='ml')),
     url('', include('social.apps.django_app.urls', namespace='social')),
+    url('', include('django.contrib.auth.urls', namespace='auth')),
 )
 
 
