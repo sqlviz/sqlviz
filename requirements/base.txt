@@ -18,6 +18,8 @@ pycrypto==2.6.1
 patsy==0.3.0
 python-dateutil==2.2
 python-keyczar==0.71c
+python-openid==2.2.5
+python-social-auth==0.2.10
 pytz==2014.9
 scipy==0.14.0
 #seaborn==0.5.0
