@@ -24,37 +24,39 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Default password data
 pwd_data = {
     'SCRATCH': {
-        'DB_TYPE': "mysql",
-        'DB': "scratch",
-        'HOST': "localhost",
-        'PWD': "django",
-        'USER': "django",
+        'DB_TYPE': 'mysql',
+        'DB': 'scratch',
+        'HOST': 'localhost',
+        'PWD': 'django',
+        'USER': 'django',
         'PORT': 3306,
     },
-    "SECRET_KEY": "j_-af1@u(h7j%nkkdweuq6n$i=dyi2b+o7n8$u4szdb9^-6-j2",
-    "EMAIL": {
-        "EMAIL_HOST_PASSWORD": "test",
-        "EMAIL_PORT": 587,
-        "EMAIL_USE_TLS": True,
-        "EMAIL_HOST_USER": "example@gmail.com",
-        "EMAIL_HOST": "smtp.gmail.com",
+    'SECRET_KEY': 'j_-af1@u(h7j%nkkdweuq6n$i=dyi2b+o7n8$u4szdb9^-6-j2',
+    'EMAIL': {
+        'EMAIL_HOST_PASSWORD': 'test',
+        'EMAIL_PORT': 587,
+        'EMAIL_USE_TLS': True,
+        'EMAIL_HOST_USER': 'example@gmail.com',
+        'EMAIL_HOST': 'smtp.gmail.com',
     },
     'DJANGO': {
-        'DB': "django",
-        'DB_TYPE': "mysql",
-        'HOST': "localhost",
+        'DB': 'django',
+        'DB_TYPE': 'mysql',
+        'HOST': 'localhost',
         'PORT': 3306,
-        'PWD': "django",
-        'USER': "django",
+        'PWD': 'django',
+        'USER': 'django',
     },
-    "SCRATCH": {
-        "DB_TYPE": "mysql",
-        "DB": "scratch",
-        "HOST": "localhost",
-        "PWD": "django",
-        "USER": "django",
-        "PORT": 3306,
+    'SCRATCH': {
+        'DB_TYPE': 'mysql',
+        'DB': 'scratch',
+        'HOST': 'localhost',
+        'PWD': 'django',
+        'USER': 'django',
+        'PORT': 3306,
     },
+    'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY': '',
+    'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET': ''
 }
 
 # Import PWDs from separate JSON file outside of VC
