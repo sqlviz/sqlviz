@@ -15,6 +15,6 @@ indent_size = 4
 [*.js]
 indent_style = tab
 
-[*.yml]
+[*.{html,yml}]
 indent_style = space
 indent_size = 2
