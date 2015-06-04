@@ -23,6 +23,8 @@
 <div class="tab-content">
 <div role="tabpanel" class="tab-pane fade in active" id="table_group">
 
+  <h3>Queries</h3>
+
 {% if query_list or dashboard_list %}
     <table id="query_list_table" class="table table-striped dataTable">
       <thead>
@@ -95,6 +97,9 @@
 </div>
 
 <div role="tabpanel" class="tab-pane fade" id="img_group">
+
+  <h3>Queries</h3>
+
   {% if query_list_images %}
     {% for query in query_list_images %}
       {% if forloop.counter|divisibleby:3 %}
