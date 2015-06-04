@@ -89,7 +89,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
     'social.apps.django_app.default',
     'django_ace',
     'website',
@@ -101,7 +100,8 @@ INSTALLED_APPS = (
     'favs',
     'csv_upload',
     'scratch',
-    'ml'
+    'ml',
+    'crispy_forms',
 )
 
 MIDDLEWARE_CLASSES = (
