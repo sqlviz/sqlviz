@@ -92,7 +92,7 @@ function make_table(columns, data, target){
 				"dom": 'T<"clear">lfrtip',
 				"tableTools": {
 					"aButtons": [ "copy", "csv" ],
-					"sSwfPath": "/static/DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls.swf"
+					"sSwfPath": "/static/DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls.swf"
 				},
 				'columnDefs': [
 					{ 'type': 'percent', 'targets': pct_array },
