@@ -1,4 +1,9 @@
 {% extends "accounts/base.html" %}
+
+{% block title %}
+  SQLVIZ Login
+{% endblock %}
+
 {% block content %}
   {% if user and not user.is_anonymous %}
     <div class="alert alert-danger" role="alert">
