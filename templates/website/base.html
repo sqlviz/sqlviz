@@ -109,13 +109,23 @@
                   <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                  <li><a href="{% url 'accounts:logout_confirm' %}">Logout</a></li>
+                  <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
                 </ul>
               </li>
             {% endif %}
           </ul>
         </div>
       </div>
+    </div>
+
+    <div class="container">
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert {{ message.tags }}" role="alert">
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endif %}
     </div>
 
     <div class="container-fluid">
