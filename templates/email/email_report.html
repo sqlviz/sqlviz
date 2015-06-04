@@ -1,16 +1,16 @@
 EMAIL TEMPLATE
 {% for query in query_list %}  
-	<a href='{% url 'website:query' query.id %}'>
-		<h2>
-			{{query.title}}
-		</h2>
-	</a></br>
-	<p>{{query.description}}</p>
-	{% if query.table %}
-		{{query.table|safe}} </br>
-	{% endif %}
-	{% if query.img %}
-		<img src='cid:{{query.img}}'>
-	{% endif %}
-		</br></br>
+  <a href='{% url 'website:query' query.id %}'>
+    <h2>
+      {{query.title}}
+    </h2>
+  </a></br>
+  <p>{{query.description}}</p>
+  {% if query.table %}
+    {{query.table|safe}} </br>
+  {% endif %}
+  {% if query.img %}
+    <img src='cid:{{query.img}}'>
+  {% endif %}
+    </br></br>
 {% endfor %}
