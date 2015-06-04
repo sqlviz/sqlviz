@@ -8,24 +8,20 @@
 {% endblock %}
 {% block main %}
 <div class="container">
-  <div>
-    <button align="right" type="submit" id="toggle_table" class="btn btn-info">Show Images</button>
-  </div>
+
+  <ul class="nav nav-tabs" role="tablist" id="layout_tabs">
+    <li role="presentation" class="active"><a href="#table_group" aria-controls="table layout" role="tab" data-toggle="tab">Table</a></li>
+    <li role="presentation"><a href="#img_group" aria-controls="images layout" role="tab" data-toggle="tab">Images</a></li>
+  </ul>
 
 <script>
-  $(document).ready(function() {
-    $('#toggle_table').click(function() {
-      $("#table_group").toggleClass("hide");
-      $("#img_group").toggleClass("hide");
-      if ($.trim($(this).text()) === 'Show Images') {
-        $(this).text('Show Table');
-      } else {
-        $(this).text('Show Images');
-      }
-    });
-  });
+  $(function() {
+    $('#layout_tabs a:first').tab('show')
+  })
 </script>
-<div id="table_group">
+
+<div class="tab-content">
+<div role="tabpanel" class="tab-pane fade in active" id="table_group">
 
 {% if query_list or dashboard_list %}
     <table id="query_list_table" class="table table-striped dataTable">
@@ -97,7 +93,8 @@
     <p>No Queries or Dashboards are available.</p>
 {% endif %}
 </div>
-<div id="img_group" class="hide">
+
+<div role="tabpanel" class="tab-pane fade" id="img_group">
   {% if query_list_images %}
     {% for query in query_list_images %}
       {% if forloop.counter|divisibleby:3 %}
