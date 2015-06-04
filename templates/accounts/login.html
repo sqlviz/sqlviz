@@ -1,5 +1,7 @@
 {% extends "accounts/base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}
   SQLVIZ Login
 {% endblock %}
@@ -22,7 +24,7 @@
     <form method="post" action="{% url 'accounts:login' %}">
       {% csrf_token %}
       <table>
-        {{ form }}
+        {{ form|crispy }}
       </table>
       <input type="submit" value="login" />
       <input type="hidden" name="next" value="{% url 'website:home' %}" />

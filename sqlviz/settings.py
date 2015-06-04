@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'social.apps.django_app.default',
     'django_ace',
     'website',
@@ -273,6 +274,8 @@ MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'
 
 STATIC_ROOT = '/var/www/sqlviz/static/'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # GOOGLE AUTH
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']

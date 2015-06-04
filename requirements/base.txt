@@ -5,6 +5,7 @@ SQLAlchemy==0.9.8
 dj-database-url==0.3.0
 django-ace==1.0.1
 django-contrib-comments==1.5
+django-crispy-forms==1.4.0
 django-crontab==0.5.1
 django-encrypted-fields==1.1.1
 django-favit==0.2.4
