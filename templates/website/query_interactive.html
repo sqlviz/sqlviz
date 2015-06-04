@@ -33,6 +33,8 @@
 
 {% block main %}
 
+<div class="container">
+
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
@@ -263,5 +265,7 @@ $( "#db_explorer" ).on("click",'.table',function() {
   });
 });
 </script>
+
+</div>
 
 {% endblock %}
