@@ -173,7 +173,7 @@
 {% block style %}
 {{ block.super }}
 <!--<link type="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
-<link rel="stylesheet" type="text/css" href="{% static 'pivottable/dist/pivot.css' %}"></link>
+<link rel="stylesheet" type="text/css" href="{% static 'pivottable/pivot.css' %}"></link>
 
 <style type="text/css" media="screen">
     ul.nav-tabs {
@@ -224,7 +224,7 @@
 <script src="{% static 'js/website_query.js' %}"></script>
 <!--<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/percent.js"></script>
 <script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/currency.js"></script>-->
-<script type="text/javascript" src="{% static 'pivottable/dist/pivot.js' %}"></script>
+<script type="text/javascript" src="{% static 'pivottable/pivot.js' %}"></script>
 <script>
   make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
 </script>
