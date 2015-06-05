@@ -3,9 +3,7 @@
 
 {% block title %} SQLVIZ Homepage {% endblock %}
 {% load staticfiles %}
-{% block style %}
 
-{% endblock %}
 {% block main %}
 <div class="container">
 
@@ -13,12 +11,6 @@
     <li role="presentation" class="active"><a href="#table_group" aria-controls="table layout" role="tab" data-toggle="tab">Table</a></li>
     <li role="presentation"><a href="#img_group" aria-controls="images layout" role="tab" data-toggle="tab">Images</a></li>
   </ul>
-
-<script>
-  $(function() {
-    $('#layout_tabs a:first').tab('show')
-  })
-</script>
 
 <div class="tab-content">
 <div role="tabpanel" class="tab-pane fade in active" id="table_group">
@@ -78,18 +70,6 @@
         {% endfor %}        
       </tbody>
     </table>
-    <script>
-    $(document).ready(function() {
-      $('#query_list_table').dataTable({
-        "bAutoWidth": false,
-        "bScrollCollapse": true,
-        "iDisplayLength": 100,
-        "tableTools": {
-          "sSwfPath": "{% static "DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls_pdf.swf" %}"
-        },
-      });
-    } );
-    </script>
 {% else %}
     <p>No Queries or Dashboards are available.</p>
 {% endif %}
@@ -125,8 +105,29 @@
       <p>No Queries Images available.</p>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+  $(function() {
+    $('#layout_tabs a:first').tab('show')
+  })
+</script>
+    <script>
+    $(document).ready(function() {
+      $('#query_list_table').dataTable({
+        "bAutoWidth": false,
+        "bScrollCollapse": true,
+        "iDisplayLength": 100,
+        "tableTools": {
+          "sSwfPath": "{% static "DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls_pdf.swf" %}"
+        },
+      });
+    } );
+    </script>
 <script>
   make_favorites("{% url "favs:add" %}","{% url "favs:remove" %}");
 </script>
 </div>
-{% endblock %}
+{% endblock javascript %}
