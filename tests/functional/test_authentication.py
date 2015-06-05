@@ -29,7 +29,7 @@ class AdminLoginTest(LiveServerTestCase):
 class LoginPageTest(LiveServerTestCase):
 
     initial_url = "/accounts/login"
-    login_button_value = 'login'
+    login_button_value = 'Login'
 
     def test_invalid_username(self):
         """Ensure error shown when logging in with an invalid username."""
