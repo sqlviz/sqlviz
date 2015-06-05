@@ -5,31 +5,6 @@
   Interactive Mode
 {% endblock %}
 
-{% block style %}
-<style type="text/css" media="screen">
-    #editor { 
-        position: relative;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        height: 480px;
-        width: 480px;
-        padding: 30px;
-        clear:both;
-        border-radius: 10px;
-    }
-    #close{
-      float:right;
-      position: absolute;
-      right: 15px;
-      top: 15px;
-      width:30px;
-      height:30px;
-    }
-</style>
-{% endblock %}
-
 
 {% block main %}
 
@@ -108,10 +83,36 @@ group by
 
 {% endblock %}
 
+{% block style %}
+{{ block.super }}
+<style type="text/css" media="screen">
+    #editor { 
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 480px;
+        width: 480px;
+        padding: 30px;
+        clear:both;
+        border-radius: 10px;
+    }
+    #close{
+      float:right;
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      width:30px;
+      height:30px;
+    }
+</style>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+{% endblock %}
+
 {% block javascript %}
 {{ block.super }}
 <script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
 <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
 
 <script type="text/javascript" src="{% static 'Highcharts/js/highcharts.src.js' %}"></script>
