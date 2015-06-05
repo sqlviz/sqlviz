@@ -228,29 +228,31 @@
 <script>
   make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
 </script>
-{% for query in query_list %}
-  {% if query.ml %}
-    {% for ml_i in query.ml %}
-      <script>
-        make_adhoc_model({{ml_i.id}},
-            '{% url "ml:build_model" ml_i.id  %}',
-            {{json_get|safe}}, {{query.id}});
-      </script>
-      <script>
-      display_data({{query.id}}, '{% url "website:query_api" query.id %}',  {{json_get|safe}}, '{{query.hide_table}}', '{{query.chart_type}}', '{{query.title}}', '{{query.stacked}}', '{{query.log_scale_y}}', '{{query.graph_extra|safe}}')
-      </script>
-    {% endfor %}
-  {% endif %}
-{% endfor %}
-<script>
-  $(document).ready(function(){      
-    $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
-      //alert('test!');
-      event.preventDefault();
-      send_data_ml_adhoc('{{query.id}}', '{% url "ml:build_model_adhoc" %}','ml_output_{{ml_i.id}}');
-    });
-  });
-</script>
+{% if query_list %}
+  {% for query in query_list %}
+    <script>
+    display_data({{query.id}}, '{% url "website:query_api" query.id %}',  {{json_get|safe}}, '{{query.hide_table}}', '{{query.chart_type}}', '{{query.title}}', '{{query.stacked}}', '{{query.log_scale_y}}', '{{query.graph_extra|safe}}')
+    </script>
+    <script>
+      $(document).ready(function(){
+        $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
+          //alert('test!');
+          event.preventDefault();
+          send_data_ml_adhoc('{{query.id}}', '{% url "ml:build_model_adhoc" %}','ml_output_{{ml_i.id}}');
+        });
+      });
+    </script>
+    {% if query.ml %}
+      {% for ml_i in query.ml %}
+        <script>
+          make_adhoc_model({{ml_i.id}},
+              '{% url "ml:build_model" ml_i.id  %}',
+              {{json_get|safe}}, {{query.id}});
+        </script>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
 <script>
   make_date_picker('{{default_dict.search_for}}');
 </script>
