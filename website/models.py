@@ -255,4 +255,4 @@ def post_save_handler_query(sender, instance, **kwargs):
         instance.image = image
         instance.save()
     post_save.connect(post_save_handler_query, sender=Query)
-# post_save.connect(post_save_handler_query, sender=Query)
+post_save.connect(post_save_handler_query, sender=Query)

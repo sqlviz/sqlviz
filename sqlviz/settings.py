@@ -63,7 +63,7 @@ pwd_data = {
 pwd_file = BASE_DIR + '/sqlviz/passwords.json'
 try:
     with open(pwd_file) as json_file:
-        pwd_data = json.load(json_file)
+        pwd_data.update(json.load(json_file))
 except IOError:
     pass
 
