@@ -49,7 +49,7 @@ def index(request):
             setattr(q, 'fav', False)
         if q.image is not None and q.image != '':
             logging.warning(q)
-            logging.warning(q.image)
+            #logging.warning(q.image)
             query_list_images.append(q)
 
     dash_favorites = favit.models.Favorite.objects.\
@@ -109,7 +109,7 @@ def query_api(request, query_id):
 
 
 @login_required
-def query_view(request, query_ids):
+def query_view(request, query_ids, type='query', **kwargs):
     query_id_array = query_ids.split(',')
     # TODO filter to make sure only this applies to queries which exist
     query_list = [m for m in models.Query.objects.filter(
@@ -147,13 +147,17 @@ def query_view(request, query_ids):
         for k in json_get_extra_array:
             if request.GET.get(k, None) is not None:
                 json_get[k] = request.GET.get(k)
-    return render_to_response(
-        'website/query.html',
-        {
+        d = {
             'query_list': query_list,
             'replacement_dict': replacement_dict,
-            'json_get': json.dumps(json_get)
-        },
+            'json_get': json.dumps(json_get),
+            'type': type
+        }
+        d.update(**kwargs)
+        logging.warning(d)
+    return render_to_response(
+        'website/query.html',
+        d,
         context_instance=RequestContext(request))
 
 
@@ -162,7 +166,7 @@ def query_name(request, query_names):
     query_name_array = query_names.split(',')
     queries = models.Query.objects.filter(title__in=query_name_array)
     query_list_string = ','.join([str(q.id) for q in queries])
-    return query_view(request, query_list_string)
+    return query_view(request, query_list_string, 'query')
 
 
 @login_required
@@ -170,11 +174,17 @@ def dashboard(request, dashboard_id):
     # First find all the queries, then run it as a list of queries
     dashboard_query_list = models.DashboardQuery.objects.filter(
         dashboard_id=dashboard_id).order_by('order')
+    dashboard_data = models.Dashboard.objects.filter(
+        id=dashboard_id).first()
     query_id_array = []
     for q in dashboard_query_list:
         query_id_array.append(str(q.query_id))
     query_list_string = ','.join(query_id_array)
-    return query_view(request, query_list_string)
+    return query_view(
+        request,
+        query_list_string,
+        'dashboard',
+        dashboard=dashboard_data)
 
 
 @login_required

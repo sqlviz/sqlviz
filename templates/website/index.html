@@ -48,7 +48,9 @@
               </a>
             {% endif %}
           </td>
-          <td> {{query.tags.names|join:", " }} </td>
+          <td>
+            {% include "website/_tags.html" %}
+          </td>
           <td> {{query.owner}} </td>
           {% if user.is_staff %}
             <td> <a href="{% url "admin:website_query_change" query.id %}">Edit</a> </td>
@@ -57,12 +59,16 @@
         {% endfor %}
         {% for dash in dashboard_list %}
           <tr>
-          <td>  <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
+          <td> <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
           <td> <a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a> </td>
           <td> <a href="{% url "website:dashboard" dash.id %}">{{dash.title}} </a></td>
           <td> {{dash.description}} {{dash.description_long}} </td>
           <td><!-- image --> </td>
-          <td> {{ dash.tags.names|join:", " |truncatechars_html:4 }} </td>
+          <td>
+            {% if dash.tags.names %}
+              <span class='label label-default'>{{dash.tags.names|join:"</span>  <span class='label label-default'>"|truncatechars_html:100 }} </span>
+            {% endif %}
+          </td>
           <td> {{dash.owner}} </td>
           {% if user.is_staff %}
             <td> <a href="{% url "admin:website_dashboard_change" dash.id %}">Edit</a> </td>
@@ -88,9 +94,9 @@
       <div class="col-sm-6 col-md-4">
         <div class="thumbnail">
           <div class="caption">
-            <h3>{{query.title}}</h3>
+            <h3>{% include "website/_favorite_button.html" %} {{query.title}} </h3>
             <p>
-              {% include "website/_favorite_button.html" %}
+              
               <a href="{% url "website:query" query.id %}">
                 <img src="{{query.image}}" width = "260px" height = "160px">
               </a>
