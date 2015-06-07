@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -208,7 +209,7 @@ def dashboard(request, dashboard_id):
         dashboard=dashboard_data)
 
 
-@login_required
+@staff_member_required
 def query_interactive(request):
     # Render empty page for users to add data to
     db_list = models.Db.objects.all()
@@ -218,7 +219,7 @@ def query_interactive(request):
         RequestContext(request))
 
 
-@login_required
+@staff_member_required
 def query_interactive_api(request):
     # Take Query, Database, and Pivot
     # Create DataManager, run and return as JSON schema
@@ -260,7 +261,7 @@ def query_interactive_api(request):
                         content_type="application/json")
 
 
-@login_required
+@staff_member_required
 def database_explorer(request):
     # Render empty page for users to add data to
     db_list = models.Db.objects.all()
@@ -270,7 +271,7 @@ def database_explorer(request):
         RequestContext(request))
 
 
-@login_required
+@staff_member_required
 def database_explorer_api(request):
     # Get DB
     try:
@@ -322,13 +323,3 @@ def database_explorer_api(request):
     return HttpResponse(
         json.dumps(return_data, cls=DateTimeEncoder),
         content_type="application/json")
-
-"""
-@login_requiredclass ArticleListView(ListView):
-
-    model = Article
-
-    def get_context_data(self, **kwargs):
-        context = super(ArticleListView, self).get_context_data(**kwargs)
-        context['now'] = timezone.now()
-        return context"""

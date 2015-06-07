@@ -283,3 +283,11 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
 
 # SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = ['gmail.com']
+
+from django.contrib import messages
+
+MESSAGE_TAGS = {
+    messages.SUCCESS: 'alert-success success',
+    messages.WARNING: 'alert-warning warning',
+    messages.ERROR: 'alert-danger error'
+}
