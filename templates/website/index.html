@@ -1,7 +1,7 @@
 {% extends "website/base.html" %}
 
 
-{% block title %} SQLVIZ Homepage {% endblock %}
+{% block title %} SQLViz Homepage {% endblock %}
 {% load staticfiles %}
 
 {% block main %}
@@ -38,7 +38,7 @@
         {% for query in query_list %}
         <tr>
           <td> <i class="fa fa-bar-chart"></i> {{query.id}} </td>
-          <td>{% include "website/_favorite_button.html" %}</td>
+          <td> <h4>{% include "website/_favorite_button.html" %}</h4> </td>
           <td> <a href="{% url "website:query" query.id %}">{{query.title}} </a></td>
           <td> {{query.description}} {{query.description_long}} </td>
           <td> 
@@ -60,14 +60,12 @@
         {% for dash in dashboard_list %}
           <tr>
           <td> <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
-          <td> <a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a> </td>
+          <td> <h4><a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a></h4></td>
           <td> <a href="{% url "website:dashboard" dash.id %}">{{dash.title}} </a></td>
           <td> {{dash.description}} {{dash.description_long}} </td>
           <td><!-- image --> </td>
           <td>
-            {% if dash.tags.names %}
-              <span class='label label-default'>{{dash.tags.names|join:"</span>  <span class='label label-default'>"|truncatechars_html:100 }} </span>
-            {% endif %}
+            {% include "website/_tags_dash.html" %}
           </td>
           <td> {{dash.owner}} </td>
           {% if user.is_staff %}

@@ -9,7 +9,7 @@ class AdminLoginTest(LiveServerTestCase):
         """Ensure error shown when logging in with an invalid username."""
         assert not self.browser.find_by_css('.errornote')
         self.login()
-        assert "case-sensitive" in self.browser.find_by_css('.errornote').text
+        assert "case-sensitive" in self.browser.find_by_css('.alert-danger').text
 
     def test_incorrect_password(self):
         """Ensure error shown when logging in with an incorrect password."""
