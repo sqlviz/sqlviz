@@ -3,9 +3,7 @@
 
 {% block title %} SQLVIZ Model Homepage {% endblock %}
 {% load staticfiles %}
-{% block style %}
 
-{% endblock %}
 {% block main %}
 <div id='table_group'>
 {% if ml_models %}
@@ -51,20 +49,23 @@
         {% endfor %}
       </tbody>
     </table>
-    <script>
-    $(document).ready(function() {
-      $('#ml_list_table').dataTable({
-        "bAutoWidth": false,
-        "bScrollCollapse": true,
-        "iDisplayLength": 100,
-        "tableTools": {
-          "sSwfPath": "{% static 'DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls_pdf.swf' %}"
-        },
-      });
-    } );
-    </script>
 {% else %}
     <p>No Models available.</p>
 {% endif %}
 </div>
 {% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+  $('#ml_list_table').dataTable({
+    "bAutoWidth": false,
+    "bScrollCollapse": true,
+    "iDisplayLength": 100,
+    "tableTools": {
+      "sSwfPath": "{% static 'DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls_pdf.swf' %}"
+    },
+  });
+} );
+</script>
+{% endblock javascript %}

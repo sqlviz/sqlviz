@@ -1,32 +1,25 @@
-{% extends 'website/base.html' %}
+{% extends "website/base.html" %}
 
 
 {% block title %} SQLVIZ Homepage {% endblock %}
 {% load staticfiles %}
-{% block style %}
 
-{% endblock %}
 {% block main %}
-  <div padding=3 align='left' padding='3px'><button align='right' type="submit" id="toggle_table" class="btn btn-info">Show Images</button>
-  </div>
+<div class="container">
 
-<script>
-  $(document).ready(function() {
-    $('#toggle_table').click(function() {
-      $("#table_group").toggleClass("hide");
-      $("#img_group").toggleClass("hide");
-      if ($.trim($(this).text()) === 'Show Images') {
-        $(this).text('Show Table');
-      } else {
-        $(this).text('Show Images');
-      }
-    });
-  });
-</script>
-<div id='table_group'>
+  <ul class="nav nav-tabs" role="tablist" id="layout_tabs">
+    <li role="presentation" class="active"><a href="#table_group" aria-controls="table layout" role="tab" data-toggle="tab">Table</a></li>
+    <li role="presentation"><a href="#img_group" aria-controls="images layout" role="tab" data-toggle="tab">Images</a></li>
+  </ul>
+
+<div class="tab-content">
+
+<div role="tabpanel" class="tab-pane fade in active" id="table_group">
+
+  <h3>Queries</h3>
 
 {% if query_list or dashboard_list %}
-    <table id='query_list_table' class="table table-striped dataTable">
+    <table id="query_list_table" class="table table-striped dataTable">
       <thead>
         <tr>
           <td> ID </td>
@@ -45,57 +38,48 @@
         {% for query in query_list %}
         <tr>
           <td> <i class="fa fa-bar-chart"></i> {{query.id}} </td>
-          <td> <a object_id='{{query.id}}' target_model='website.Query' href='javascript:'
-            class='fa {% if query.fav %}fa-star{% else %}fa-star-o{% endif %}'></a></td>
-          <td> <a href="{% url 'website:query' query.id %}">{{query.title}} </a></td>
+          <td>{% include "website/_favorite_button.html" %}</td>
+          <td> <a href="{% url "website:query" query.id %}">{{query.title}} </a></td>
           <td> {{query.description}} {{query.description_long}} </td>
           <td> 
             {% if query.image %}
-              <a href="{% url 'website:query' query.id %}">
-                <img src='{{query.image}}' width = '132px' height = '80px' alt='image for query {{query.id}}'>
+              <a href="{% url "website:query" query.id %}">
+                <img src="{{query.image}}" width = "132px" height = "80px" alt="image for query {{query.id}}">
               </a>
             {% endif %}
           </td>
           <td> {{query.tags.names|join:", " }} </td>
           <td> {{query.owner}} </td>
           {% if user.is_staff %}
-            <td> <a href="{% url 'admin:website_query_change' query.id %}">Edit</a> </td>
+            <td> <a href="{% url "admin:website_query_change" query.id %}">Edit</a> </td>
           {% endif %}
         </tr>   
         {% endfor %}
         {% for dash in dashboard_list %}
           <tr>
           <td>  <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
-          <td> <a object_id='{{dash.id}}' target_model='website.Dashboard' href='javascript:' class='fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}'></a> </td>
-          <td> <a href="{% url 'website:dashboard' dash.id %}">{{dash.title}} </a></td>
+          <td> <a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a> </td>
+          <td> <a href="{% url "website:dashboard" dash.id %}">{{dash.title}} </a></td>
           <td> {{dash.description}} {{dash.description_long}} </td>
           <td><!-- image --> </td>
           <td> {{ dash.tags.names|join:", " |truncatechars_html:4 }} </td>
           <td> {{dash.owner}} </td>
           {% if user.is_staff %}
-            <td> <a href="{% url 'admin:website_dashboard_change' dash.id %}">Edit</a> </td>
+            <td> <a href="{% url "admin:website_dashboard_change" dash.id %}">Edit</a> </td>
           {% endif %}
         </tr>      
         {% endfor %}        
       </tbody>
     </table>
-    <script>
-    $(document).ready(function() {
-      $('#query_list_table').dataTable({
-        "bAutoWidth": false,
-        "bScrollCollapse": true,
-        "iDisplayLength": 100,
-        "tableTools": {
-          "sSwfPath": "{% static 'DataTables-1.10.2/extensions/TableTools/swf/copy_csv_xls_pdf.swf' %}"
-        },
-      });
-    } );
-    </script>
 {% else %}
     <p>No Queries or Dashboards are available.</p>
 {% endif %}
 </div>
-<div id='img_group' class='hide'>
+
+<div role="tabpanel" class="tab-pane fade" id="img_group">
+
+  <h3>Queries</h3>
+
   {% if query_list_images %}
     {% for query in query_list_images %}
       {% if forloop.counter|divisibleby:3 %}
@@ -106,10 +90,9 @@
           <div class="caption">
             <h3>{{query.title}}</h3>
             <p>
-              <a object_id='{{query.id}}' target_model='website.Query' href='javascript:'
-              class='fa {% if query.fav %}fa-star{% else %}fa-star-o{% endif %}'></a>
-              <a href="{% url 'website:query' query.id %}">
-                <img src='{{query.image}}' width = '260px' height = '160px'>
+              {% include "website/_favorite_button.html" %}
+              <a href="{% url "website:query" query.id %}">
+                <img src="{{query.image}}" width = "260px" height = "160px">
               </a>
             </p>
           </div>
@@ -123,7 +106,31 @@
       <p>No Queries Images available.</p>
   {% endif %}
 </div>
-<script>
-  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
-</script>
+
+</div>
 {% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+  $(function() {
+    $('#layout_tabs a:first').tab('show')
+  })
+</script>
+    <script>
+    $(document).ready(function() {
+      $('#query_list_table').dataTable({
+        "bAutoWidth": false,
+        "bScrollCollapse": true,
+        "iDisplayLength": 100,
+        "tableTools": {
+          "sSwfPath": "{% static "DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls_pdf.swf" %}"
+        },
+      });
+    } );
+    </script>
+<script>
+  make_favorites("{% url "favs:add" %}","{% url "favs:remove" %}");
+</script>
+</div>
+{% endblock javascript %}

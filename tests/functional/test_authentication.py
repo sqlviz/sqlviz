@@ -29,20 +29,27 @@ class AdminLoginTest(LiveServerTestCase):
 class LoginPageTest(LiveServerTestCase):
 
     initial_url = "/accounts/login"
-    login_button_value = 'login'
+    login_button_value = 'Login'
+
+    def assertDoesNotHaveErrors(self):
+        assert not self.browser.find_by_css('.alert-danger')
+
+    def assertHasErrors(self):
+        assert "case-sensitive" in self.browser.find_by_css(
+            '.alert-danger').text
 
     def test_invalid_username(self):
         """Ensure error shown when logging in with an invalid username."""
-        assert not self.browser.find_by_css('.errorlist')
+        self.assertDoesNotHaveErrors()
         self.login()
-        assert "case-sensitive" in self.browser.find_by_css('.errorlist').text
+        self.assertHasErrors()
 
     def test_incorrect_password(self):
         """Ensure error shown when logging in with an incorrect password."""
-        assert not self.browser.find_by_css('.errorlist')
+        self.assertDoesNotHaveErrors()
         self.create_user(password="other password")
         self.login()
-        assert "case-sensitive" in self.browser.find_by_css('.errorlist').text
+        self.assertHasErrors()
 
     def test_valid_credentials(self):
         """Ensure logging in with valid credentials redirects to admin."""

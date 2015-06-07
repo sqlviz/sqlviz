@@ -100,7 +100,8 @@ INSTALLED_APPS = (
     'favs',
     'csv_upload',
     'scratch',
-    'ml'
+    'ml',
+    'crispy_forms',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -273,6 +274,8 @@ MEDIA_ROOT = BASE_DIR + '/media/'
 MEDIA_URL = '/media/'
 
 STATIC_ROOT = '/var/www/sqlviz/static/'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # GOOGLE AUTH
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']

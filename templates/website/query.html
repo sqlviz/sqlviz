@@ -11,57 +11,6 @@
       No Matched Query
   {% endif %}  
 {% endblock %}
-{% block style %}
-<script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
-<!--<link type="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-<!-- For country charts -->
-<script type="text/javascript" src="{% static 'Highcharts/js/highcharts.src.js' %}"></script>
-<script type="text/javascript" src="{% static 'Highmaps/modules/map.js' %}"></script>
-<script type="text/javascript" src="{% static 'Highmaps/modules/exporting.js' %}"></script>
-<script src="{% static 'js/world-highres.js' %}"></script>
-<script src="{% static 'js/website_query.js' %}"></script>
-<!--<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/percent.js"></script>
-<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/currency.js"></script>-->
-<link rel="stylesheet" type="text/css" href="{% static 'pivottable/dist/pivot.css' %}"></link>
-<script type="text/javascript" src="{% static 'pivottable/dist/pivot.js' %}"></script>
-
-<style type="text/css" media="screen">
-    ul.nav-tabs {
-      width: 140px;
-      margin-top: 20px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
-    }
-    ul.nav-tabs li {
-      margin: 0;
-      border-top: 1px solid #ddd;
-    }
-    ul.nav-tabs li:first-child {
-      border-top: none;
-    }
-    ul.nav-tabs li a {
-      margin: 0;
-      padding: 8px 16px;
-      border-radius: 0;
-    }
-    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
-      color: #fff;
-      background: #0088cc;
-      border: 1px solid #0088cc;
-    }
-    ul.nav-tabs li:first-child a {
-      border-radius: 4px 4px 0 0;
-    }
-    ul.nav-tabs li:last-child a {
-      border-radius: 0 0 4px 4px;
-    }
-    ul.nav-tabs.affix {
-      top: 30px; /* Set the top position of pinned element */
-    }
-</style>
-{% endblock %}
 
 {% block body %}
   data-spy="scroll" data-target="#myScrollspy"
@@ -69,9 +18,6 @@
 
 
 {% block main %}
-<script>
-  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
-</script>  
   <div class='col-xs-9 content' role='main'>
   {% if query_list %}
     {% for query in query_list %}    
@@ -124,11 +70,6 @@
                     <button type="submit" id="ml_{{ml_i.id}}" class="btn btn-info">
                       {{ml_i}}
                     </button>
-                    <script>
-                      make_adhoc_model({{ml_i.id}},
-                          '{% url "ml:build_model" ml_i.id  %}',
-                          {{json_get|safe}}, {{query.id}});
-                    </script>
                   {% endfor %}
                 {% endif %}
                 <h4> ad hoc model</h4>
@@ -171,18 +112,6 @@
               </div>
             </div>
       </section>
-      <script>
-      display_data({{query.id}}, '{% url "website:query_api" query.id %}',  {{json_get|safe}}, '{{query.hide_table}}', '{{query.chart_type}}', '{{query.title}}', '{{query.stacked}}', '{{query.log_scale_y}}', '{{query.graph_extra|safe}}')
-      </script>
-      <script>
-        $(document).ready(function(){      
-          $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
-            //alert('test!');
-            event.preventDefault();
-            send_data_ml_adhoc('{{query.id}}', '{% url "ml:build_model_adhoc" %}','ml_output_{{ml_i.id}}');
-          });
-        });
-      </script>
       
     {% endfor %}
   {% else %}
@@ -200,9 +129,6 @@
             name = "{{default_dict.search_for}}"
             >
             </p>
-          <script>
-            make_date_picker('{{default_dict.search_for}}');
-          </script>
           {% elif default_dict.data_type == 'Numeric' %}
             {# NUMERIC #}
             <p> {{default_dict.search_for}}
@@ -243,3 +169,91 @@
     </div>
   {% endif %}
 {% endblock %}
+
+{% block style %}
+{{ block.super }}
+<!--<link type="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
+<link rel="stylesheet" type="text/css" href="{% static 'pivottable/pivot.css' %}"></link>
+
+<style type="text/css" media="screen">
+    ul.nav-tabs {
+      width: 140px;
+      margin-top: 20px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+    }
+    ul.nav-tabs li {
+      margin: 0;
+      border-top: 1px solid #ddd;
+    }
+    ul.nav-tabs li:first-child {
+      border-top: none;
+    }
+    ul.nav-tabs li a {
+      margin: 0;
+      padding: 8px 16px;
+      border-radius: 0;
+    }
+    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
+      color: #fff;
+      background: #0088cc;
+      border: 1px solid #0088cc;
+    }
+    ul.nav-tabs li:first-child a {
+      border-radius: 4px 4px 0 0;
+    }
+    ul.nav-tabs li:last-child a {
+      border-radius: 0 0 4px 4px;
+    }
+    ul.nav-tabs.affix {
+      top: 30px; /* Set the top position of pinned element */
+    }
+</style>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/make_chart.js' %}"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<!-- For country charts -->
+<script type="text/javascript" src="{% static 'Highcharts/js/highcharts.src.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highmaps/modules/map.js' %}"></script>
+<script type="text/javascript" src="{% static 'Highmaps/modules/exporting.js' %}"></script>
+<script src="{% static 'js/world-highres.js' %}"></script>
+<script src="{% static 'js/website_query.js' %}"></script>
+<!--<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/percent.js"></script>
+<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/currency.js"></script>-->
+<script type="text/javascript" src="{% static 'pivottable/pivot.js' %}"></script>
+<script>
+  make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
+</script>
+{% if query_list %}
+  {% for query in query_list %}
+    <script>
+    display_data({{query.id}}, '{% url "website:query_api" query.id %}',  {{json_get|safe}}, '{{query.hide_table}}', '{{query.chart_type}}', '{{query.title}}', '{{query.stacked}}', '{{query.log_scale_y}}', '{{query.graph_extra|safe}}')
+    </script>
+    <script>
+      $(document).ready(function(){
+        $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
+          //alert('test!');
+          event.preventDefault();
+          send_data_ml_adhoc('{{query.id}}', '{% url "ml:build_model_adhoc" %}','ml_output_{{ml_i.id}}');
+        });
+      });
+    </script>
+    {% if query.ml %}
+      {% for ml_i in query.ml %}
+        <script>
+          make_adhoc_model({{ml_i.id}},
+              '{% url "ml:build_model" ml_i.id  %}',
+              {{json_get|safe}}, {{query.id}});
+        </script>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+<script>
+  make_date_picker('{{default_dict.search_for}}');
+</script>
+{% endblock javascript %}
