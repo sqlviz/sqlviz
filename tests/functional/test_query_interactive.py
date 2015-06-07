@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 class QueryInteractiveAPITest(APITestCase):
 
     def setUp(self):
-        self.user = self.create_user()
+        self.user = self.create_user(is_staff=True)
         self.login()
         self.db = DbFactory()
 
