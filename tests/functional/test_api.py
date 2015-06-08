@@ -4,7 +4,7 @@ from ..factories import QueryFactory, QueryDefaultFactory, UserFactory, \
     QueryPrecedentFactory
 from .testcases import APITestCase
 import datetime
-import logging
+#  import logging
 import os
 
 
