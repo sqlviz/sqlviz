@@ -63,7 +63,7 @@ pwd_data = {
 pwd_file = BASE_DIR + '/sqlviz/passwords.json'
 try:
     with open(pwd_file) as json_file:
-        pwd_data = json.load(json_file)
+        pwd_data.update(json.load(json_file))
 except IOError:
     pass
 
@@ -83,6 +83,7 @@ ALLOWED_HOSTS = ['localhost']
 # Application definition
 
 INSTALLED_APPS = (
+    'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -282,3 +283,11 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = pwd_data['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
 
 # SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = ['gmail.com']
+
+from django.contrib import messages
+
+MESSAGE_TAGS = {
+    messages.SUCCESS: 'alert-success success',
+    messages.WARNING: 'alert-warning warning',
+    messages.ERROR: 'alert-danger error'
+}

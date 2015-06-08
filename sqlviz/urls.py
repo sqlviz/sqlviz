@@ -3,6 +3,10 @@ from django.contrib import admin
 # from django.views.generic.base import RedirectView
 from django.conf import settings
 
+admin.site.site_header = 'SQLViz Admin'
+admin.site.index_title = ''
+
+
 urlpatterns = patterns(
     '',
     url(r'^', include('website.urls', namespace='website')),

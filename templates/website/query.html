@@ -19,12 +19,27 @@
 
 {% block main %}
   <div class='col-xs-9 content' role='main'>
+  {% if dashboard %}
+    <section class='well' id='dash_data'>
+
+      <h2><a object_id ='{{dashboard.id}}' target_model='website.Dashboard' href='javascript:' class='fa {% if dashboard.fav %}fa-star{% else %}fa-star-o{% endif %}'>
+      </a>{{dashboard.title}}</h2>
+    <div class='inline'>
+      <p>
+        {{dashboard.description}}
+        {{dashboard.description_long}}
+      </p>
+    </div>
+    </section>
+
+    
+  {% endif %}
   {% if query_list %}
     {% for query in query_list %}    
       <section class='well' id='div_{{query.id}}'>
         <h2>
           <div class='inline'>
-            <a object_id ='{{query.id}}' target_model='website.Query' href='javascript:' class='fa {% if query.fav %}fa-star{% else %}fa-star-o{% endif %}'>
+            {% include "website/_favorite_button.html" %}
             </a>
             {{query.title}}
           </div>
@@ -91,10 +106,11 @@
 
                 <ul>
                   <li>{{query.description}}</li>
-                  <form action="{% url 'admin:website_query_change' query.id %}">
+                  {% if user.is_staff %}
+                  <form action="{% firstof url 'admin:website_query_change' query.id %}">
                     <button class="btn btn-default" type="submit" value="Edit Query">Edit</button>
                   </form>
-
+                  {% endif %}
                   <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
                   {% if query.description_long %}
                     <li>Description Long: {{query.description_long}}</li>
@@ -108,6 +124,7 @@
                   <li>Query Last Modified: {{query.modified_time}}</li>
                   <li>Database: {{query.db}}</li>
                   <li id='execution_info_{{query.id}}'></li>
+                  <li> {% include "website/_tags.html" %} <li>
                 </ul>
               </div>
             </div>

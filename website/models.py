@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -90,14 +89,16 @@ class Query(models.Model):
         return "%s: %s" % (self.id, self.title)
 
     def get_absolute_url(self):
-        return reverse('website.query', args=[str(self.id)])
+        return '/query/{id}'.format(id=self.id)
 
     def clean(self):
         # dont allow queries to contain blacklist words
         blacklist = ['delete', 'insert', 'update', 'alter', 'drop']
 
         def find_whole_word(w):
-            return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
+            return re.compile(
+                r'\b({0})\b'.format(w), flags=re.IGNORECASE
+            ).search
         for word in blacklist:
             if find_whole_word(word)(self.query_text) is not None:
                 raise ValidationError('Queries can not contain %s' % word)
@@ -181,7 +182,9 @@ class QueryPrecedent(models.Model):
 
 class Dashboard(models.Model):
     title = models.CharField(
-        unique=True, max_length=124, help_text='Primary Short Name Used for URL mappings')
+        unique=True,
+        max_length=124,
+        help_text='Primary Short Name Used for URL mappings')
     description = models.TextField(max_length=200)
     description_long = models.TextField(max_length=1024)
     owner = models.ForeignKey(User)
@@ -198,7 +201,7 @@ class Dashboard(models.Model):
         return "%s: %s" % (self.id, self.title)
 
     def get_absolute_url(self):
-        return reverse('website.dashboard', args=[str(self.id)])
+        return '/dashboard/{id}'.format(id=self.id)
 
 
 class DashboardQuery(models.Model):
@@ -255,4 +258,4 @@ def post_save_handler_query(sender, instance, **kwargs):
         instance.image = image
         instance.save()
     post_save.connect(post_save_handler_query, sender=Query)
-# post_save.connect(post_save_handler_query, sender=Query)
+post_save.connect(post_save_handler_query, sender=Query)

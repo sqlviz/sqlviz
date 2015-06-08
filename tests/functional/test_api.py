@@ -4,7 +4,7 @@ from ..factories import QueryFactory, QueryDefaultFactory, UserFactory, \
     QueryPrecedentFactory
 from .testcases import APITestCase
 import datetime
-import logging
+#  import logging
 import os
 
 
@@ -43,15 +43,19 @@ class QueryAPITest(QueryAPITestCase):
 
     def test_not_logged_in(self):
         # TODO add more endpoints here
-        endpoints = ['/api/query/1',
-                     '/api/query_interactive/', '/api/database_explorer/']
-        for resp in endpoints:
+        endpoints = {
+            '/api/query/1':
+                'http://testserver/accounts/login?next=/api/query/1',
+            '/api/query_interactive/':
+                'http://testserver/admin/login/?next=/api/query_interactive/',
+            '/api/database_explorer/':
+                'http://testserver/admin/login/?next=/api/database_explorer/'
+        }
+        for resp, endpoint in endpoints.iteritems():
             response = self.client.get(resp)
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(
-                response['location'],
-                "http://testserver/accounts/login?next=%s" % (resp),
-            )
+            #  logging.warning(response['location'])
+            self.assertEqual(response['location'], endpoint)
 
     def test_invalid_query_id(self):
         """
@@ -298,7 +302,7 @@ class QueryPrecedentTest(QueryAPITestCase):
         # Strip volatile data
         inner_data.pop('time_elapsed')
         outer_data.pop('time_elapsed')
-        logging.warning(outer_data)
+        # logging.warning(outer_data)
         self.assertEqual(inner_data, outer_data)
 
 

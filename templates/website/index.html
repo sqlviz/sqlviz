@@ -1,7 +1,7 @@
 {% extends "website/base.html" %}
 
 
-{% block title %} SQLVIZ Homepage {% endblock %}
+{% block title %} SQLViz Homepage {% endblock %}
 {% load staticfiles %}
 
 {% block main %}
@@ -38,7 +38,7 @@
         {% for query in query_list %}
         <tr>
           <td> <i class="fa fa-bar-chart"></i> {{query.id}} </td>
-          <td>{% include "website/_favorite_button.html" %}</td>
+          <td> <h4>{% include "website/_favorite_button.html" %}</h4> </td>
           <td> <a href="{% url "website:query" query.id %}">{{query.title}} </a></td>
           <td> {{query.description}} {{query.description_long}} </td>
           <td> 
@@ -48,7 +48,9 @@
               </a>
             {% endif %}
           </td>
-          <td> {{query.tags.names|join:", " }} </td>
+          <td>
+            {% include "website/_tags.html" %}
+          </td>
           <td> {{query.owner}} </td>
           {% if user.is_staff %}
             <td> <a href="{% url "admin:website_query_change" query.id %}">Edit</a> </td>
@@ -57,12 +59,14 @@
         {% endfor %}
         {% for dash in dashboard_list %}
           <tr>
-          <td>  <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
-          <td> <a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a> </td>
+          <td> <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
+          <td> <h4><a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a></h4></td>
           <td> <a href="{% url "website:dashboard" dash.id %}">{{dash.title}} </a></td>
           <td> {{dash.description}} {{dash.description_long}} </td>
           <td><!-- image --> </td>
-          <td> {{ dash.tags.names|join:", " |truncatechars_html:4 }} </td>
+          <td>
+            {% include "website/_tags_dash.html" %}
+          </td>
           <td> {{dash.owner}} </td>
           {% if user.is_staff %}
             <td> <a href="{% url "admin:website_dashboard_change" dash.id %}">Edit</a> </td>
@@ -88,9 +92,9 @@
       <div class="col-sm-6 col-md-4">
         <div class="thumbnail">
           <div class="caption">
-            <h3>{{query.title}}</h3>
+            <h3>{% include "website/_favorite_button.html" %} {{query.title}} </h3>
             <p>
-              {% include "website/_favorite_button.html" %}
+              
               <a href="{% url "website:query" query.id %}">
                 <img src="{{query.image}}" width = "260px" height = "160px">
               </a>

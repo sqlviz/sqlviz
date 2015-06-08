@@ -1,0 +1,6 @@
+{% if query.tags.slugs %}
+  {% for tag in query.tags.all %}
+    <a class='label label-default' href='{% url "website:home" %}?tags={{tag.name}}'>
+      {{tag.name}}</a>
+  {% endfor %}
+{% endif %}

@@ -1,0 +1,6 @@
+{% if dash.tags.slugs %}
+  {% for tag in dash.tags.all %}
+    <a class='label label-default' href='{% url "website:home" %}?tags={{tag.name}}'>
+      {{tag.name}}</a>
+  {% endfor %}
+{% endif %}

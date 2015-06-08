@@ -1,9 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.db.models import Q
+from itertools import chain
 
 import json
 import time
@@ -23,17 +25,37 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
-    if request.GET.get('q', None) is None:
-        query_list = models.Query.objects.filter(hide_index=0)
-        dashboard_list = models.Dashboard.objects.filter(hide_index=0)
-    else:
+    if request.GET.get('q', None) is not None \
+            and request.GET.get('q', None) != '':
         filter = request.GET.get('q', None)
         query_list = models.Query.objects.filter(hide_index=0).filter(
-            Q(title__contains=filter) | Q(description__contains=filter)
+            Q(title__contains=filter) |
+            Q(description__contains=filter)
+        ).distinct()
+        query_list2 = models.Query.objects.filter(hide_index=0).filter(
+            tags__name__in=[filter]
+        ).distinct()
+        query_list = list(chain(query_list, query_list2))
+        dashboard_list = models.Dashboard.objects.filter(hide_index=0).filter(
+            Q(title__contains=filter) |
+            Q(description__contains=filter)
+        ).distinct()
+        dashboard_list2 = models.Dashboard.objects.filter(hide_index=0).filter(
+            tags__name__in=[filter]
+        ).distinct()
+        dashboard_list = list(chain(dashboard_list, dashboard_list2))
+    elif request.GET.get('tags', None) is not None:
+        # Tag search
+        filter = request.GET.get('tags', None)
+        query_list = models.Query.objects.filter(hide_index=0).filter(
+            tags__name__in=[filter]
         ).distinct()
         dashboard_list = models.Dashboard.objects.filter(hide_index=0).filter(
-            Q(title__contains=filter) | Q(description__contains=filter)
+            tags__name__in=[filter]
         ).distinct()
+    else:
+        query_list = models.Query.objects.filter(hide_index=0)
+        dashboard_list = models.Dashboard.objects.filter(hide_index=0)
 
     # Get Favorites
     user = User.objects.get(username=request.user)
@@ -49,7 +71,7 @@ def index(request):
             setattr(q, 'fav', False)
         if q.image is not None and q.image != '':
             logging.warning(q)
-            logging.warning(q.image)
+            #logging.warning(q.image)
             query_list_images.append(q)
 
     dash_favorites = favit.models.Favorite.objects.\
@@ -109,7 +131,7 @@ def query_api(request, query_id):
 
 
 @login_required
-def query_view(request, query_ids):
+def query_view(request, query_ids, type='query', **kwargs):
     query_id_array = query_ids.split(',')
     # TODO filter to make sure only this applies to queries which exist
     query_list = [m for m in models.Query.objects.filter(
@@ -147,13 +169,17 @@ def query_view(request, query_ids):
         for k in json_get_extra_array:
             if request.GET.get(k, None) is not None:
                 json_get[k] = request.GET.get(k)
-    return render_to_response(
-        'website/query.html',
-        {
+        d = {
             'query_list': query_list,
             'replacement_dict': replacement_dict,
-            'json_get': json.dumps(json_get)
-        },
+            'json_get': json.dumps(json_get),
+            'type': type
+        }
+        d.update(**kwargs)
+        # logging.warning(d)
+    return render_to_response(
+        'website/query.html',
+        d,
         context_instance=RequestContext(request))
 
 
@@ -162,7 +188,7 @@ def query_name(request, query_names):
     query_name_array = query_names.split(',')
     queries = models.Query.objects.filter(title__in=query_name_array)
     query_list_string = ','.join([str(q.id) for q in queries])
-    return query_view(request, query_list_string)
+    return query_view(request, query_list_string, 'query')
 
 
 @login_required
@@ -170,14 +196,20 @@ def dashboard(request, dashboard_id):
     # First find all the queries, then run it as a list of queries
     dashboard_query_list = models.DashboardQuery.objects.filter(
         dashboard_id=dashboard_id).order_by('order')
+    dashboard_data = models.Dashboard.objects.filter(
+        id=dashboard_id).first()
     query_id_array = []
     for q in dashboard_query_list:
         query_id_array.append(str(q.query_id))
     query_list_string = ','.join(query_id_array)
-    return query_view(request, query_list_string)
+    return query_view(
+        request,
+        query_list_string,
+        'dashboard',
+        dashboard=dashboard_data)
 
 
-@login_required
+@staff_member_required
 def query_interactive(request):
     # Render empty page for users to add data to
     db_list = models.Db.objects.all()
@@ -187,7 +219,7 @@ def query_interactive(request):
         RequestContext(request))
 
 
-@login_required
+@staff_member_required
 def query_interactive_api(request):
     # Take Query, Database, and Pivot
     # Create DataManager, run and return as JSON schema
@@ -229,7 +261,7 @@ def query_interactive_api(request):
                         content_type="application/json")
 
 
-@login_required
+@staff_member_required
 def database_explorer(request):
     # Render empty page for users to add data to
     db_list = models.Db.objects.all()
@@ -239,7 +271,7 @@ def database_explorer(request):
         RequestContext(request))
 
 
-@login_required
+@staff_member_required
 def database_explorer_api(request):
     # Get DB
     try:
