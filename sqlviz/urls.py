@@ -16,6 +16,7 @@ urlpatterns = patterns(
     url(r'^', include('ml.urls', namespace='ml')),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),
+    url(r'^comments/', include('django_comments.urls')),
 )
 
 

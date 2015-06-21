@@ -79,7 +79,7 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = ['localhost']
 
-
+SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = (
@@ -91,6 +91,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social.apps.django_app.default',
+    'django.contrib.sites',
+    'django_comments',
     'django_ace',
     'website',
     'taggit',

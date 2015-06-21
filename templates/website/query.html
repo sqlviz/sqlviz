@@ -1,6 +1,7 @@
 {% extends 'website/base.html' %}
 
 {% load staticfiles %}
+{% load comments %}
 
 {% block title %} 
   {% if query_list %}
@@ -125,6 +126,8 @@
                   <li>Database: {{query.db}}</li>
                   <li id='execution_info_{{query.id}}'></li>
                   <li> {% include "website/_tags.html" %} <li>
+                  <li> {% render_comment_list for query %} <li>
+
                 </ul>
               </div>
             </div>
