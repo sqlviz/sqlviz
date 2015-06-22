@@ -32,8 +32,9 @@
       </p>
     </div>
     </section>
-  {% endif %}
 
+    
+  {% endif %}
   {% if query_list %}
     {% for query in query_list %}    
       <section class='well' id='div_{{query.id}}'>
@@ -55,11 +56,7 @@
         <div role="tabpanel" id="ready_{{query.id}}">
           <!-- Nav tabs -->
           <ul class="nav nav-pills" role="tablist">
-            <li role="presentation" class="active">
-              <a href="#description_{{query.id}}" aria-controls="settings" role="tab" data-toggle="tab">
-                Description
-              </a>
-            </li>
+            <li role="presentation" class="active"><a href="#description_{{query.id}}" aria-controls="settings" role="tab" data-toggle="tab">Description</a></li>
             {% if query.chart_type != "None" %}
               <li role="presentation" class="hide"><a href="#graph_{{query.id}}" aria-controls="graph_{{query.id}}" role="tab" data-toggle="tab">Graph</a></li>
             {% endif %}
@@ -216,8 +213,44 @@
 
 {% block style %}
 {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static 'pivottable/pivot.css' %}"></link>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/nav_stuff.css' %}"></link>
+<!--<link type="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
+<link rel="stylesheet" type="text/css" href="{% static 'pivottable/pivot.css' %}"></link>
+
+<style type="text/css" media="screen">
+    ul.nav-tabs {
+      width: 140px;
+      margin-top: 20px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+    }
+    ul.nav-tabs li {
+      margin: 0;
+      border-top: 1px solid #ddd;
+    }
+    ul.nav-tabs li:first-child {
+      border-top: none;
+    }
+    ul.nav-tabs li a {
+      margin: 0;
+      padding: 8px 16px;
+      border-radius: 0;
+    }
+    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
+      color: #fff;
+      background: #0088cc;
+      border: 1px solid #0088cc;
+    }
+    ul.nav-tabs li:first-child a {
+      border-radius: 4px 4px 0 0;
+    }
+    ul.nav-tabs li:last-child a {
+      border-radius: 0 0 4px 4px;
+    }
+    ul.nav-tabs.affix {
+      top: 30px; /* Set the top position of pinned element */
+    }
+</style>
 {% endblock %}
 
 {% block javascript %}
@@ -230,6 +263,8 @@
 <script type="text/javascript" src="{% static 'Highmaps/modules/exporting.js' %}"></script>
 <script src="{% static 'js/world-highres.js' %}"></script>
 <script src="{% static 'js/website_query.js' %}"></script>
+<!--<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/percent.js"></script>
+<script src="//cdn.datatables.net/plug-ins/1.10.6/sorting/currency.js"></script>-->
 <script type="text/javascript" src="{% static 'pivottable/pivot.js' %}"></script>
 <script>
   make_favorites('{% url 'favs:add' %}','{% url 'favs:remove' %}');
@@ -242,6 +277,7 @@
     <script>
       $(document).ready(function(){
         $( "#ml_adhoc_{{query.id}}").submit(function( event ) {
+          //alert('test!');
           event.preventDefault();
           send_data_ml_adhoc('{{query.id}}', '{% url "ml:build_model_adhoc" %}','ml_output_{{ml_i.id}}');
         });

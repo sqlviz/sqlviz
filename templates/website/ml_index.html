@@ -41,8 +41,8 @@
           {% if user.is_staff %}
             <td> 
               <form action="{% url 'admin:ml_machine_learning_model_change' model.id %}">
-              <button type="submit" class="btn btn-info">Edit</button>
-            </form>
+                <button type="submit" class="btn btn-info">Edit</button>
+              </form>
             </td>
           {% endif %}
         </tr>   
