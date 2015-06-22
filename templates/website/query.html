@@ -108,9 +108,11 @@
                 <ul>
                   <li>{{query.description}}</li>
                   {% if user.is_staff %}
-                  <form action="{% firstof url 'admin:website_query_change' query.id %}">
-                    <button class="btn btn-default" type="submit" value="Edit Query">Edit</button>
-                  </form>
+                    <form action="{% url 'admin:website_query_change' query.id %}">
+                      <button type="submit" class="btn btn-info">
+                        Edit
+                      </button>
+                    </form>
                   {% endif %}
                   <li><a href="mailto:{{query.owner.email}}">{{query.owner}}</a></li>
                   {% if query.description_long %}
@@ -126,14 +128,15 @@
                   <li>Database: {{query.db}}</li>
                   <!--<li id='execution_info_{{query.id}}'></li>-->
                   {% include "website/_tags.html" %}
+                  {% render_comment_list for query %}
+
                   {% if user.is_staff %}
                     {% get_comment_form for query as form %}
                       <div class="form-group">
-
                         <form action="{% comment_form_target %}" method="POST">
 
                         {% csrf_token %}
-                        {{ form.comment }}
+                        <input type="text" class="form-control" id="id_comment" maxlength="3000" name="comment" placeholder="Comment Here">
                         {{ form.content_type }}
                         {{ form.object_pk }}
                         {{ form.timestamp }}
@@ -141,7 +144,6 @@
                         <input type="hidden" name="next" value="{% url 'website:query' query.id %}" />
                       </br>
                         <input type="submit" class="btn btn-default" value="Add comment" id="id_submit" />
-
                     </form>
                     </div>
                 {% endif %}
