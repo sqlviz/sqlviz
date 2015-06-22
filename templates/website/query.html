@@ -124,10 +124,29 @@
                   <li>Query Creation: {{query.create_time}}</li>
                   <li>Query Last Modified: {{query.modified_time}}</li>
                   <li>Database: {{query.db}}</li>
-                  <li id='execution_info_{{query.id}}'></li>
-                  <li> {% include "website/_tags.html" %} <li>
-                  <li> {% render_comment_list for query %} <li>
+                  <!--<li id='execution_info_{{query.id}}'></li>-->
+                  {% include "website/_tags.html" %}
+                  {% if user.is_staff %}
+                    {% get_comment_form for query as form %}
+                      <div class="form-group">
 
+                        <form action="{% comment_form_target %}" method="POST">
+
+                        {% csrf_token %}
+                        {{ form.comment }}
+                        {{ form.content_type }}
+                        {{ form.object_pk }}
+                        {{ form.timestamp }}
+                        {{ form.security_hash }}
+                        <input type="hidden" name="next" value="{% url 'website:query' query.id %}" />
+                      </br>
+                        <input type="submit" class="btn btn-default" value="Add comment" id="id_submit" />
+
+                    </form>
+                    </div>
+                {% endif %}
+
+                  
                 </ul>
               </div>
             </div>

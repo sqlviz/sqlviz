@@ -1,6 +1,6 @@
 {% for comment in comment_list %}
-<li><b>{{ comment.submit_date }} - <a href={{comment.email}}>{{ comment.name }}</a></b>
-{{ comment.comment }}
-</li>
-
+  <li>
+    <b>{{ comment.submit_date }} - <a href='mailto:{{comment.user.email}}'>{{ comment.name }}</a></b>
+  {{ comment.comment }}
+  </li>
 {% endfor %}
