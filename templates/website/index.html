@@ -53,7 +53,13 @@
           </td>
           <td> {{query.owner}} </td>
           {% if user.is_staff %}
-            <td> <a href="{% url "admin:website_query_change" query.id %}">Edit</a> </td>
+            <td> 
+              <form action="{% url 'admin:website_query_change' query.id %}">
+                <button type="submit" class="btn btn-info">
+                  Edit
+                </button>
+              </form>
+              </td>
           {% endif %}
         </tr>   
         {% endfor %}
@@ -69,7 +75,13 @@
           </td>
           <td> {{dash.owner}} </td>
           {% if user.is_staff %}
-            <td> <a href="{% url "admin:website_dashboard_change" dash.id %}">Edit</a> </td>
+            <td>
+              <form action="{% url "admin:website_dashboard_change" dash.id %}">
+                <button type="submit" class="btn btn-info">
+                  Edit
+                </button>
+              </form>
+            </td>
           {% endif %}
         </tr>      
         {% endfor %}        
