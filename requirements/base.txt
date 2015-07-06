@@ -12,6 +12,7 @@ django-crontab==0.5.1
 django-encrypted-fields==1.1.1
 django-favit==0.2.4
 django-taggit==0.12.2
+elasticsearch==1.6.0
 logutils==0.3.3
 numpy==1.9.2
 oauthlib==0.7.2
