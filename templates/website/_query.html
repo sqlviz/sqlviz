@@ -1,0 +1,32 @@
+<tr>
+  <td> <i class="fa fa-bar-chart"></i> {{query.object.id}} </td>
+  <td> <h4>{% include "website/_favorite_button.html" %}</h4> </td>
+  <td> <a href=" {{ query.object.get_absolute_url }} ">{{query.object.title}} </a></td>
+  <td> {{query.object.description}} {{query.object.description_long}} </td>
+  <td> 
+    {% if query.object.image %}
+      <a href="{% url "website:query" query.object.id %}">
+        <img src="{{query.object.image}}" width = "132px" height = "80px" alt="image for query {{query.id}}">
+      </a>
+    {% endif %}
+  </td>
+  <td>
+    {% if query.object.tags.slugs %}
+      {% for tag in query.object.tags.all %}
+        <a class='label label-default' href='{% url "haystack_search" %}?q={{tag.name}}'>
+          {{tag.name}}
+        </a>
+    {% endfor %}
+  {% endif %}
+  </td>
+  <td> {{query.object.owner}} </td>
+  {% if user.is_staff %}
+    <td> 
+      <form action="{% url 'admin:website_query_change' query.id %}">
+        <button type="submit" class="btn btn-info">
+          Edit
+        </button>
+      </form>
+      </td>
+  {% endif %}
+</tr>   
