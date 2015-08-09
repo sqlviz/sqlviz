@@ -136,6 +136,7 @@ HAYSTACK_CONNECTIONS = {
 }
 
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates"
