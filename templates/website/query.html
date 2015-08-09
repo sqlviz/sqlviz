@@ -61,7 +61,11 @@
               </a>
             </li>
             {% if query.chart_type != "None" %}
-              <li role="presentation" class="hide"><a href="#graph_{{query.id}}" aria-controls="graph_{{query.id}}" role="tab" data-toggle="tab">Graph</a></li>
+              <li role="presentation" class="hide">
+                <a href="#graph_{{query.id}}" aria-controls="graph_{{query.id}}" role="tab" data-toggle="tab">
+                  Graph
+                </a>
+              </li>
             {% endif %}
             <li role="presentation" class="hide"><a href="#tab_table_{{query.id}}" aria-controls="tab_table_{{query.id}}" role="tab" data-toggle="tab">Table</a></li>
             <li role="presentation" class="hide"><a href="#pivot_{{query.id}}" aria-controls="pivot_{{query.id}}" role="tab" data-toggle="tab">Pivot</a></li>
