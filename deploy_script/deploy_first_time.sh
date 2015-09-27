@@ -10,6 +10,8 @@ echo 'pip install complete'
 MYSQLPWD=$(openssl rand -hex 32)
 DJANGOPWD=$(openssl rand -hex 32)
 PWD_JSON='{
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "",
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET" : "",
     "SECRET_KEY" : "DJANGOPWD",
     "EMAIL": {
         "EMAIL_HOST" : "smtp.gmail.com",
@@ -48,7 +50,9 @@ echo 'please provide mysql root password'
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
 	GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';
 	CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
-	GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';"
+	GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';
+  CREATE DATABASE IF NOT EXISTS django_test CHARACTER SET utf8 COLLATE utf8_general_ci;
+	GRANT ALL PRIVILEGES ON django_test.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';"
 
 echo 'begin django migrations'
 ./manage.py migrate
@@ -74,5 +78,3 @@ chmod  -R 777 media
 
 echo 'starting dev server'
 ./manage.py runserver 0.0.0.0:8000
-
-
