@@ -10,6 +10,8 @@ echo 'pip install complete'
 MYSQLPWD=$(openssl rand -hex 32)
 DJANGOPWD=$(openssl rand -hex 32)
 PWD_JSON='{
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "",
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET" : "",
     "SECRET_KEY" : "DJANGOPWD",
     "EMAIL": {
         "EMAIL_HOST" : "smtp.gmail.com",
