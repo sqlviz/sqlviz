@@ -105,10 +105,8 @@ INSTALLED_APPS = (
     'scratch',
     'ml',
     'crispy_forms',
+    'haystack'
 )
-if 'CI' not in os.environ:
-    INSTALLED_APPS = INSTALLED_APPS + ('haystack',)
-
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -129,17 +127,26 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
-if 'CI' not in os.environ:
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'sqlviz_elasticsearch',
+    },
+}
+
+if 'CI' in os.environ:
+    print "USING DUMMY SEARCH"
     HAYSTACK_CONNECTIONS = {
         'default': {
-            'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-            'URL': 'http://127.0.0.1:9200/',
-            'INDEX_NAME': 'sqlviz_elasticsearch',
+            'engine': 'haystack.backends.simple_backend.SimpleEngine'
         },
     }
 
-    HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-    HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
+
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates"
