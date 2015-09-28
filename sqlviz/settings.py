@@ -105,8 +105,10 @@ INSTALLED_APPS = (
     'scratch',
     'ml',
     'crispy_forms',
-    'haystack'
 )
+if 'CI' not in os.environ:
+    INSTALLED_APPS = INSTALLED_APPS + ('haystack',)
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -127,7 +129,7 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
-if 'CI' : os.environ:
+if 'CI' not in os.environ:
     HAYSTACK_CONNECTIONS = {
         'default': {
             'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
