@@ -136,7 +136,7 @@ HAYSTACK_CONNECTIONS = {
 }
 
 if 'CI' in os.environ:
-    print "USING DUMMY SEARCH"
+    # USING DUMMY SEARCH
     HAYSTACK_CONNECTIONS = {
         'default': {
             'engine': 'haystack.backends.simple_backend.SimpleEngine'
