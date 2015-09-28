@@ -6,4 +6,3 @@
 {% for tag in object.tags.all %} {{ tag.name }} {% endfor %}
 {% for comment in object.comments.all %} Pickles {{comment.comment}}  {% endfor %}
 
-
