@@ -25,37 +25,8 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
-    if request.GET.get('q', None) is not None \
-            and request.GET.get('q', None) != '':
-        filter = request.GET.get('q', None)
-        query_list = models.Query.objects.filter(hide_index=0).filter(
-            Q(title__contains=filter) |
-            Q(description__contains=filter)
-        ).distinct()
-        query_list2 = models.Query.objects.filter(hide_index=0).filter(
-            tags__name__in=[filter]
-        ).distinct()
-        query_list = list(chain(query_list, query_list2))
-        dashboard_list = models.Dashboard.objects.filter(hide_index=0).filter(
-            Q(title__contains=filter) |
-            Q(description__contains=filter)
-        ).distinct()
-        dashboard_list2 = models.Dashboard.objects.filter(hide_index=0).filter(
-            tags__name__in=[filter]
-        ).distinct()
-        dashboard_list = list(chain(dashboard_list, dashboard_list2))
-    elif request.GET.get('tags', None) is not None:
-        # Tag search
-        filter = request.GET.get('tags', None)
-        query_list = models.Query.objects.filter(hide_index=0).filter(
-            tags__name__in=[filter]
-        ).distinct()
-        dashboard_list = models.Dashboard.objects.filter(hide_index=0).filter(
-            tags__name__in=[filter]
-        ).distinct()
-    else:
-        query_list = models.Query.objects.filter(hide_index=0)
-        dashboard_list = models.Dashboard.objects.filter(hide_index=0)
+    query_list = models.Query.objects.filter(hide_index=0)
+    dashboard_list = models.Dashboard.objects.filter(hide_index=0)
 
     # Get Favorites
     user = User.objects.get(username=request.user)
