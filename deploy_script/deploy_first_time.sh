@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev phantomjs libxml2-dev libxslt1-dev unzip openjdk-7-jre-headless
+sudo apt-get install libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev phantomjs libxml2-dev libxslt1-dev unzip openjdk-7-jre-headless elasticsearch
 echo 'apt get complete'
 sudo pip install -r requirements/local.txt
 echo 'pip install complete'
@@ -85,12 +85,8 @@ python manage.py loaddata initial_data/initial_data.json
 chmod  -R 777 media
 
 echo 'installing elastic search'
-wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.7.2.zip
-sudo unzip elasticsearch-1.7.2 -d /usr/local/elasticsearch
-rm elasticsearch-1.7.2.zip
-cd /usr/local/elasticsearch/elasticsearch-1.7.2/
+sudo update-rc.d elasticsearch defaults 95 10
 
-.bin/elasticsearch -d
 
 echo 'starting dev server'
 ./manage.py runserver 0.0.0.0:8000
