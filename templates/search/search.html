@@ -1,0 +1,78 @@
+{% extends "website/base.html" %}
+
+
+{% block title %} SQLViz Homepage {% endblock %}
+{% load staticfiles %}
+
+{% block main %}
+<div class="container">
+
+  <ul class="nav nav-tabs" role="tablist" id="layout_tabs">
+    <li role="presentation" class="active"><a href="#table_group" aria-controls="table layout" role="tab" data-toggle="tab">Table</a></li>
+  </ul>
+
+<div class="tab-content">
+
+<div role="tabpanel" class="tab-pane fade in active" id="table_group">
+  <h3>Queries</h3>
+
+{% if page.object_list %}
+    <h4>Number of Results: {{ page.object_list|length }}</h4>
+    <table id="query_list_table" class="table table-striped dataTable">
+      <thead>
+        <tr>
+        <td> ID </td>
+        <td> Fav </td>
+        <td> Title </td>
+        <td> Description </td>
+        <td> Thumbnail </td>
+        <td> Tags </td>
+        <td> Owner </td>
+        {% if user.is_staff %}
+            <td> Edit </td>
+        {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for query in page.object_list %}
+            {% if query.content_type == 'website.query' %}
+                {% include "website/_query.html" %}
+            {% endif %}
+            {% if query.content_type == 'website.dashboard' %}
+                {% include "website/_dashboard.html" %}
+            {% endif %}
+        {% endfor %}      
+      </tbody>
+    </table>
+{% else %}
+    <p>No Queries or Dashboards are available.</p>
+{% endif %}
+</div>
+
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+  $(function() {
+    $('#layout_tabs a:first').tab('show')
+  })
+</script>
+    <script>
+    $(document).ready(function() {
+      $('#query_list_table').dataTable({
+        "bAutoWidth": false,
+        "bScrollCollapse": true,
+        "iDisplayLength": 100,
+        "tableTools": {
+          "sSwfPath": "{% static "DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls_pdf.swf" %}"
+        },
+      });
+    } );
+    </script>
+<script>
+  make_favorites("{% url "favs:add" %}","{% url "favs:remove" %}");
+</script>
+</div>
+{% endblock javascript %}

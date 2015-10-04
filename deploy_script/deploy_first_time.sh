@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev phantomjs libxml2-dev libxslt1-dev
+sudo apt-get install libmysqlclient-dev python-dev libblas-dev liblapack-dev gfortran lamp-server^ python-pip python-numpy python-psycopg2  python-psycopg2 libpq-dev libfreetype6-dev libxft-dev phantomjs libxml2-dev libxslt1-dev unzip openjdk-7-jre-headless elasticsearch
 echo 'apt get complete'
 sudo pip install -r requirements/local.txt
 echo 'pip install complete'
@@ -10,6 +10,8 @@ echo 'pip install complete'
 MYSQLPWD=$(openssl rand -hex 32)
 DJANGOPWD=$(openssl rand -hex 32)
 PWD_JSON='{
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "OATHKEY",
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET" : "OATHSECRET",
     "SECRET_KEY" : "DJANGOPWD",
     "EMAIL": {
         "EMAIL_HOST" : "smtp.gmail.com",
@@ -43,12 +45,22 @@ PWD_JSON="${PWD_JSON//MYSQLPWD/$MYSQLPWD}"
 echo "$PWD_JSON" > sqlviz/passwords.json
 sed -i "s@MYSQLPWD@$MYSQLPWD@" initial_data/initial_data.json
 
+echo 'please provide OATH KEY'
+read OATHKEY
+echo 'please provide OATHSECRET'
+read OATHSECRET
+
+sed -i "s@OATHKEY@$OATHKEY@" initial_data/initial_data.json
+sed -i "s@OATHSECRET@$OATHSECRET@" initial_data/initial_data.json
+
 echo 'please provide mysql root password'
 
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS django CHARACTER SET utf8 COLLATE utf8_general_ci;
 	GRANT ALL PRIVILEGES ON django.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';
 	CREATE DATABASE IF NOT EXISTS scratch CHARACTER SET utf8 COLLATE utf8_general_ci;
-	GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';"
+	GRANT ALL PRIVILEGES ON scratch.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';
+  CREATE DATABASE IF NOT EXISTS django_test CHARACTER SET utf8 COLLATE utf8_general_ci;
+	GRANT ALL PRIVILEGES ON django_test.*  TO 'django'@'localhost' IDENTIFIED BY '$MYSQLPWD';"
 
 echo 'begin django migrations'
 ./manage.py migrate
@@ -72,7 +84,9 @@ python manage.py loaddata initial_data/initial_data.json
 
 chmod  -R 777 media
 
+echo 'installing elastic search'
+sudo update-rc.d elasticsearch defaults 95 10
+
+
 echo 'starting dev server'
 ./manage.py runserver 0.0.0.0:8000
-
-

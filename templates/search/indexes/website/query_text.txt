@@ -1,0 +1,6 @@
+{{object.title}}
+{{object.description}}
+{{object.description_long}}
+{{object.query_text}}
+{{object.chart_type}}
+{% for tag in object.tags.all %} {{ tag.name }} {% endfor %}

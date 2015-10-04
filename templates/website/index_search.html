@@ -1,0 +1,152 @@
+{% extends "website/base.html" %}
+
+
+{% block title %} SQLViz Homepage {% endblock %}
+{% load staticfiles %}
+
+{% block main %}
+<div class="container">
+
+  <ul class="nav nav-tabs" role="tablist" id="layout_tabs">
+    <li role="presentation" class="active"><a href="#table_group" aria-controls="table layout" role="tab" data-toggle="tab">Table</a></li>
+    <li role="presentation"><a href="#img_group" aria-controls="images layout" role="tab" data-toggle="tab">Images</a></li>
+  </ul>
+
+<div class="tab-content">
+
+<div role="tabpanel" class="tab-pane fade in active" id="table_group">
+
+  <h3>Queries</h3>
+
+{% if query_list or dashboard_list %}
+    <table id="query_list_table" class="table table-striped dataTable">
+      <thead>
+        <tr>
+          <td> ID </td>
+          <td> Fav </td>
+          <td> Title </td>
+          <td> Description </td>
+          <td> Thumbnail </td>
+          <td> Tags </td>
+          <td> Owner </td>
+          {% if user.is_staff %}
+          <td> Edit </td>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for query in query_list %}
+        <tr>
+          <td> <i class="fa fa-bar-chart"></i> {{query.id}} </td>
+          <td> <h4>{% include "website/_favorite_button.html" %}</h4> </td>
+          <td> <a href="{% url "website:query" query.id %}">{{query.title}} </a></td>
+          <td> {{query.description}} {{query.description_long}} </td>
+          <td> 
+            {% if query.image %}
+              <a href="{% url "website:query" query.id %}">
+                <img src="{{query.image}}" width = "132px" height = "80px" alt="image for query {{query.id}}">
+              </a>
+            {% endif %}
+          </td>
+          <td>
+            {% include "website/_tags.html" %}
+          </td>
+          <td> {{query.owner}} </td>
+          {% if user.is_staff %}
+            <td> 
+              <form action="{% url 'admin:website_query_change' query.id %}">
+                <button type="submit" class="btn btn-info">
+                  Edit
+                </button>
+              </form>
+              </td>
+          {% endif %}
+        </tr>   
+        {% endfor %}
+        {% for dash in dashboard_list %}
+          <tr>
+          <td> <i class="fa fa-tachometer"></i> {{dash.id}} </td> 
+          <td> <h4><a object_id="{{dash.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if dash.fav %}fa-star{% else %}fa-star-o{% endif %}"></a></h4></td>
+          <td> <a href="{% url "website:dashboard" dash.id %}">{{dash.title}} </a></td>
+          <td> {{dash.description}} {{dash.description_long}} </td>
+          <td><!-- image --> </td>
+          <td>
+            {% include "website/_tags_dash.html" %}
+          </td>
+          <td> {{dash.owner}} </td>
+          {% if user.is_staff %}
+            <td>
+              <form action="{% url "admin:website_dashboard_change" dash.id %}">
+                <button type="submit" class="btn btn-info">
+                  Edit
+                </button>
+              </form>
+            </td>
+          {% endif %}
+        </tr>      
+        {% endfor %}        
+      </tbody>
+    </table>
+{% else %}
+    <p>No Queries or Dashboards are available.</p>
+{% endif %}
+</div>
+
+<div role="tabpanel" class="tab-pane fade" id="img_group">
+
+  <h3>Queries</h3>
+
+  {% if query_list_images %}
+    {% for query in query_list_images %}
+      {% if forloop.counter|divisibleby:3 %}
+        <div class="row">
+      {% endif %}
+      <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+          <div class="caption">
+            <h3>{% include "website/_favorite_button.html" %} {{query.title}} </h3>
+            <p>
+              
+              <a href="{% url "website:query" query.id %}">
+                <img src="{{query.image}}" width = "260px" height = "160px">
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+      {% if forloop.counter|divisibleby:3 %}
+        </div class="row">
+      {% endif %}
+    {% endfor %}
+  {% else %}
+      <p>No Queries Images available.</p>
+  {% endif %}
+</div>
+
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+  $(function() {
+    $('#layout_tabs a:first').tab('show')
+  })
+</script>
+    <script>
+    $(document).ready(function() {
+      $('#query_list_table').dataTable({
+        "bAutoWidth": false,
+        "bScrollCollapse": true,
+        "iDisplayLength": 100,
+        "tableTools": {
+          "sSwfPath": "{% static "DataTables-1.10.7/extensions/TableTools/swf/copy_csv_xls_pdf.swf" %}"
+        },
+      });
+    } );
+    </script>
+<script>
+  make_favorites("{% url "favs:add" %}","{% url "favs:remove" %}");
+</script>
+</div>
+{% endblock javascript %}

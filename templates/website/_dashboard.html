@@ -1,0 +1,25 @@
+<tr>
+  <td> <i class="fa fa-tachometer"></i> {{query.object.id}} </td>
+  <td> <h4><a object_id="{{query.object.id}}" target_model="website.Dashboard" href="javascript:" class="fa {% if query.object.fav %}fa-star{% else %}fa-star-o{% endif %}"></a></h4></td>
+  <td> <a href="{% url "website:dashboard" query.object.id %}">{{query.object.title}} </a></td>
+  <td> {{query.object.description}} {{query.object.description_long}} </td>
+  <td><!-- image --> </td>
+  <td>
+    {% if query.object.tags.slugs %}
+      {% for tag in query.object.tags.all %}
+        <a class='label label-default' href='{% url "haystack_search" %}?q={{tag.name}}'>
+          {{tag.name}}
+        </a>
+    {% endfor %}
+  {% endif %}  </td>
+  <td> {{query.object.owner}} </td>
+  {% if user.is_staff %}
+    <td>
+      <form action="{% url "admin:website_dashboard_change" query.object.id %}">
+        <button type="submit" class="btn btn-info">
+          Edit
+        </button>
+      </form>
+    </td>
+  {% endif %}
+</tr>

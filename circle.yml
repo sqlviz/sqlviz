@@ -3,6 +3,8 @@ machine:
     DATABASE_URL: mysql://ubuntu:@localhost:3306/circle_test
     CUSTOM_DATABASE_URL: mysql://ubuntu:@localhost:3306/circle_test
     PWD_DATA: 
+  services:
+    - elasticsearch
 
 dependencies:
   override:

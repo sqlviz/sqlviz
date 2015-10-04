@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'scratch',
     'ml',
     'crispy_forms',
+    'haystack'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -125,6 +126,27 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 )
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'sqlviz_elasticsearch',
+    },
+}
+
+if 'CI' in os.environ:
+    # USING DUMMY SEARCH
+    HAYSTACK_CONNECTIONS = {
+        'default': {
+            'engine': 'haystack.backends.simple_backend.SimpleEngine'
+        },
+    }
+
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 100
+
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates"
@@ -257,7 +279,8 @@ CRONJOBS = [
     ('18 0 * * *', 'cron.cron.scheduled_job', ['daily_7pm']),
     ('0 0 * * 0', 'cron.cron.scheduled_job', ['weekly']),
     ('0 0 1 * *', 'cron.cron.scheduled_job', ['monthly']),
-    ('0 0 * * *', 'cron.cron.cache_buster')
+    ('0 0 * * *', 'cron.cron.cache_buster'),
+    ('*/15 * * * *', 'cron.cron.refresh_search_index')
 ]
 
 # Add minutely scheduele for testing
