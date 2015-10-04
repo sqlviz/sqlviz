@@ -11,6 +11,7 @@ import logging
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from website.get_db_engine import get_db_engine
+from haystack.management.commands import update_index
 
 
 class Job:
@@ -165,3 +166,10 @@ def scheduled_job(frequency):
         # except Exception, e:
         #    print str(sys.exc_info()) + str(e)
         #    j.failure(str(sys.exc_info()) + str(e))
+
+
+def refresh_search_index():
+    """
+    Run this to re-index haystack
+    """
+    update_index.Command().handle()
