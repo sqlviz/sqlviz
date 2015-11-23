@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^admin/', include(admin.site.urls), name='admin'),
     url(r'^favs/', include('favs.urls', namespace='favs')),
+    url(r'^explorer/', include('table_explorer.urls')),
     url(r'^', include('ml.urls', namespace='ml')),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('django.contrib.auth.urls', namespace='auth')),

@@ -253,6 +253,7 @@ def database_explorer_api(request):
         con = models.Db.objects.filter(id=con_id).first()
 
         # Switch in database Type
+        # TODO generalize this as it will be copy-pasta soon
         if con.type == 'MySQL':
             dmm = sql_manager.MySQLManager(con, request)
         elif con.type == 'Postgres':

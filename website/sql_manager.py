@@ -15,6 +15,8 @@ class Manager:
         self.RQ.run_query()
         return self.RQ.pandas_to_array()
 
+    def select_start(self, db, table):
+        self.RQ.query_text = 'select * from %s.%s limit 1000' % (db, table)
 
 class MySQLManager(Manager):
 
@@ -30,6 +32,9 @@ class MySQLManager(Manager):
     def describe_index_table(self, db, table):
         self.RQ.query_text = "show index from %s in %s" % (table, db)
 
+    def normalize_table_describe(self):
+        self.RQ.data = self.RQ.data[['Field','Type']]
+        return self.RQ.pandas_to_array()
 
 class PSQLManager(Manager):
 

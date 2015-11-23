@@ -105,7 +105,8 @@ INSTALLED_APPS = (
     'scratch',
     'ml',
     'crispy_forms',
-    'haystack'
+    'haystack',
+    'table_explorer',
 )
 
 MIDDLEWARE_CLASSES = (
